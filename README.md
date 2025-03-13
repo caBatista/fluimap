@@ -1,92 +1,200 @@
-# Core
+# FluiMap
 
+FluiMap é uma aplicação web projetada para ajudar gestores a avaliar a dinâmica, engajamento e relacionamentos da equipe através de pesquisas estruturadas. O sistema coleta respostas dos membros da equipe via pesquisas distribuídas por e-mail e processa esses dados através de um modelo estatístico em R acessível por meio de uma API web.
 
+## Visão Geral do Projeto
 
-## Getting started
+FluiMap ajuda gestores a entender a dinâmica da equipe:
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- Fornecendo ferramentas para avaliar relacionamentos e padrões de comunicação
+- Simplificando processos de distribuição e coleta de pesquisas
+- Gerando insights relevantes a partir das respostas da equipe
+- Apresentando visualizações de dados que destacam os relacionamentos da equipe
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Principais Funcionalidades
 
-## Add your files
+### Para Gestores
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- Autenticação usando Clerk
+- Gerenciamento de equipe com uploads individuais e em massa via CSV
+- Administração de pesquisas com prazos e acompanhamento de respostas em tempo real
+- Painel analítico com visualizações interativas
+
+### Para Membros da Equipe
+
+- Não requer criação de conta
+- Interface de pesquisa otimizada para dispositivos móveis
+- Envio seguro de feedback através de links únicos
+
+### Análise e Visualização
+
+- Visualização de rede de relacionamentos da equipe
+- Métricas de engajamento com análise de tendências
+- Análises comparativas para dados históricos
+
+## Stack Tecnológica
+
+### Frontend
+
+- [Next.js](https://nextjs.org/) - Framework React
+- [Shadcn UI](https://ui.shadcn.com/) - Biblioteca de componentes UI
+- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS utilitário
+- [React Hook Form](https://react-hook-form.com/) - Validação de formulários
+- [Zod](https://zod.dev/) - Validação de esquemas
+- [React Email](https://react.email/) - Sistema de templates de e-mail
+
+### Backend
+
+- [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction) - Endpoints do servidor
+- [MongoDB](https://www.mongodb.com/) - Banco de dados
+- [Mongoose](https://mongoosejs.com/) - ODM para MongoDB
+- [Clerk](https://clerk.com/) - Autenticação
+- [Resend](https://resend.io/) - Serviço de e-mail
+
+### Ferramentas de Desenvolvimento
+
+- [TypeScript](https://www.typescriptlang.org/) - Segurança de tipos
+- [ESLint](https://eslint.org/) - Linting de código
+- [Prettier](https://prettier.io/) - Formatação de código
+- [Docker](https://www.docker.com/) - Containerização
+
+## Começando
+
+### Instalação
+
+Primeiramente se certifique que possua um sistema operacional de adulto funcional (linux ou macos)
+
+brincadeiras a parte, esse tutorial é pra unix, se tu usa windows tu vai ter que adaptar alguns comando mas nada que o GPT não possa te ajudar com.
+
+Para sistemas UNIX eu criei um script q deve fazer todo o setup sozinho (talvez)
+
+```bash
+./setup.sh
+```
+
+se der certo pula lá pro passo 6
+
+1. Baixe um Versionador de node
+
+- se certifique q não possui o node já instalado na maquina
+
+  ```bash
+  node --version
+  ```
+
+  caso tenha desinstale
+
+- baixe algum versionador: de preferencia (nvm)[https://github.com/nvm-sh/nvm] mas eu uso (fnm)[https://github.com/Schniz/fnm]
+  o tutorial vai estar assumindo nvm
+
+2. Clone o repositório
+
+   ```bash
+   git clone https://tools.ages.pucrs.br/fluimap/core.git
+   cd core
+   ```
+
+3. Instale a versão do node
+
+   ```bash
+    nvm use
+   ```
+
+   esse comando vai setar a versão do node definida para o projeto em (.nvmrc)[.nvmrc] e baixar caso tu não tenha
+
+4. Instale as dependências
+
+   ```bash
+   npm install
+   ```
+
+5. Configure as variáveis de ambiente
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Atualize o arquivo `.env` com suas credenciais fornecidas no servidor do discord
+
+6. Inicie o MongoDB
+   esse passo é só se tu quiser usar o mongodb no docker. eu recoemndo fazer isso se tu vai fazer muitos testes e mudanças e não quer poluir o banco de dev
+
+   ```bash
+   docker-compose up -d
+   ```
+
+7. Inicie o servidor de desenvolvimento
+
+   ```bash
+   npm run dev
+   ```
+
+8. Abra [http://localhost:3000](http://localhost:3000) no seu navegador
+
+### Variáveis de Ambiente
+
+Variáveis de ambiente necessárias:
+
+- `DATABASE_URL`: String de conexão do MongoDB Atlas ou do docker (mongodb://localhost:27017/db)
+- `CLERK_SECRET_KEY`: Chave secreta do Clerk
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Chave pública do Clerk
+- `RESEND_API_KEY`: Chave da API Resend para envio de e-mails
+
+## Estrutura do Projeto
 
 ```
-cd existing_repo
-git remote add origin https://tools.ages.pucrs.br/fluimap/core.git
-git branch -M main
-git push -uf origin main
+fluimap/
+├── src/
+│   ├── app/              # Páginas e layouts do Next.js
+│   │   ├── [page route]/ # pagina web
+│   │   └── api/          # rotas de API
+│   ├── lib/              # Funções utilitárias
+│   ├── models/           # Scheemas MongoDB
+│   ├── server/           # Código do servidor
+│   └── styles/           # Estilos globais
+├── public/               # Ativos estáticos
+├── LLM                   # contexto para IA
+├── .env.example          # Exemplo de variáveis de ambiente
+└── docker-compose.yml    # Configuração Docker
 ```
 
-## Integrate with your tools
+## Desenvolvimento
 
-- [ ] [Set up project integrations](https://tools.ages.pucrs.br/fluimap/core/-/settings/integrations)
+```bash
+# Iniciar servidor de desenvolvimento
+npm run dev
 
-## Collaborate with your team
+# Verificar tipos e lint
+npm run check
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+# Formatar código
+npm run format:write
 
-## Test and Deploy
+# Compilar para produção
+npm run build
 
-Use the built-in continuous integration in GitLab.
+# Iniciar servidor de produção
+npm run start
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Acessos
 
-***
+todos os acessos necessarios para o desenvolvimento foram criados e podem ser encontrados no discord.
 
-# Editing this README
+são eles:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+- Clerk
+- MongoDB Atlas
+- Resend
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Integração com Modelo R
 
-## Name
-Choose a self-explaining name for your project.
+FluiMap integra-se com um modelo estatístico em R por meio de uma API web para processar dados de pesquisa e gerar insights. Os dados são transformados antes de serem enviados ao modelo R e os resultados são visualizados no painel.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Contribuição
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+O workflow e convenção de como iremos trabalhar pode ser encontrado no arquivo (CONTRIBUTING)[CONTRIBUTING]
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Licença
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+[MIT](LICENSE)
