@@ -1,4 +1,4 @@
-# FluiMap
+# FluiMap!
 
 FluiMap é uma aplicação web projetada para ajudar gestores a avaliar a dinâmica, engajamento e relacionamentos da equipe através de pesquisas estruturadas. O sistema coleta respostas dos membros da equipe via pesquisas distribuídas por e-mail e processa esses dados através de um modelo estatístico em R acessível por meio de uma API web.
 
