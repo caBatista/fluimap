@@ -58,6 +58,39 @@ FluiMap ajuda gestores a entender a dinâmica da equipe:
 - [Prettier](https://prettier.io/) - Formatação de código
 - [Docker](https://www.docker.com/) - Containerização
 
+## Padrões de Desenvolvimento
+
+### Convenção
+
+Estamos utilizando o padrão Conventional Commits baseado em @commitlint/config-conventional.
+Este padrão se aplica para branches, commits e merge requests. Nele, há uma convenção de tipos de alteração. Estes tipos estão descritos abaixo:
+
+  - **build**: Mudanças que afetam o sistema de build ou dependências externas (exemplos de escopos: gulp, broccoli, npm)
+  - **chore**: Outras mudanças que não modificam arquivos de src ou de teste
+  - **ci**: Mudanças nos arquivos e scripts de configuração de CI (exemplos de escopos: Travis, Circle, BrowserStack, SauceLabs)
+  - **docs**: Mudanças apenas na documentação
+  - **feat**: Uma nova funcionalidade
+  - **fix**: Correção de um bug
+  - **perf**: Mudança de código que melhora o desempenho
+  - **refactor**: Mudança de código que não corrige um bug nem adiciona uma funcionalidade
+  - **revert**: Reversão de um commit anterior
+  - **style**: Mudanças que não afetam o significado do código (espaços em branco, formatação, ponto e vírgula ausente, etc)
+  - **test**: Adição de testes ausentes ou correção de testes existentes
+
+### Commits
+
+Os commits devem seguir o padrão `<tipo>(<escopo>): <mensagem>`;
+- Escopo é a abreviação da user story dois e o número da task no Linear separados por um hífen (e.g., us01-99);
+- Mensagens de commit não podem ultrapassar 72 caracteres e devem ser escritas em inglês e no imperativo;
+
+### Merge Requests
+
+O título do merge request deve seguir o mesmo formato acima. Os MRs precisam passar todos os jobs no pipeline e, após isso, podem ser mergeados por um AGES III. É obrigatório submeter o MR no formato definido pelo template.
+
+### Branches
+
+As branches para desenvolvimento devem ser feitas a partir da develop. Os nomes de branch devem seguir `<tipo>/<escopo>/<descrição>`, onde a descrição deve ser breve e com hífen no lugar dos espaços. Tipo e escopo são definidos conforme dito anteriormente.
+
 ## Começando
 
 ### Instalação
