@@ -11,8 +11,8 @@ import {
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/header";
 import { QueryProvider } from "@/components/query-provider";
+import Sidebar from "@/components/sidebar";
 
 export const metadata: Metadata = {
   title: "FluiMap",
@@ -25,27 +25,23 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html
-        lang="en"
-        className={`${GeistSans.variable}`}
-        suppressHydrationWarning
-      >
+      <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
         <body className="h-screen w-screen overflow-hidden">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <QueryProvider>
-              <Header />
               <SignedOut>
                 <div className="flex h-full flex-row items-center justify-center gap-8">
                   <SignInButton />
                   <SignUpButton />
                 </div>
               </SignedOut>
-              <SignedIn>{children}</SignedIn>
+
+              <SignedIn>
+                <div className="flex h-full">
+                  <Sidebar /> 
+                  <div className="flex-1 overflow-auto">{children}</div> 
+                </div>
+              </SignedIn>
             </QueryProvider>
           </ThemeProvider>
           <Toaster />

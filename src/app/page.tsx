@@ -22,7 +22,12 @@ export default async function Home() {
 
   if (user === null) return redirectToSignIn();
 
-  await createUser(user.id, user?.fullName);
+  async function createUser(clerkId: string, name: string | null) {
+    const user = await User.findOne({ clerkId });
+    if (!user && name) {
+      await User.create({ clerkId, name });
+    }
+  }
 
   return (
     <main className="container mx-auto flex flex-col items-center">
