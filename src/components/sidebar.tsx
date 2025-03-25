@@ -28,11 +28,11 @@ export default function Sidebar() {
       : "gestor";
 
   return (
-    <div className="flex h-screen w-[256px] flex-col bg-white shadow-md">
+    <div className="shadow- flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))]">
       {/* Header */}
-      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[#E7E5E4]">
+      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <h1 className="text-2xl font-bold">
-          <span className="text-[#3C83F6]">FluiMap</span>
+          <span className="text-[hsl(var(--primary))]">FluiMap</span>
         </h1>
       </header>
 
@@ -47,7 +47,7 @@ export default function Sidebar() {
         <SidebarItem
           href="/surveys"
           icon={<ClipboardList size={20} />}
-          label="Formulario"
+          label="Formulário"
           currentPath={pathname}
         />
         <SidebarItem
@@ -59,41 +59,41 @@ export default function Sidebar() {
         <SidebarItem
           href="/relatorios"
           icon={<BarChart4 size={20} />}
-          label="Relatorios"
+          label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
           href="/configuracao"
           icon={<Settings size={20} />}
-          label="Configuracao"
+          label="Configuração"
           currentPath={pathname}
         />
       </nav>
 
       {/* Footer – Perfil e Logout */}
-      <footer className="mt-auto flex h-[71px] w-full items-center justify-between border-t border-[#E7E5E4] p-4">
+      <footer className="mt-auto flex h-[71px] w-full items-center justify-between border-t border-[hsl(var(--sidebar-border))] p-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
             {user?.imageUrl ? (
               <AvatarImage src={user.imageUrl} alt="Profile" />
             ) : (
-              // Apenas cor de fundo, sem iniciais
-              <AvatarFallback className="bg-[#F5F5F4]" />
+              <AvatarFallback className="bg-[hsl(var(--sidebar-avatar-bg))]" />
             )}
           </Avatar>
-          {/* Nome e cargo */}
           <div>
-            <div className="text-sm font-medium text-[#374151]">
+            <div className="text-sm font-medium text-[hsl(var(--sidebar-text))]">
               {displayName}
             </div>
-            <div className="text-xs text-[#374151]">{cargo}</div>
+            <div className="text-xs text-[hsl(var(--sidebar-text))]">
+              {cargo}
+            </div>
           </div>
         </div>
         <Button
           variant="default"
           size="icon"
           onClick={() => signOut()}
-          className="cursor-pointer bg-white shadow-none"
+          className="cursor-pointer bg-[hsl(var(--sidebar-logout-btn-bg))] text-[hsl(var(--sidebar-logout-btn-text))] shadow-none"
         >
           <LogOut size={20} />
         </Button>
@@ -113,16 +113,14 @@ function SidebarItem({
   href: string;
   currentPath: string;
 }) {
-  // Considera somente a rota exata como ativa
   const isActive = currentPath === href;
-
   return (
     <Link href={href}>
       <div
         className={`flex h-[36px] w-[240px] cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
           isActive
-            ? "bg-[#3C83F6] text-white"
-            : "text-[#374151] hover:bg-gray-100"
+            ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active-text))]"
+            : "text-[hsl(var(--sidebar-text))] hover:bg-[hsl(var(--sidebar-hover-bg))]"
         }`}
       >
         {icon}
