@@ -25,7 +25,6 @@ export default function Sidebar() {
         </h1>
       </header>
 
-      {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
           href="/home"
