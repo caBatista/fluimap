@@ -17,7 +17,7 @@ export default function Sidebar() {
   const { user } = useUser();
 
   return (
-    <div className="flex h-[910px] w-[256px] flex-col bg-white">
+    <div className="flex h-[100vh] w-[256px] flex-col bg-white">
       {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[#E7E5E4]">
         <h1 className="text-2xl font-bold">
