@@ -113,6 +113,7 @@ function SidebarItem({
   href: string;
   currentPath: string;
 }) {
+  // Considera somente a rota exata como ativa
   const isActive = currentPath === href;
 
   return (
