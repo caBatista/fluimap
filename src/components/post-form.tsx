@@ -78,12 +78,7 @@ export function PostForm() {
             </FormItem>
           )}
         />
-        <div className="flex gap-5">
-          <Button type="submit">Submit</Button>
-          <Button type="button" onClick={() => router.push('/sidebartest')}>
-            Iniciar
-          </Button>
-        </div>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   );
