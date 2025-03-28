@@ -36,7 +36,11 @@
     --sidebar-logout-btn-bg: 0 0% 96%; 
     --sidebar-logout-btn-text: 30 15% 10%; 
     --sidebar-active-bg: var(--primary);   
-    --sidebar-active-text: 0 0% 100%;        
+    --sidebar-active-text: 0 0% 100%;    
+    --badge-active-bg: 144 88% 92%;
+    --badge-active-text: 144 64% 24%;
+    --badge-gray-bg: 220 16% 96%; 
+    --badge-gray-text: 218 28% 17%;  
   }
   
   .dark {
@@ -72,6 +76,10 @@
     --sidebar-logout-btn-text: 0 0% 96%;    
     --sidebar-active-bg: var(--primary);
     --sidebar-active-text: 0 0% 100%;
+    --badge-active-bg: 164 93% 17%; 
+    --badge-active-text: 134 79% 90%; 
+    --badge-gray-bg: 220 13% 25%;
+    --badge-gray-text: 220 10% 83%;
   }
 }
 
