@@ -39,37 +39,37 @@ export default function Sidebar() {
       {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
-          href="/app-layout/home"
+          href="/fluimap/home"
           icon={<Home size={20} />}
           label="Dashboard"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/app-layout/surveys"
+          href="/fluimap/surveys"
           icon={<ClipboardList size={20} />}
           label="Formulário"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/app-layout/teams"
+          href="/fluimap/teams"
           icon={<Users size={20} />}
           label="Times"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/app-layout/reports"
+          href="/fluimap/reports"
           icon={<BarChart4 size={20} />}
           label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/app-layout/settings"
+          href="/fluimap/settings"
           icon={<Settings size={20} />}
           label="Configuração"
           currentPath={pathname}
         />
         <SidebarItem
-        href="/no-layout/select-users"
+        href="/questionnaire/select-users"
         icon={<ClipboardList size={20} />}
         label="Questionário"
         currentPath={pathname}

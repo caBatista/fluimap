@@ -28,7 +28,7 @@ export function SelectUser({ name, role, imageUrl, onSelect }: SelectUserProps) 
   return (
     <button onClick={handleClick}>
       <Card
-        className={`w-[200px] h-[150px] border-[5px] transition-all duration-200 
+        className={`bg-secondary w-[200px] h-[150px] border-[5px] transition-all duration-200 
         ${selected ? "border-primary" : "border-transparent"} 
         hover:border-primary flex items-center justify-center`}
       >

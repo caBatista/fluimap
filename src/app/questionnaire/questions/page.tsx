@@ -16,7 +16,7 @@ export default function QuestionsPage() {
   
 
   const handleContinue = () => {
-    router.push(`/no-layout/success`);
+    router.push(`/questionnaire/success`);
   };
   
   const [questions, setQuestions] = useState<Question[]>([]);

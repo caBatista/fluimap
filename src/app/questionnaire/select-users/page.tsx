@@ -27,11 +27,11 @@ export default function HomePage() {
 
   const handleContinue = () => {
     const query = selectedUsers.map((name) => `users=${encodeURIComponent(name)}`).join("&");
-    router.push(`/no-layout/questions?${query}`);
+    router.push(`/questionnaire/questions?${query}`);
   };
 
   return (
-    <div className="flex items-center flex-col gap-6 w-full max-w-2xl mx-auto px-4 pb-12">
+    <main className="flex items-center flex-col gap-6 w-full max-w-2xl mx-auto px-4 pb-12 bg-[hsl(var(--background))]">
       <h1 className="text-4xl font-bold mt-6">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
@@ -64,6 +64,6 @@ export default function HomePage() {
           Continuar
         </Button>
       </div>
-    </div>
+    </main>
   );
 }
