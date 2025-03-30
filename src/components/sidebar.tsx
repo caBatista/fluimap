@@ -69,7 +69,7 @@ export default function Sidebar() {
           currentPath={pathname}
         />
         <SidebarItem
-        href="/questionnaire/select-users"
+        href="/questionnaire/selectUsers"
         icon={<ClipboardList size={20} />}
         label="Questionário"
         currentPath={pathname}

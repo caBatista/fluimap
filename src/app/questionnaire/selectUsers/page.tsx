@@ -15,7 +15,7 @@ const mockUsers = [
   { name: "Emanuel Costa Pereira", role: "Dono", imageUrl: "https://i.pravatar.cc/150?img=6" },
 ];
 
-export default function HomePage() {
+export default function SelectUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
 
@@ -27,12 +27,12 @@ export default function HomePage() {
 
   const handleContinue = () => {
     const query = selectedUsers.map((name) => `users=${encodeURIComponent(name)}`).join("&");
-    router.push(`/questionnaire/questions?${query}`);
+    router.push(`/questionnaire/peerCommunication?${query}`);
   };
 
   return (
-    <main className="flex items-center flex-col gap-6 w-full max-w-2xl mx-auto px-4 pb-12 bg-[hsl(var(--background))]">
-      <h1 className="text-4xl font-bold mt-6">
+    <main className="flex items-center flex-col gap-6 w-full max-w-4xl mx-auto px-4 pb-12 bg-[hsl(var(--background))]">
+      <h1 className="text-4xl font-bold mt-6 items-center">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
       <h1 className="mt-[-10px] text-2xl text-[#6B7280] text-center">
@@ -53,7 +53,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Botão normal abaixo dos cards */}
       <div className="w-full flex justify-end mt-8">
         <Button
           variant="default"
