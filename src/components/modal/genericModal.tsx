@@ -26,7 +26,7 @@ export function GenericModal({
 }: GenericModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white text-black sm:max-w-[425px]">
+      <DialogContent className="rounded-lg bg-white text-black shadow-xl dark:bg-black dark:text-white sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

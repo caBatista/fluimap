@@ -31,15 +31,15 @@ export function Cards({
         {/* CardTitle à esquerda */}
         <div className="flex w-full items-center justify-between">
           {/* Título à esquerda */}
-          <CardTitle className="ml-4 text-left text-xl">{name}</CardTitle>
+          <CardTitle className="ml-4 mt-2 text-left text-xl">{name}</CardTitle>
 
           {/* Botões à direita */}
-          <div className="flex gap-2">
-            <button className="flex items-center gap-2 rounded-md bg-white px-2 py-2 text-black">
-              <PencilIcon className="h-5 w-5 text-gray-800" />
+          <div className="mr-2 flex gap-2">
+            <button className="flex items-center gap-2 rounded-md bg-white px-2 py-2 text-black dark:bg-gray-950 dark:text-white">
+              <PencilIcon className="h-5 w-5 text-gray-800 dark:text-white" />
             </button>
-            <button className="flex items-center gap-2 rounded-md bg-white px-2 py-2 text-black">
-              <TrashIcon className="h-5 w-5 text-black" />
+            <button className="flex items-center gap-2 rounded-md bg-white px-2 py-2 text-black dark:bg-gray-950 dark:text-white">
+              <TrashIcon className="h-5 w-5 text-black dark:text-white" />
             </button>
           </div>
         </div>

@@ -59,12 +59,12 @@ export default function TeamlistProps({ teams }: TeamListProps) {
   };
 
   return (
-    <div className="p-6">
+    <div className="bg-white p-6 text-black dark:bg-black dark:text-white">
       <div className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {teams.map((team, index) => (
           <div
             key={index}
-            className="justify-center rounded-none bg-white p-4 shadow-none"
+            className="justify-center rounded-none bg-white p-4 shadow-none dark:bg-black dark:shadow-lg"
           >
             <div className="mb-4 flex items-center">
               <Cards

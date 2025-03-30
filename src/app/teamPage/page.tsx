@@ -32,7 +32,7 @@ export default function TeamPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
       {/* Cabeçalho */}
       <div className="mx-2 mb-4 flex flex-col items-center justify-between sm:flex-row">
         <div>
