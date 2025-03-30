@@ -1,13 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "./card";
+import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardHeader, CardTitle, CardDescription } from './card';
 
 interface SelectUserProps {
   name: string;
@@ -28,12 +23,10 @@ export function SelectUser({ name, role, imageUrl, onSelect }: SelectUserProps) 
   return (
     <button onClick={handleClick}>
       <Card
-        className={`bg-secondary w-[200px] h-[150px] border-[5px] transition-all duration-200 
-        ${selected ? "border-primary" : "border-transparent"} 
-        hover:border-primary flex items-center justify-center`}
+        className={`h-[120px] w-[160px] border-[5px] bg-secondary transition-all duration-200 sm:h-[150px] sm:w-[200px] ${selected ? 'border-primary' : 'border-transparent'} flex items-center justify-center hover:border-primary`}
       >
-        <CardHeader className="flex items-center gap-3">
-          <Avatar className="w-[50px] h-[50px]">
+        <CardHeader className="flex items-center gap-3 p-2 sm:p-4">
+          <Avatar className="h-10 w-10 sm:h-[50px] sm:w-[50px]">
             {imageUrl ? (
               <AvatarImage src={imageUrl} />
             ) : (
@@ -41,8 +34,8 @@ export function SelectUser({ name, role, imageUrl, onSelect }: SelectUserProps) 
             )}
           </Avatar>
           <div>
-            <CardTitle>{name}</CardTitle>
-            <CardDescription>{role}</CardDescription>
+            <CardTitle className="text-sm sm:text-base">{name}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">{role}</CardDescription>
           </div>
         </CardHeader>
       </Card>

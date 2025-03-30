@@ -1,7 +1,6 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import "@/styles/globals.css";
-import { GeistSans } from "geist/font/sans";
-
+import { ThemeProvider } from '@/components/theme-provider';
+import '@/styles/globals.css';
+import { GeistSans } from 'geist/font/sans';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,5 +13,3 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
-
-

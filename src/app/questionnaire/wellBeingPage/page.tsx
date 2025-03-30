@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Questionnaire {
   titulo: string;
@@ -15,33 +15,47 @@ interface Questionnaire {
 export default function WellBeingPage() {
   const router = useRouter();
   const [data, setData] = useState<Questionnaire | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch("/well-being.json")
+    fetch('/well-being.json')
       .then((res) => res.json())
       .then((json) => setData(json));
   }, []);
+
+  const handleAnswer = (questionIndex: number, value: string) => {
+    const key = `question-${questionIndex}`;
+    setAnswers((prev) => ({ ...prev, [key]: value }));
+  };
+
+  //   const totalQuestions = data?.itens.length || 0;
+  //   const allAnswered = Object.keys(answers).length === totalQuestions;
+
+  //   const handleContinue = () => {
+  //     if (!allAnswered) {
+  //       alert('Por favor, responda todas as perguntas antes de continuar.');
+  //       return;
+  //     }
+  //     router.push(`/questionnaire/jobMeaning`);
+  //   };
 
   const handleContinue = () => {
     router.push(`/questionnaire/jobMeaning`);
   };
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center">
-    <h1 className="text-4xl font-bold mb-6">
-      <span className="text-[hsl(var(--primary))]">FluiMap</span>
-    </h1>
-    <h2 className="text-2xl text-center font-semibold mb-4">{data?.titulo}</h2>
-    <p className="max-w-2xl text-sm text-center mb-8">{data?.instrucoes}</p>
-      <h3 className="text-xl font-semibold mb-6 text-[hsl(var(--primary))]">{data?.pergunta}</h3>
+    <div className="flex min-h-screen flex-col items-center p-6">
+      <h1 className="mb-6 text-4xl font-bold">
+        <span className="text-[hsl(var(--primary))]">FluiMap</span>
+      </h1>
+      <h2 className="mb-4 text-center text-2xl font-semibold">{data?.titulo}</h2>
+      <p className="mb-8 max-w-2xl text-center text-sm">{data?.instrucoes}</p>
+      <h3 className="mb-6 text-xl font-semibold text-[hsl(var(--primary))]">{data?.pergunta}</h3>
 
       <div className="w-full max-w-4xl space-y-6">
         {data?.itens.map((item, index) => (
-          <div
-            key={index}
-            className="border p-4 rounded-xl shadow-sm bg-secondary"
-          >
-            <p className="font-medium mb-3">{item}</p>
+          <div key={index} className="rounded-xl border bg-secondary p-4 shadow-sm">
+            <p className="mb-3 font-medium">{item}</p>
             <div className="flex flex-wrap gap-4 sm:gap-6">
               {Object.entries(data.escala).map(([key, label]) => (
                 <label key={key} className="flex items-center gap-2">
@@ -50,8 +64,12 @@ export default function WellBeingPage() {
                     name={`question-${index}`}
                     value={key}
                     className="accent-[hsl(var(--primary))]"
+                    checked={answers[`question-${index}`] === key}
+                    onChange={() => handleAnswer(index, key)}
                   />
-                  <span className="text-sm">{key} - {label}</span>
+                  <span className="text-sm">
+                    {key} - {label}
+                  </span>
                 </label>
               ))}
             </div>
@@ -59,9 +77,9 @@ export default function WellBeingPage() {
         ))}
       </div>
 
-      <div className="flex justify-between w-full max-w-4xl mt-10">
+      <div className="mt-10 flex w-full max-w-4xl justify-between">
         <Button
-          className="px-8 py-4 text-base h-auto"
+          className="h-auto px-8 py-4 text-base"
           variant="outline"
           onClick={() => router.back()}
         >
@@ -69,8 +87,9 @@ export default function WellBeingPage() {
         </Button>
         <Button
           variant="default"
-          className="px-8 py-4 text-base h-auto"
+          className="h-auto px-8 py-4 text-base"
           onClick={handleContinue}
+          // disabled={!allAnswered}
         >
           Continuar
         </Button>
