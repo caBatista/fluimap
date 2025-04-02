@@ -107,7 +107,6 @@ export function SurveyList({
         return (
           <Card
             key={survey._id}
-            // Medidas do card: 364 × 138
             className="relative h-[138px] w-[364px] rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm"
           >
             {/* Linha superior: Título e Badge de status */}

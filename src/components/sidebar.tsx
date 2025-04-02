@@ -28,8 +28,8 @@ export default function Sidebar() {
       : "gestor";
 
   return (
-    <div className="shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)] flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))]">
-    {/* Header */}
+    <div className="flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
+      {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <h1 className="text-2xl font-bold">
           <span className="text-[hsl(var(--primary))]">FluiMap</span>
@@ -113,7 +113,7 @@ function SidebarItem({
   href: string;
   currentPath: string;
 }) {
-  const isActive = currentPath === href;
+  const isActive = currentPath.startsWith(href);
   return (
     <Link href={href}>
       <div
