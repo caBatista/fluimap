@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { GenericModal } from "../modal/genericModal";
 import { DialogFooter } from "../ui/dialog";
 import { type ITeam } from "@/models/Team"; // Importando a interface ITeam
+import { Button } from "../ui/button";
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -119,20 +120,24 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
 
       <DialogFooter>
         <div className="mt-4 flex justify-end gap-2">
-          <button
+          <Button
+            variant="outline"
+            size="lg"
             type="button"
+            className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
             onClick={onClose}
-            className="rounded-md border border-black bg-white px-4 py-2 text-black hover:bg-white"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
             type="submit"
             className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             onSubmit={handleSubmit}
           >
             Salvar
-          </button>
+          </Button>
         </div>
       </DialogFooter>
     </GenericModal>
