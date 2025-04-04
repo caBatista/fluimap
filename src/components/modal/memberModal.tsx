@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { GenericModal } from "./genericModal";
 import { DownloadIcon } from "lucide-react";
 import { DialogFooter } from "../ui/dialog";
+import { Button } from "../ui/button";
 //import { type ITeam } from "@/models/Team";
 
 interface Team {
@@ -122,30 +123,36 @@ export function MemberModal({
       <DialogFooter>
         <div className="mt-4 flex items-center justify-between gap-14">
           <div>
-            <button
+            <Button
+              variant="outline"
+              size="lg"
               type="button"
-              className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black hover:bg-gray-400"
+              className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
             >
               <DownloadIcon className="h-5 w-5" />
               Arq. CSV
-            </button>
+            </Button>
           </div>
 
           <div className="ml-auto flex gap-2">
-            <button
+            <Button
+              variant="outline"
+              size="lg"
               type="button"
+              className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
               onClick={onClose}
-              className="rounded-md border border-black bg-white px-4 py-2 text-black hover:bg-white"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
               type="submit"
               className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
               onSubmit={handleSubmit}
             >
               Salvar
-            </button>
+            </Button>
           </div>
         </div>
       </DialogFooter>

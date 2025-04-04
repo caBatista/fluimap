@@ -3,6 +3,7 @@
 import { Cards } from "@/components/cards";
 //import { MemberModal } from "@/components/modal/memberModal";
 import { MemberModal } from "@/components/modal/memberModal";
+import { UserPlus, Users } from "lucide-react";
 import { useState } from "react";
 //import { type ITeam } from "@/models/Team";
 
@@ -60,18 +61,20 @@ export default function TeamlistProps({ teams }: TeamListProps) {
 
   return (
     <div className="bg-white p-6 text-black dark:bg-black dark:text-white">
-      <div className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 justify-center gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {teams.map((team, index) => (
           <div
             key={index}
             className="justify-center rounded-none bg-white p-4 shadow-none dark:bg-black dark:shadow-lg"
           >
-            <div className="mb-4 flex items-center">
+            <div className="mb-2 flex items-center">
               <Cards
                 name={team.name}
                 description={team.description}
                 button1="Ver Membros"
+                icon1={Users}
                 button2="Adicionar Membros"
+                icon2={UserPlus}
                 onOpenModal={() => openModal(team)}
               ></Cards>
 

@@ -4,6 +4,7 @@ import { TeamModal } from "@/components/modal/teamModal";
 import { useState } from "react";
 import TeamListDialog from "./teamListDialog";
 import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function TeamPage() {
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
@@ -34,7 +35,7 @@ export default function TeamPage() {
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
       {/* Cabeçalho */}
-      <div className="mx-2 mb-4 flex flex-col items-center justify-between sm:flex-row">
+      <div className="mx-8 mb-4 flex flex-col items-center justify-between sm:flex-row">
         <div>
           <h1 className="mt-4 text-2xl font-bold sm:text-3xl">Times</h1>
           <h2 className="text-sm sm:text-base">
@@ -42,8 +43,8 @@ export default function TeamPage() {
           </h2>
         </div>
 
-        {/* Botão Criar Novo Time */}
-        <button
+        <Button
+          size="lg"
           className="mt-4 flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-white sm:mt-0"
           onClick={() => setIsTeamModalOpen(true)}
         >
@@ -51,17 +52,17 @@ export default function TeamPage() {
             <PlusIcon className="h-5 w-5" />
           </span>
           Criar Novo Time
-        </button>
+        </Button>
       </div>
 
       {/* Campo de busca */}
-      <div className="mb-4 ml-2">
+      <div className="mb-2 w-full px-8">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar por nome ou descrição"
-          className="w-full max-w-md rounded-md border border-gray-300 px-4 py-2"
+          className="w-full rounded-md border border-gray-300 px-4 py-2"
         />
       </div>
 
