@@ -1,12 +1,9 @@
 "use client";
 
 import { Cards } from "@/components/cards";
-//import { MemberModal } from "@/components/modal/memberModal";
 import { MemberModal } from "@/components/modal/memberModal";
 import { UserPlus, Users } from "lucide-react";
 import { useState } from "react";
-//import { type ITeam } from "@/models/Team";
-
 interface Team {
   name: string;
   description: string;
@@ -14,16 +11,12 @@ interface Team {
 
 interface TeamListProps {
   teams: Team[];
+  onDelete?: (team: Team) => void;
 }
 
-export default function TeamlistProps({ teams }: TeamListProps) {
+export default function TeamList({ teams, onDelete }: TeamListProps) {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
-  /**
-    const [teamsState, setTeamsState] = useState<Team[]>(teams); // Gerenciar os times no estado local
-    const [editingTeamIndex, setEditingTeamIndex] = useState<number | null>(null); // Controla qual time está sendo editado
-    const [newTeamName, setNewTeamName] = useState(""); // Armazena o novo nome do time
-   */
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null); // Armazena o time selecionado
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
   function handleAddMember(
     memberName: string,
@@ -32,32 +25,15 @@ export default function TeamlistProps({ teams }: TeamListProps) {
   ) {
     console.log("Adicionando membro:", memberName, memberEmail, memberPosition);
   }
-  /**
-    function handleSetTeamName(index: number) {
-    if (newTeamName.trim() !== "") {
-      const updatedTeams = [...teamsState];
-      updatedTeams[index].name = newTeamName; // Atualiza o nome do time no índice correspondente
-      setTeamsState(updatedTeams);
-      setEditingTeamIndex(null); // Fecha o campo de edição
-      setNewTeamName(""); // Limpa o campo de nome do time
-    }
+
+  function openModal(team: Team) {
+    setSelectedTeam(team);
+    setIsMemberModalOpen(true);
   }
 
-  function handleDeleteTeam(index: number) {
-    const updatedTeams = teamsState.filter((_, i) => i !== index); // Filtra o time a ser excluído
-    setTeamsState(updatedTeams); // Atualiza o estado com a lista de times filtrada
+  function closeModal() {
+    setIsMemberModalOpen(false);
   }
- 
- */
-
-  const openModal = (team: Team) => {
-    setSelectedTeam(team); // Define o time selecionado
-    setIsMemberModalOpen(true); // Abre a modal
-  };
-
-  const closeModal = () => {
-    setIsMemberModalOpen(false); // Fecha a modal
-  };
 
   return (
     <div className="bg-white p-6 text-black dark:bg-black dark:text-white">
@@ -76,7 +52,8 @@ export default function TeamlistProps({ teams }: TeamListProps) {
                 button2="Adicionar Membros"
                 icon2={UserPlus}
                 onOpenModal={() => openModal(team)}
-              ></Cards>
+                onDelete={() => onDelete?.(team)} // 🔥 integração com exclusão
+              />
 
               <MemberModal
                 isOpen={isMemberModalOpen}
