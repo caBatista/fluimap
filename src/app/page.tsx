@@ -1,6 +1,6 @@
 import { PostForm } from "@/components/post-form";
 import { PostList } from "@/components/post-list";
-import dbConnect from "@/server/db";
+import dbConnect from "@/server/database/db";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import User from "@/models/User";
 
