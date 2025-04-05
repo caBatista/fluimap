@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import Respondee from "@/models/Respondee";
-import Team from "@/models/Team";
+import Respondee from "@/models/teamRespondents";
+import Team from "@/models/team";
 import { auth } from "@clerk/nextjs/server";
 import dbConnect from "@/server/db";
 import { revalidatePath } from "next/cache";

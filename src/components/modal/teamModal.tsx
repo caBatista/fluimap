@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { GenericModal } from "../modal/genericModal";
 import { DialogFooter } from "../ui/dialog";
-import { type ITeam } from "@/models/Team"; // Importando a interface ITeam
 import { Button } from "../ui/button";
+import { type TeamType } from "@/models/team";
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -12,9 +12,9 @@ interface TeamModalProps {
   onSubmit: (teamName: string, teamDescription: string) => void;
 }
 
-// Usando a interface ITeam que foi importada
+// Usando o tipo inferido TeamType
 interface SuccessResponse {
-  team: ITeam; // Substituindo Team por ITeam
+  team: TeamType;
 }
 
 interface ErrorResponse {
@@ -53,24 +53,17 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
         }),
       });
 
-      // Parse a resposta JSON
-      const data: CreateTeamResponse =
-        (await response.json()) as CreateTeamResponse;
+      const data = (await response.json()) as CreateTeamResponse;
 
-      // Verificar se a resposta é de sucesso
       if (isSuccessResponse(data)) {
-        // Caso de sucesso
         console.log("Time criado com sucesso:", data.team);
-        onSubmit(data.team.name, data.team.description ?? ""); // Usando "" como valor padrão
-        // Passa os dados para o callback
+        onSubmit(data.team.name, data.team.description ?? "");
         onClose(); // Fecha a modal
       } else {
-        // Caso de erro
         console.error("Erro ao criar time:", data.error);
       }
     } catch (error) {
       console.error("Erro de requisição:", error);
-      // Aqui você pode adicionar um alerta de erro para o usuário
     }
   }
 
@@ -100,6 +93,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
         />
       </div>
 
+      {/* Campo para descrição */}
       <div className="mb-4">
         <label
           htmlFor="teamDescription"

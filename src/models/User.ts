@@ -5,7 +5,7 @@ export const UserSchemaZod = z.object({
   clerkId: z.string(),
   name: z.string(),
   email: z.string().email(),
-  type: z.enum(["lead", "rh"]),
+  // type: z.enum(["lead", "rh"]),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
@@ -20,7 +20,7 @@ const UserMongooseSchema: Schema = new Schema(
       required: true,
       match: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
     },
-    type: { type: String, required: true, enum: ["lead", "rh"] },
+    // type: { type: String, required: true, enum: ["lead", "rh"] },
   },
   { timestamps: true },
 );

@@ -17,7 +17,7 @@ const TeamRespondentMongooseSchema: Schema = new Schema(
       required: true,
       match: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
     },
-    role: { type: String, required: false },
+    role: { type: String, required: true },
   },
   { timestamps: true },
 );
