@@ -30,3 +30,4 @@ function createTeamModel(): Model<ITeam> {
 
 const Team = createTeamModel();
 export default Team;
+ 
