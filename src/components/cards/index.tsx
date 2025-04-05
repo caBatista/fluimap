@@ -49,15 +49,6 @@ export function Cards({
               className="flex items-center gap-2 rounded-md border-none bg-white px-3 py-3 text-black shadow-none hover:bg-accent dark:border-0 dark:bg-transparent dark:text-white dark:hover:bg-accent"
               onClick={onDelete}
             >
-              <button
-                className={
-                  "flex items-center gap-2 rounded-md bg-white px-2 py-2 text-black dark:bg-gray-950 dark:text-white"
-                }
-                onClick={() => console.log("Editar", name)}
-              >
-                <PencilIcon className="h-5 w-5 text-gray-800 dark:text-white" />
-              </button>
-
               <TrashIcon className="h-5 w-5 text-black dark:text-white" />
             </Button>
           </div>
