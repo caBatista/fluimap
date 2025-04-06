@@ -19,9 +19,7 @@ declare global {
 const cached: MongooseCache = global.mongoose ?? { conn: null, promise: null };
 
 // Set the cache on the global object if it doesn't exist
-if (!global.mongoose) {
-  global.mongoose = cached;
-}
+global.mongoose ??= cached;
 
 async function dbConnect() {
   if (cached.conn) {

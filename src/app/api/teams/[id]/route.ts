@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Team, { TeamSchemaZod } from "@/models/team";
 import TeamRespondent from "@/models/teamRespondents";
 import { auth } from "@clerk/nextjs/server";
-import dbConnect from "@/server/db";
+import dbConnect from "@/server/database/db";
 import { revalidatePath } from "next/cache";
 
 // Helpers
