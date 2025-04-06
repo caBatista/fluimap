@@ -1,28 +1,27 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import "@/styles/globals.css";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-} from "@clerk/nextjs";
+import { ThemeProvider } from '@/components/theme-provider';
+import '@/styles/globals.css';
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs';
 
-import { GeistSans } from "geist/font/sans";
-import { type Metadata } from "next";
-import { Toaster } from "@/components/ui/sonner";
-import { QueryProvider } from "@/components/query-provider";
-import Sidebar from "@/components/sidebar";
+import { GeistSans } from 'geist/font/sans';
+import { type Metadata } from 'next';
+import { Toaster } from '@/components/ui/sonner';
+import Sidebar from '@/components/sidebar';
+import { QueryProvider } from '@/components/query-provider';
+import '@/styles/globals.css';
+
+import { GeistSans } from 'geist/font/sans';
+import { type Metadata } from 'next';
+import { Toaster } from '@/components/ui/sonner';
+import { QueryProvider } from '@/components/query-provider';
+import Sidebar from '@/components/sidebar';
 
 export const metadata: Metadata = {
-  title: "FluiMap",
-  description: "generate your team analytics",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: 'FluiMap',
+  description: 'generate your team analytics',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
       <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
@@ -38,8 +37,8 @@ export default function RootLayout({
 
               <SignedIn>
                 <div className="flex h-full">
-                  <Sidebar /> 
-                  <div className="flex-1 overflow-auto">{children}</div> 
+                  <Sidebar />
+                  <div className="flex-1 overflow-auto">{children}</div>
                 </div>
               </SignedIn>
             </QueryProvider>

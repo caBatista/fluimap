@@ -106,7 +106,7 @@ function SidebarItem({
   href: string;
   currentPath: string;
 }) {
-  const isActive = currentPath === href;
+  const isActive = currentPath.startsWith(href);
   return (
     <Link href={href}>
       <div
