@@ -78,7 +78,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
     <GenericModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Criar/Editar Time"
+      title="Criar Time"
       description="Crie um novo time para a qual você gerenciará pesquisas"
     >
       {/* Campo para o nome da equipe */}
