@@ -4,10 +4,10 @@ import dbConnect from "@/server/database/db";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import User from "@/models/User";
 
-async function createUser(clerkId: string, name: string | null) {
+async function createUser(clerkId: string, email: string, name: string | null) {
   const user = await User.findOne({ clerkId });
   if (!user) {
-    await User.create({ clerkId, name });
+    await User.create({ clerkId, name, email });
   }
 }
 
@@ -22,7 +22,11 @@ export default async function Home() {
 
   if (user === null) return redirectToSignIn();
 
-  await createUser(user.id, user?.fullName);
+  await createUser(
+    user.id,
+    user.primaryEmailAddress?.emailAddress ?? "",
+    user?.fullName,
+  );
 
   return (
     <main className="container mx-auto flex flex-col items-center">

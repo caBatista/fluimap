@@ -6,12 +6,15 @@ export const TeamSchemaZod = z.object({
   description: z.string().optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
+  ownerId: z.string(),
 });
 export type TeamType = z.infer<typeof TeamSchemaZod>;
 
 const TeamMongooseSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
+    ownerId: { type: String, required: true },
+    description: { type: String },
   },
   { timestamps: true },
 );
@@ -27,3 +30,4 @@ function createTeamModel(): Model<ITeam> {
 
 const Team = createTeamModel();
 export default Team;
+ 
