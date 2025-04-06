@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import Team, { TeamSchemaZod } from "@/models/team";
 import TeamRespondent from "@/models/teamRespondents";
 import { auth } from "@clerk/nextjs/server";
@@ -14,14 +14,16 @@ async function getUserIdOrThrow(): Promise<string> {
 
 // GET: Retorna um time específico e seus membros
 export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
+    const { id } = await params;
+
     const userId: string = await getUserIdOrThrow();
 
-    const team = await Team.findById(params.id).lean();
+    const team = await Team.findById(id).lean();
     if (!team) {
       return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
@@ -30,7 +32,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const members = await TeamRespondent.find({ teamId: params.id }).lean();
+    const members = await TeamRespondent.find({ teamId: id }).lean();
 
     return NextResponse.json({ team, members }, { status: 200 });
   } catch (err: unknown) {
@@ -44,14 +46,15 @@ export async function GET(
 
 // PUT: Atualiza os dados de um time
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
+    const { id } = await params;
     const userId: string = await getUserIdOrThrow();
 
-    const team = await Team.findById(params.id);
+    const team = await Team.findById(id);
     if (!team) {
       return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
@@ -64,7 +67,7 @@ export async function PUT(
     const body = TeamSchemaZod.partial().parse(rawBody);
 
     const updatedTeam = await Team.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: body },
       { new: true },
     ).lean();
@@ -83,14 +86,15 @@ export async function PUT(
 
 // DELETE: Remove um time e seus membros
 export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
+    const { id } = await params;
     const userId: string = await getUserIdOrThrow();
 
-    const team = await Team.findById(params.id);
+    const team = await Team.findById(id);
     if (!team) {
       return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
@@ -99,8 +103,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    await Team.findByIdAndDelete(params.id);
-    await TeamRespondent.deleteMany({ teamId: params.id });
+    await Team.findByIdAndDelete(id);
+    await TeamRespondent.deleteMany({ teamId: id });
 
     revalidatePath("/dashboard");
 
