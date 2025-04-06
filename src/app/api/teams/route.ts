@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import Team from "@/models/team";
 import { auth } from "@clerk/nextjs/server";
-import dbConnect from "@/server/db";
+import dbConnect from "@/server/database/db";
 import { revalidatePath } from "next/cache";
 
 // GET handler to retrieve all teams for the authenticated user
