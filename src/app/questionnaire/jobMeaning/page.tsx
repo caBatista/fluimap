@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 interface Questionnaire {
   titulo: string;
   instrucoes: string;
-  escala: { [key: string]: string };
+  escala: Record<string, string>;
   pergunta: string;
   itens: string[];
 }
@@ -18,8 +18,10 @@ export default function JobMeaningPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch('/job-meaning.json')
       .then((res) => res.json())
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       .then((json) => setData(json));
   }, []);
 
@@ -56,14 +58,14 @@ export default function JobMeaningPage() {
         {data?.itens.map((item, index) => (
           <div key={index} className="rounded-xl border bg-secondary p-4 shadow-sm">
             <p className="mb-3 font-medium">{item}</p>
-            <div className="flex flex-wrap gap-4 sm:gap-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {Object.entries(data.escala).map(([key, label]) => (
                 <label key={key} className="flex items-center gap-2">
                   <input
                     type="radio"
                     name={`question-${index}`}
                     value={key}
-                    className="accent-[hsl(var(--primary))]"
+                    className="accent-[hsl(var(--primary))] hover:cursor-pointer"
                     checked={answers[`question-${index}`] === key}
                     onChange={() => handleAnswer(index, key)}
                   />

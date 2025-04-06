@@ -25,8 +25,10 @@ export default function PeerCommunicationPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch('/peer-communication.json')
       .then((res) => res.json())
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       .then((json) => setData(json));
   }, []);
 
@@ -76,7 +78,7 @@ export default function PeerCommunicationPage() {
                         type="radio"
                         name={questionKey}
                         value={option}
-                        className="accent-[hsl(var(--primary))]"
+                        className="accent-[hsl(var(--primary))] hover:cursor-pointer"
                         checked={answers[questionKey] === option}
                         onChange={() => handleAnswer(userIndex, qIndex, option)}
                       />
