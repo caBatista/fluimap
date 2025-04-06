@@ -13,9 +13,10 @@ interface Team {
 interface TeamListProps {
   teams: Team[];
   onDelete?: (team: Team) => void;
+  onEdit?: (team: Team) => void;
 }
 
-export default function TeamList({ teams, onDelete }: TeamListProps) {
+export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
@@ -54,6 +55,7 @@ export default function TeamList({ teams, onDelete }: TeamListProps) {
                 icon2={UserPlus}
                 onOpenModal={() => openModal(team)}
                 onDelete={() => onDelete?.(team)} // 🔥 integração com exclusão
+                onEdit={() => onEdit?.(team)}
               />
 
               <MemberModal

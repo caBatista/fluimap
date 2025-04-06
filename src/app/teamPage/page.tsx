@@ -5,6 +5,7 @@ import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { TeamModal } from "@/components/modal/teamModal";
+import { EditTeamModal } from "@/components/modal/editTeamModal";
 import TeamListDialog from "./teamListDialog";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { revalidatePath } from "next/cache";
 
 type Team = {
   name: string;
@@ -37,6 +39,8 @@ export default function TeamPage() {
 
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [teamToEdit, setTeamToEdit] = useState<Team | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const filteredTeams = teams.filter(
     (team) =>
@@ -54,6 +58,15 @@ export default function TeamPage() {
     setTeams((prev) => [...prev, newTeam]);
     toast.success("Time criado com sucesso");
     setIsModalOpen(false);
+  }
+
+  function handleEditTeam() {
+    revalidatePath("/teamPage");
+  }
+
+  function confirmEditTeam(team: Team) {
+    setTeamToEdit(team);
+    setIsEditDialogOpen(true);
   }
 
   function confirmDeleteTeam(team: Team) {
@@ -116,7 +129,13 @@ export default function TeamPage() {
         onSubmit={handleCreateTeam}
       />
 
-      {/* Modal de confirmação de exclusão */}
+      <EditTeamModal
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSubmit={handleEditTeam}
+        team={teamToEdit}
+      />
+
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -144,8 +163,11 @@ export default function TeamPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Lista de times */}
-      <TeamListDialog teams={filteredTeams} onDelete={confirmDeleteTeam} />
+      <TeamListDialog
+        teams={filteredTeams}
+        onDelete={confirmDeleteTeam}
+        onEdit={confirmEditTeam}
+      />
     </div>
   );
 }
