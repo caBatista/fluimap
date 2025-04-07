@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Icons } from '@/components/ui/icons'
-import { cn } from '@/lib/utils'
+import { cn, getErrorMessage } from '@/lib/utils'
 
 export function SignUpCard() {
   return (
@@ -37,7 +37,9 @@ export function SignUpCard() {
                       <Clerk.Input type="email" required asChild>
                         <Input />
                       </Clerk.Input>
-                      <Clerk.FieldError className="block text-sm text-destructive" />
+                      <Clerk.FieldError className="block text-sm text-destructive">
+                        {({ code }) => <span>{getErrorMessage(code)}</span>}
+                      </Clerk.FieldError>
                     </Clerk.Field>
                     <Clerk.Field name="password" className="space-y-2">
                       <Clerk.Label asChild>
@@ -46,7 +48,9 @@ export function SignUpCard() {
                       <Clerk.Input type="password" required asChild>
                         <Input />
                       </Clerk.Input>
-                      <Clerk.FieldError className="block text-sm text-destructive" />
+                      <Clerk.FieldError className="block text-sm text-destructive">
+                        {({ code }) => <span>{getErrorMessage(code)}</span>}
+                      </Clerk.FieldError>
                     </Clerk.Field>
                     <p className="flex items-center gap-x-3 text-xs text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
                         OU CONTINUE COM
@@ -115,7 +119,9 @@ export function SignUpCard() {
                       <Clerk.Input type="text" required asChild>
                         <Input />
                       </Clerk.Input>
-                      <Clerk.FieldError className="block text-sm text-destructive" />
+                      <Clerk.FieldError className="block text-sm text-destructive">
+                        {({ code }) => <span>{getErrorMessage(code)}</span>}
+                      </Clerk.FieldError>
                     </Clerk.Field>
                   </CardContent>
                   <CardFooter>
@@ -179,7 +185,9 @@ export function SignUpCard() {
                               }}
                             />
                           </div>
-                          <Clerk.FieldError className="block text-center text-sm text-destructive" />
+                          <Clerk.FieldError className="block text-sm text-destructive">
+                            {({ code }) => <span>{getErrorMessage(code)}</span>}
+                          </Clerk.FieldError>
                         </Clerk.Field>
                         <SignUp.Action
                           asChild
