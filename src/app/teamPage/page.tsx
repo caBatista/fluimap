@@ -108,7 +108,11 @@ export default function TeamPage() {
     }
   }
 
-  async function handleEditTeam(id: string, name: string, description: string) {
+  async function handleEditTeam(
+    id: string,
+    name: string,
+    description?: string,
+  ) {
     if (!name.trim()) {
       toast.error("O nome do time é obrigatório");
       return;

@@ -82,6 +82,7 @@ export async function PUT(
     );
 
     revalidatePath("/dashboard");
+    revalidatePath("/teamPage");
 
     return NextResponse.json({ team: updatedTeam }, { status: 200 });
   } catch (error) {
@@ -126,6 +127,7 @@ export async function DELETE(
     await Respondee.deleteMany({ teamId: params.id });
 
     revalidatePath("/dashboard");
+    revalidatePath("/teamPage");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

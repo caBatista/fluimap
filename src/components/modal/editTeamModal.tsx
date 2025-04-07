@@ -54,32 +54,13 @@ export function EditTeamModal({
     }
   }, [isOpen]);
 
-  async function handleEdit() {
-    try {
-      const response = await fetch(`/api/teams/${teamId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: teamName,
-          description: teamDescription,
-        }),
-      });
+  const handleEdit = () => {
+    const validDescription = teamDescription ?? ""; // Se for undefined, usa uma string vazia
 
-      const data = (await response.json()) as EditTeamResponse;
+    onSubmit(teamId, teamName, validDescription);
+    onClose();
+  };
 
-      if (isSuccessResponse(data)) {
-        console.log("Time editado com sucesso:", data.team);
-        onSubmit(data.team._id, data.team.name, data.team.description ?? "");
-        onClose(); // Fecha a modal
-      } else {
-        console.error("Erro ao editar time:", data.error);
-      }
-    } catch (error) {
-      console.error("Erro de requisição:", error);
-    }
-  }
   return (
     <GenericModal
       isOpen={isOpen}

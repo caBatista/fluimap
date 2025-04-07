@@ -39,39 +39,15 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
     }
   }, [isOpen]);
 
-  // Função para lidar com o envio do formulário
   async function handleSubmit() {
-    try {
-      const response = await fetch("/api/teams", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: teamName,
-          description: teamDescription,
-        }),
-      });
-
-      // Parse a resposta JSON
-      const data: CreateTeamResponse =
-        (await response.json()) as CreateTeamResponse;
-
-      // Verificar se a resposta é de sucesso
-      if (isSuccessResponse(data)) {
-        // Caso de sucesso
-        console.log("Time criado com sucesso:", data.team);
-        onSubmit(data.team.name, data.team.description ?? ""); // Usando "" como valor padrão
-        // Passa os dados para o callback
-        onClose(); // Fecha a modal
-      } else {
-        // Caso de erro
-        console.error("Erro ao criar time:", data.error);
-      }
-    } catch (error) {
-      console.error("Erro de requisição:", error);
-      // Aqui você pode adicionar um alerta de erro para o usuário
+    if (!teamName.trim()) {
+      console.error("O nome do time é obrigatório");
+      return; // Se o nome estiver vazio, não faz o envio
     }
+
+    // Chama o callback onSubmit passando os dados para o componente pai
+    onSubmit(teamName, teamDescription);
+    onClose(); // Fecha o modal após enviar
   }
 
   return (
