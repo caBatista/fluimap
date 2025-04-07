@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Icons } from '@/components/ui/icons'
+import { getErrorMessage } from "@/lib/utils";
 
 
 export function SignInCard() {
@@ -35,7 +36,9 @@ export function SignInCard() {
                         <Clerk.Input type="email" required asChild>
                           <Input />
                         </Clerk.Input>
-                        <Clerk.FieldError className="block text-sm text-destructive" />
+                        <Clerk.FieldError className="block text-sm text-destructive">
+                          {({ code }) => <span>{getErrorMessage(code)}</span>}
+                        </Clerk.FieldError>
                       </Clerk.Field>
                       <SignIn.Action submit asChild>
                           <Button 
@@ -149,7 +152,9 @@ export function SignInCard() {
                           <Clerk.Input type="password" asChild>
                             <Input />
                           </Clerk.Input>
-                          <Clerk.FieldError className="block text-sm text-destructive" />
+                          <Clerk.FieldError className="block text-sm text-destructive">
+                            {({ code }) => <span>{getErrorMessage(code)}</span>}
+                          </Clerk.FieldError>
                         </Clerk.Field>
                       </CardContent>
                       <CardFooter>
@@ -209,7 +214,9 @@ export function SignInCard() {
                                 }}
                               />
                             </div>
-                            <Clerk.FieldError className="block text-sm text-destructive text-center" />
+                            <Clerk.FieldError className="block text-sm text-destructive">
+                              {({ code }) => <span>{getErrorMessage(code)}</span>}
+                            </Clerk.FieldError>
                             <SignIn.Action
                               asChild
                               resend
