@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { GenericModal } from "../modal/genericModal";
 import { DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { type TeamType } from "@/models/team";
+import { type EditTeamType, type TeamType } from "@/models/Team";
 
 type Team = {
   _id: string;
@@ -15,12 +15,12 @@ type Team = {
 interface TeamModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (teamName: string, teamDescription: string) => void;
-  team: Team;
+  onSubmit: (id: string, teamName: string, teamDescription: string) => void;
+  team: EditTeamType | null;
 }
 
 interface SuccessResponse {
-  team: TeamType;
+  team: EditTeamType;
 }
 
 interface ErrorResponse {
@@ -41,12 +41,14 @@ export function EditTeamModal({
   team,
 }: TeamModalProps) {
   const [teamName, setTeamName] = useState<string>("");
-  const [teamDescription, setTeamDescription] = useState<string>("");
+  const [teamDescription, setTeamDescription] = useState<string | undefined>(
+    "",
+  );
   const [teamId, setTeamId] = useState<string>("");
 
   useEffect(() => {
     if (isOpen && team) {
-      setTeamId(team._id ?? "");
+      setTeamId(team._id);
       setTeamName(team.name); // Limpa o nome da equipe
       setTeamDescription(team.description); // Limpa a descrição da equipe
     }
@@ -69,7 +71,7 @@ export function EditTeamModal({
 
       if (isSuccessResponse(data)) {
         console.log("Time editado com sucesso:", data.team);
-        onSubmit(data.team.name, data.team.description ?? "");
+        onSubmit(data.team._id, data.team.name, data.team.description ?? "");
         onClose(); // Fecha a modal
       } else {
         console.error("Erro ao editar time:", data.error);

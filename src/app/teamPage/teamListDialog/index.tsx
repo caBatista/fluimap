@@ -4,6 +4,7 @@ import { UserPlus, Users } from "lucide-react";
 import { useState } from "react";
 import { Cards } from "@/components/cards";
 import { MemberModal } from "@/components/modal/memberModal";
+import { type EditTeamType } from "@/models/Team";
 
 interface Team {
   name: string;
@@ -11,14 +12,14 @@ interface Team {
 }
 
 interface TeamListProps {
-  teams: Team[];
-  onDelete?: (team: Team) => void;
-  onEdit?: (team: Team) => void;
+  teams: EditTeamType[];
+  onDelete?: (team: EditTeamType) => void;
+  onEdit?: (team: EditTeamType) => void;
 }
 
 export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<EditTeamType | null>(null);
 
   function handleAddMember(
     memberName: string,
@@ -28,7 +29,7 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
     console.log("Adicionando membro:", memberName, memberEmail, memberPosition);
   }
 
-  function openModal(team: Team) {
+  function openModal(team: EditTeamType) {
     setSelectedTeam(team);
     setIsMemberModalOpen(true);
   }
@@ -39,7 +40,7 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
 
   return (
     <div className="bg-white p-6 text-black dark:bg-black dark:text-white">
-      <div className="grid grid-cols-1 justify-center gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid max-h-[500px] grid-cols-1 justify-center gap-3 overflow-y-auto sm:grid-cols-2 lg:grid-cols-3">
         {teams.map((team, index) => (
           <div
             key={index}

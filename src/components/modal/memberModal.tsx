@@ -7,6 +7,7 @@ import { GenericModal } from "./genericModal";
 import { DownloadIcon } from "lucide-react";
 import { DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { type EditTeamType } from "@/models/Team";
 //import { type ITeam } from "@/models/Team";
 
 interface Team {
@@ -22,7 +23,7 @@ interface MemberModalProps {
     memberEmail: string,
     memberPosition: string,
   ) => void;
-  selectedTeam?: Team | null; // Adiciona o time selecionado
+  selectedTeam?: EditTeamType | null; // Adiciona o time selecionado
 }
 
 export function MemberModal({
@@ -48,7 +49,7 @@ export function MemberModal({
     onSubmit(memberName, memberEmail, memberPosition); // Passa os dados de membro
   }
 
-  function handleTitle(selectedTeam: Team | null | undefined): string {
+  function handleTitle(selectedTeam: EditTeamType | null | undefined): string {
     // Se selectedTeam for nulo ou o nome for vazio, retorna uma string vazia
     if (!selectedTeam?.name) {
       return "Adicione um novo membro a equipe";

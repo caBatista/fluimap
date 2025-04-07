@@ -13,6 +13,15 @@ export const TeamSchemaZod = z.object({
 // Define the TypeScript type based on the Zod schema
 export type TeamType = z.infer<typeof TeamSchemaZod>;
 
+export type CreateTeamType = Omit<
+  TeamType,
+  "ownerId" | "createdAt" | "updatedAt"
+>;
+
+export type EditTeamType = Omit<TeamType, "createdAt" | "updatedAt"> & {
+  _id: string;
+};
+
 // 2. Mongoose Schema Definition
 const TeamSchema: Schema = new Schema(
   {
