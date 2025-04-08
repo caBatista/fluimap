@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import Team from '@/models/team';
+import Team from '@/models/Team';
 import { auth } from '@clerk/nextjs/server';
 import dbConnect from '@/server/database/db';
 import { revalidatePath } from 'next/cache';

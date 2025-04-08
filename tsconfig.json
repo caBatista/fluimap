@@ -44,7 +44,7 @@
     "**/*.cjs",
     "**/*.js",
     ".next/types/**/*.ts",
-    "src/app/questionnaire/peerCommunication"
+    "src/app/(questionnaire)/peerCommunication"
   ],
   "exclude": [
     "node_modules"

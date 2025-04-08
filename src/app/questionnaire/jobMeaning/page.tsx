@@ -93,7 +93,7 @@ export default function JobMeaningPage() {
           onClick={handleContinue}
           // disabled={!allAnswered}
         >
-          Continuar
+          Finalizar
         </Button>
       </div>
     </div>
