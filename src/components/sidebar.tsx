@@ -1,34 +1,25 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Home,
-  ClipboardList,
-  Users,
-  BarChart4,
-  Settings,
-  LogOut,
-} from "lucide-react";
-import { useUser, useClerk } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-react';
+import { useUser, useClerk } from '@clerk/nextjs';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useUser();
   const { signOut } = useClerk();
 
-  const email = user?.primaryEmailAddress?.emailAddress ?? "";
-  const localPart = email.split("@")[0] ?? "";
+  const email = user?.primaryEmailAddress?.emailAddress ?? '';
+  const localPart = email.split('@')[0] ?? '';
   const displayName = user?.fullName?.trim() ? user.fullName : localPart;
   const cargo =
-    typeof user?.publicMetadata?.cargo === "string"
-      ? user.publicMetadata.cargo
-      : "gestor";
+    typeof user?.publicMetadata?.cargo === 'string' ? user.publicMetadata.cargo : 'gestor';
 
   return (
-    <div className="flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
+    <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <h1 className="text-2xl font-bold">
@@ -39,33 +30,39 @@ export default function Sidebar() {
       {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
-          href="/home"
+          href="/fluimap/home"
           icon={<Home size={20} />}
           label="Dashboard"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/surveys"
+          href="/fluimap/surveys"
           icon={<ClipboardList size={20} />}
           label="Formulário"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/teams"
+          href="/fluimap/teams"
           icon={<Users size={20} />}
           label="Times"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/reports"
+          href="/fluimap/reports"
           icon={<BarChart4 size={20} />}
           label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/settings"
+          href="/fluimap/settings"
           icon={<Settings size={20} />}
           label="Configuração"
+          currentPath={pathname}
+        />
+        <SidebarItem
+          href="/questionnaire/selectUsers"
+          icon={<ClipboardList size={20} />}
+          label="Questionário"
           currentPath={pathname}
         />
       </nav>
@@ -81,12 +78,8 @@ export default function Sidebar() {
             )}
           </Avatar>
           <div>
-            <div className="text-sm font-medium text-[hsl(var(--sidebar-text))]">
-              {displayName}
-            </div>
-            <div className="text-xs text-[hsl(var(--sidebar-text))]">
-              {cargo}
-            </div>
+            <div className="text-sm font-medium text-[hsl(var(--sidebar-text))]">{displayName}</div>
+            <div className="text-xs text-[hsl(var(--sidebar-text))]">{cargo}</div>
           </div>
         </div>
         <Button
@@ -119,8 +112,8 @@ function SidebarItem({
       <div
         className={`flex h-[36px] w-[240px] cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
           isActive
-            ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active-text))]"
-            : "text-[hsl(var(--sidebar-text))] hover:bg-[hsl(var(--sidebar-hover-bg))]"
+            ? 'bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active-text))]'
+            : 'text-[hsl(var(--sidebar-text))] hover:bg-[hsl(var(--sidebar-hover-bg))]'
         }`}
       >
         {icon}

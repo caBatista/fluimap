@@ -1,0 +1,35 @@
+{
+    "titulo": "Questionário de bem estar",
+    "instrucoes": "Indique conforme a escala abaixo, o quanto você vivência os diferentes afetos descritos no seu local de trabalho. Não há respostas certas ou erradas. A melhor resposta é aquela que melhor representa a sua vivência.",
+    "escala": {
+      "1": "Nem um pouco",
+      "2": "Um pouco",
+      "3": "Moderadamente",
+      "4": "Bastante",
+      "5": "Extremamente"
+    },
+    "pergunta": "Quando estou trabalhando me sinto...",
+    "itens": [
+      "Animado(a)",
+      "Entusiasmado(a)",
+      "Empolgado(a)",
+      "Feliz",
+      "Alegre",
+      "Contente",
+      "Disposto(a)",
+      "Orgulhoso(a)",
+      "Tranquilo(a)",
+      "Nervoso(a)",
+      "Tenso(a)",
+      "Irritado(a)",
+      "Chateado(a)",
+      "Impaciente",
+      "Com raiva",
+      "Incomodado(a)",
+      "Deprimido(a)",
+      "Frustrado(a)",
+      "Ansioso(a)",
+      "Preocupado(a)"
+    ],
+    "respostas": {}
+  }

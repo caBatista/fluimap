@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   useForm,
   useFieldArray,
@@ -8,10 +8,10 @@ import {
   type Control,
   type UseFormGetValues,
   type UseFormSetValue,
-} from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+} from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -19,62 +19,54 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { PlusCircle, Trash2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+} from '@/components/ui/select';
+import { PlusCircle, Trash2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 const ratingQuestionSchema = z.object({
   id: z.string(),
-  text: z.string().min(5, "A pergunta deve ter ao menos 5 caracteres."),
-  type: z.literal("rating"),
+  text: z.string().min(5, 'A pergunta deve ter ao menos 5 caracteres.'),
+  type: z.literal('rating'),
   options: z.array(z.object({ value: z.string() })).default([]),
 });
 
 const relationshipQuestionSchema = z.object({
   id: z.string(),
-  text: z.string().min(5, "A pergunta deve ter ao menos 5 caracteres."),
-  type: z.literal("relacionamento"),
+  text: z.string().min(5, 'A pergunta deve ter ao menos 5 caracteres.'),
+  type: z.literal('relacionamento'),
   options: z
     .array(
       z.object({
         memberId: z.string(),
         name: z.string(),
         cargo: z.string(),
-      }),
+      })
     )
     .default([]),
 });
 
-const questionSchema = z.discriminatedUnion("type", [
+const questionSchema = z.discriminatedUnion('type', [
   ratingQuestionSchema,
   relationshipQuestionSchema,
 ]);
 
 const surveyFormSchema = z.object({
-  title: z.string().min(2, "Título deve ter pelo menos 2 caracteres."),
+  title: z.string().min(2, 'Título deve ter pelo menos 2 caracteres.'),
   description: z.string(),
-  teamId: z.string().min(1, "Selecione um time."),
-  dateClosing: z.string().nonempty("Insira a data de fechamento"),
-  questions: z
-    .array(questionSchema)
-    .min(2, "São necessárias ao menos 2 perguntas"),
+  teamId: z.string().min(1, 'Selecione um time.'),
+  dateClosing: z.string().nonempty('Insira a data de fechamento'),
+  questions: z.array(questionSchema).min(2, 'São necessárias ao menos 2 perguntas'),
 });
 
 export type SurveyFormValues = z.infer<typeof surveyFormSchema>;
@@ -90,16 +82,11 @@ interface RatingOptionsProps {
   setValue: UseFormSetValue<SurveyFormValues>;
 }
 
-function RatingOptions({
-  questionIndex,
-  control,
-  getValues,
-  setValue,
-}: RatingOptionsProps) {
+function RatingOptions({ questionIndex, control, getValues, setValue }: RatingOptionsProps) {
   const { fields, append, remove } = useFieldArray<
     SurveyFormValues,
     `questions.${number}.options`,
-    "id"
+    'id'
   >({
     control,
     name: `questions.${questionIndex}.options`,
@@ -107,14 +94,12 @@ function RatingOptions({
   return (
     <div className="mt-2 space-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[hsl(var(--muted-foreground))]">
-          Opções de escala
-        </p>
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">Opções de escala</p>
         <Button
           type="button"
           variant="outline"
           className="h-[40px] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))]"
-          onClick={() => append({ value: "" })}
+          onClick={() => append({ value: '' })}
         >
           <PlusCircle className="h-4 w-4" />
           Adicionar opção
@@ -129,7 +114,7 @@ function RatingOptions({
           <div key={option.id} className="flex items-center gap-2">
             <Input
               placeholder={`Opção ${optionIndex + 1}`}
-              value={currentOptions[optionIndex]?.value ?? ""}
+              value={currentOptions[optionIndex]?.value ?? ''}
               onChange={(e) => {
                 const updated = [...currentOptions];
                 updated[optionIndex] = { value: e.target.value };
@@ -178,11 +163,7 @@ function RelationshipOptions({
     }[]) || [];
   const isMemberSelected = (memberId: string): boolean =>
     selectedOptions.some((opt) => opt.memberId === memberId);
-  const toggleSelection = (member: {
-    _id: string;
-    name: string;
-    cargo: string;
-  }) => {
+  const toggleSelection = (member: { _id: string; name: string; cargo: string }) => {
     let updated = [...selectedOptions];
     if (isMemberSelected(member._id)) {
       updated = updated.filter((opt) => opt.memberId !== member._id);
@@ -198,21 +179,17 @@ function RelationshipOptions({
 
   return (
     <div className="mt-2 rounded-md">
-      <p className="mb-2 text-sm text-[hsl(var(--muted-foreground))]">
-        Membros do time:
-      </p>
+      <p className="mb-2 text-sm text-[hsl(var(--muted-foreground))]">Membros do time:</p>
       {members.length === 0 ? (
-        <p className="text-sm text-[hsl(var(--muted-foreground))]">
-          Nenhum membro encontrado.
-        </p>
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">Nenhum membro encontrado.</p>
       ) : (
         <div className="container grid gap-4 overflow-y-auto md:grid-cols-2 lg:grid-cols-6">
           {members.map((member) => {
             const selected = isMemberSelected(member._id);
             const initials = member.name
-              .split(" ")
+              .split(' ')
               .map((n) => n[0]?.toUpperCase())
-              .join("")
+              .join('')
               .slice(0, 2);
             return (
               <div
@@ -220,8 +197,8 @@ function RelationshipOptions({
                 onClick={() => toggleSelection(member)}
                 className={`flex cursor-pointer flex-col items-center justify-start overflow-y-auto rounded-md border p-2 transition-colors ${
                   selected
-                    ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10"
-                    : "border-[hsl(var(--border))] bg-[hsl(var(--card))]"
+                    ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10'
+                    : 'border-[hsl(var(--border))] bg-[hsl(var(--card))]'
                 }`}
               >
                 <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--muted))] text-[hsl(var(--foreground))]">
@@ -230,9 +207,7 @@ function RelationshipOptions({
                 <p className="items-between justify-between text-sm font-medium text-[hsl(var(--foreground))]">
                   {member.name}
                 </p>
-                <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                  {member.cargo}
-                </p>
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">{member.cargo}</p>
               </div>
             );
           })}
@@ -243,72 +218,66 @@ function RelationshipOptions({
 }
 
 const mockTeams = [
-  { _id: "team1", name: "Time 1" },
-  { _id: "team2", name: "Time 2" },
-  { _id: "team3", name: "Time 3" },
+  { _id: 'team1', name: 'Time 1' },
+  { _id: 'team2', name: 'Time 2' },
+  { _id: 'team3', name: 'Time 3' },
 ];
 
 const mockTeamMembers = [
-  { _id: "m1", name: "João Pereira", cargo: "Desenvolvedor" },
-  { _id: "m2", name: "Maria Silva", cargo: "Designer" },
-  { _id: "m3", name: "Carlos Souza", cargo: "Gerente" },
-  { _id: "m4", name: "Ana Costa", cargo: "Analista" },
-  { _id: "m5", name: "João Pereira", cargo: "Desenvolvedor" },
-  { _id: "m6", name: "Maria Silva", cargo: "Designer" },
-  { _id: "m7", name: "Carlos Souza", cargo: "Gerente" },
+  { _id: 'm1', name: 'João Pereira', cargo: 'Desenvolvedor' },
+  { _id: 'm2', name: 'Maria Silva', cargo: 'Designer' },
+  { _id: 'm3', name: 'Carlos Souza', cargo: 'Gerente' },
+  { _id: 'm4', name: 'Ana Costa', cargo: 'Analista' },
+  { _id: 'm5', name: 'João Pereira', cargo: 'Desenvolvedor' },
+  { _id: 'm6', name: 'Maria Silva', cargo: 'Designer' },
+  { _id: 'm7', name: 'Carlos Souza', cargo: 'Gerente' },
 ];
 
 export function SurveyForm({ onSuccess }: SurveyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const { data: teams = mockTeams } = useQuery<{ _id: string; name: string }[]>(
-    {
-      queryKey: ["teams"],
-      queryFn: async (): Promise<{ _id: string; name: string }[]> => {
-        const response = await fetch("/api/teams");
-        if (!response.ok) {
-          throw new Error("Falha ao buscar times");
-        }
-        const data = (await response.json()) as {
-          teams: { _id: string; name: string }[];
-        };
-        return data.teams || [];
-      },
+  const { data: teams = mockTeams } = useQuery<{ _id: string; name: string }[]>({
+    queryKey: ['teams'],
+    queryFn: async (): Promise<{ _id: string; name: string }[]> => {
+      const response = await fetch('/api/teams');
+      if (!response.ok) {
+        throw new Error('Falha ao buscar times');
+      }
+      const data = (await response.json()) as {
+        teams: { _id: string; name: string }[];
+      };
+      return data.teams || [];
     },
-  );
+  });
 
   const form = useForm<SurveyFormValues>({
     resolver: zodResolver(surveyFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      teamId: "",
-      dateClosing: "",
+      title: '',
+      description: '',
+      teamId: '',
+      dateClosing: '',
       questions: [
         {
           id: crypto.randomUUID(),
-          text: "Texto da pergunta 1",
-          type: "relacionamento",
+          text: 'Texto da pergunta 1',
+          type: 'relacionamento',
           options: [],
         },
         {
           id: crypto.randomUUID(),
-          text: "Texto da pergunta 2",
-          type: "rating",
+          text: 'Texto da pergunta 2',
+          type: 'rating',
           options: [],
         },
       ],
     },
   });
 
-  const { fields, append, remove } = useFieldArray<
-    SurveyFormValues,
-    "questions",
-    "id"
-  >({
+  const { fields, append, remove } = useFieldArray<SurveyFormValues, 'questions', 'id'>({
     control: form.control,
-    name: "questions",
+    name: 'questions',
   });
 
   async function onSubmit(data: SurveyFormValues): Promise<void> {
@@ -317,7 +286,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
       const transformedData = {
         ...data,
         questions: data.questions.map((q) => {
-          if (q.type === "rating") {
+          if (q.type === 'rating') {
             return {
               ...q,
               options: q.options.map((opt) => opt.value),
@@ -326,27 +295,27 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
           return q;
         }),
       };
-      const response = await fetch("/api/surveys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/surveys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transformedData),
       });
       if (!response.ok) {
         const err = (await response.json()) as { error: string };
-        throw new Error(err.error ?? "Erro ao criar formulário");
+        throw new Error(err.error ?? 'Erro ao criar formulário');
       }
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push("/surveys", undefined);
+        router.push('/surveys', undefined);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
-        alert("Falha ao criar formulário: " + error.message);
+        alert('Falha ao criar formulário: ' + error.message);
       } else {
         console.error(error);
-        alert("Falha ao criar formulário. Ver console.");
+        alert('Falha ao criar formulário. Ver console.');
       }
     } finally {
       setIsSubmitting(false);
@@ -365,8 +334,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               Cadastrar Formulário
             </CardTitle>
             <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-              Crie uma pesquisa para avaliar a dinâmica e os relacionamentos da
-              equipe
+              Crie uma pesquisa para avaliar a dinâmica e os relacionamentos da equipe
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -379,10 +347,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                     Título do Formulário
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Digite o título do formulário"
-                      {...field}
-                    />
+                    <Input placeholder="Digite o título do formulário" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -393,14 +358,9 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[hsl(var(--muted-foreground))]">
-                    Descrição
-                  </FormLabel>
+                  <FormLabel className="text-[hsl(var(--muted-foreground))]">Descrição</FormLabel>
                   <FormControl className="h-[71px] w-[1110px]">
-                    <Textarea
-                      placeholder="Breve descrição do objetivo do formulário"
-                      {...field}
-                    />
+                    <Textarea placeholder="Breve descrição do objetivo do formulário" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -411,14 +371,9 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                 name="teamId"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-[hsl(var(--muted-foreground))]">
-                      Time
-                    </FormLabel>
+                    <FormLabel className="text-[hsl(var(--muted-foreground))]">Time</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <SelectTrigger className="h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--muted-foreground))]">
                           <SelectValue placeholder="Selecione um time" />
                         </SelectTrigger>
@@ -466,8 +421,8 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                   onClick={() =>
                     append({
                       id: crypto.randomUUID(),
-                      text: "",
-                      type: "relacionamento",
+                      text: '',
+                      type: 'relacionamento',
                       options: [],
                     })
                   }
@@ -506,10 +461,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                             Texto da pergunta
                           </FormLabel>
                           <FormControl>
-                            <Textarea
-                              placeholder="Digite sua pergunta?"
-                              {...f}
-                            />
+                            <Textarea placeholder="Digite sua pergunta?" {...f} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -523,17 +475,12 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                             Tipo de pergunta
                           </FormLabel>
                           <FormControl>
-                            <Select
-                              onValueChange={f.onChange}
-                              defaultValue={f.value}
-                            >
+                            <Select onValueChange={f.onChange} defaultValue={f.value}>
                               <SelectTrigger className="h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--muted-foreground))]">
                                 <SelectValue placeholder="Selecione o tipo" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="relacionamento">
-                                  Relacionamento
-                                </SelectItem>
+                                <SelectItem value="relacionamento">Relacionamento</SelectItem>
                                 <SelectItem value="rating">Escala</SelectItem>
                               </SelectContent>
                             </Select>
@@ -544,7 +491,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                         </FormItem>
                       )}
                     />
-                    {questionType === "rating" && (
+                    {questionType === 'rating' && (
                       <RatingOptions
                         questionIndex={index}
                         control={form.control}
@@ -552,7 +499,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                         setValue={form.setValue}
                       />
                     )}
-                    {questionType === "relacionamento" && (
+                    {questionType === 'relacionamento' && (
                       <RelationshipOptions
                         questionIndex={index}
                         control={form.control}
@@ -571,7 +518,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               variant="outline"
               type="button"
               className="h-[40px] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))]"
-              onClick={() => router.push("/surveys")}
+              onClick={() => router.push('/surveys')}
             >
               Cancelar
             </Button>
@@ -580,7 +527,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               className="h-[40px] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Criando..." : "Criar Pesquisa"}
+              {isSubmitting ? 'Criando...' : 'Criar Pesquisa'}
             </Button>
           </CardFooter>
         </Card>
