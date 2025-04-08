@@ -1,5 +1,3 @@
-// src/components/Modal/MemberModal.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,8 +6,6 @@ import { DownloadIcon } from "lucide-react";
 import { DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { type EditTeamType } from "@/models/Team";
-//import { type ITeam } from "@/models/Team";
-
 interface Team {
   name: string;
   description: string;
@@ -129,6 +125,7 @@ export function MemberModal({
               size="lg"
               type="button"
               className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
+              // future CSV logic goes here
             >
               <DownloadIcon className="h-5 w-5" />
               Arq. CSV

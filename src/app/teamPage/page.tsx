@@ -181,7 +181,6 @@ export default function TeamPage() {
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
-      {/* Cabeçalho */}
       <div className="mx-8 mb-4 flex flex-col items-center justify-between sm:flex-row">
         <div>
           <h1 className="mt-4 text-2xl font-bold sm:text-3xl">Times</h1>
@@ -213,7 +212,6 @@ export default function TeamPage() {
         />
       </div>
 
-      {/* Modal de criação de time */}
       <TeamModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { GenericModal } from "../modal/genericModal";
-import { DialogFooter } from "../ui/dialog";
-import { type ITeam } from "@/models/Team"; // Importando a interface ITeam
-import { Button } from "../ui/button";
+import { useState, useEffect } from 'react';
+import { GenericModal } from '../modal/genericModal';
+import { DialogFooter } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { type TeamType } from '@/models/Team';
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -12,9 +12,9 @@ interface TeamModalProps {
   onSubmit: (teamName: string, teamDescription: string) => void;
 }
 
-// Usando a interface ITeam que foi importada
+// Usando o tipo inferido TeamType
 interface SuccessResponse {
-  team: ITeam; // Substituindo Team por ITeam
+  team: TeamType;
 }
 
 interface ErrorResponse {
