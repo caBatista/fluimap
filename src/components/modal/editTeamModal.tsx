@@ -1,43 +1,51 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { GenericModal } from '../modal/genericModal';
-import { DialogFooter } from '../ui/dialog';
-import { Button } from '../ui/button';
+import { useState, useEffect } from "react";
+import { GenericModal } from "../modal/genericModal";
+import { DialogFooter } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { type EditTeamType } from "@/models/Team";
 
 interface TeamModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (teamName: string, teamDescription: string) => void;
+  onSubmit: (id: string, teamName: string, teamDescription: string) => void;
+  team: EditTeamType | null;
 }
 
-export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
+
+export function EditTeamModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  team,
+}: TeamModalProps) {
   const [teamName, setTeamName] = useState<string>("");
-  const [teamDescription, setTeamDescription] = useState<string>("");
+  const [teamDescription, setTeamDescription] = useState<string | undefined>(
+    "",
+  );
+  const [teamId, setTeamId] = useState<string>("");
 
   useEffect(() => {
-    if (isOpen) {
-      setTeamName(""); // Limpa o nome da equipe
-      setTeamDescription(""); // Limpa a descrição da equipe
+    if (isOpen && team) {
+      setTeamId(team._id);
+      setTeamName(team.name); // Limpa o nome da equipe
+      setTeamDescription(team.description); // Limpa a descrição da equipe
     }
-  }, [isOpen]);
+  }, [isOpen, team]);
 
-  async function handleSubmit() {
-    if (!teamName.trim()) {
-      console.error("O nome do time é obrigatório");
-      return; // Se o nome estiver vazio, não faz o envio
-    }
+  const handleEdit = () => {
+    const validDescription = teamDescription ?? ""; // Se for undefined, usa uma string vazia
 
-    // Chama o callback onSubmit passando os dados para o componente pai
-    onSubmit(teamName, teamDescription);
-    onClose(); // Fecha o modal após enviar
-  }
+    onSubmit(teamId, teamName, validDescription);
+    onClose();
+  };
 
   return (
     <GenericModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Criar Time"
+      title="Editar Time"
       description="Crie um novo time para a qual você gerenciará pesquisas"
     >
       {/* Campo para o nome da equipe */}
@@ -59,6 +67,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
         />
       </div>
 
+      {/* Campo para descrição */}
       <div className="mb-4">
         <label
           htmlFor="teamDescription"
@@ -93,7 +102,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
             size="lg"
             type="submit"
             className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            onClick={handleSubmit}
+            onClick={handleEdit}
           >
             Salvar
           </Button>

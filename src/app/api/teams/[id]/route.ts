@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Team, { TeamSchemaZod } from '@/models/Team';
 import TeamRespondent from '@/models/teamRespondents';
 import { auth } from '@clerk/nextjs/server';
@@ -13,7 +13,7 @@ async function getUserIdOrThrow(): Promise<string> {
 }
 
 // GET: Retorna um time específico e seus membros
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -41,7 +41,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // PUT: Atualiza os dados de um time
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -62,6 +62,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const updatedTeam = await Team.findByIdAndUpdate(id, { $set: body }, { new: true }).lean();
 
     revalidatePath('/dashboard');
+    revalidatePath("/teamPage");
 
     return NextResponse.json({ team: updatedTeam }, { status: 200 });
   } catch (err: unknown) {
@@ -73,7 +74,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // DELETE: Remove um time e seus membros
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -92,6 +93,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     await TeamRespondent.deleteMany({ teamId: id });
 
     revalidatePath('/dashboard');
+    revalidatePath("/teamPage");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err: unknown) {

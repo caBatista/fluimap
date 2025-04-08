@@ -5,6 +5,7 @@ import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { TeamModal } from "@/components/modal/teamModal";
+import { EditTeamModal } from "@/components/modal/editTeamModal";
 import TeamListDialog from "./teamListDialog";
 import {
   Dialog,
@@ -14,14 +15,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { type EditTeamType } from "@/models/Team";
 
-type Team = {
-  _id?: string;
-  name: string;
-  description: string; // ← agora opcional
-};
-
-function isTeam(item: unknown): item is Team {
+function isTeam(item: unknown): item is EditTeamType {
   return (
     typeof item === "object" &&
     item !== null &&
@@ -41,15 +37,11 @@ function isApiTeamResponse(data: unknown): data is { teams: unknown[] } {
 export default function TeamPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
+  const [teams, setTeams] = useState<EditTeamType[]>([]);
+  const [teamToDelete, setTeamToDelete] = useState<EditTeamType | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const filteredTeams = teams.filter(
-    (team) =>
-      team.name.toLowerCase().includes(search.toLowerCase()) ||
-      (team.description?.toLowerCase() ?? "").includes(search.toLowerCase()),
-  );
+  const [teamToEdit, setTeamToEdit] = useState<EditTeamType | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     async function fetchTeams() {
@@ -64,7 +56,7 @@ export default function TeamPage() {
           throw new Error("Formato inválido da resposta da API");
         }
 
-        const data: Team[] = json.teams.filter(isTeam);
+        const data: EditTeamType[] = json.teams.filter(isTeam);
         console.log("Times carregados:", data);
         setTeams(data);
       } catch (error) {
@@ -74,6 +66,12 @@ export default function TeamPage() {
     }
     void fetchTeams();
   }, []);
+
+  const filteredTeams = teams.filter(
+    (team) =>
+      typeof team.name === "string" && team.name.toLowerCase().includes(search.toLowerCase()) ||
+      team.description?.toLowerCase().includes(search.toLowerCase()),
+  );
 
   async function handleCreateTeam(name: string, description: string) {
     if (!name.trim()) {
@@ -104,7 +102,52 @@ export default function TeamPage() {
     }
   }
 
-  function confirmDeleteTeam(team: Team) {
+  async function handleEditTeam(
+    id: string,
+    name: string,
+    description?: string,
+  ) {
+    if (!name.trim()) {
+      toast.error("O nome do time é obrigatório");
+      return;
+    }
+
+    try {
+      // Realiza a requisição PUT para editar o time
+      const response = await fetch(`/api/teams/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description }),
+      });
+
+      if (!response.ok) throw new Error("Erro ao editar time");
+
+      // Obtém a resposta e atualiza o estado com o time editado
+      const updatedJson: unknown = await response.json();
+      const updatedTeam = (updatedJson as { team?: unknown }).team;
+
+      if (isTeam(updatedTeam)) {
+        // Atualiza o time na lista
+        setTeams((prev) =>
+          prev.map((team) =>
+            team._id === id ? { ...team, name, description } : team,
+          ),
+        );
+        toast.success("Time editado com sucesso");
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao editar time");
+    }
+  }
+
+  function confirmEditTeam(team: EditTeamType) {
+    setTeamToEdit(team);
+    setIsEditDialogOpen(true);
+  }
+
+  function confirmDeleteTeam(team: EditTeamType) {
     setTeamToDelete(team);
     setIsDeleteDialogOpen(true);
   }
@@ -140,8 +183,8 @@ export default function TeamPage() {
           </h2>
         </div>
 
-        <button
-          type="button"
+        <Button
+          size="lg"
           className="mt-4 flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-white sm:mt-0"
           onClick={() => setIsModalOpen(true)}
         >
@@ -149,9 +192,10 @@ export default function TeamPage() {
             <PlusIcon className="h-5 w-5" />
           </span>
           Criar Novo Time
-        </button>
+        </Button>
       </div>
 
+      {/* Campo de busca */}
       <div className="mb-2 w-full px-8">
         <input
           type="text"
@@ -166,6 +210,13 @@ export default function TeamPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleCreateTeam}
+      />
+
+      <EditTeamModal
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSubmit={handleEditTeam}
+        team={teamToEdit}
       />
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -195,7 +246,11 @@ export default function TeamPage() {
         </DialogContent>
       </Dialog>
 
-      <TeamListDialog teams={filteredTeams} onDelete={confirmDeleteTeam} />
+      <TeamListDialog
+        teams={filteredTeams}
+        onDelete={confirmDeleteTeam}
+        onEdit={confirmEditTeam}
+      />
     </div>
   );
 }

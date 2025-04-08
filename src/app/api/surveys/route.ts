@@ -8,7 +8,7 @@ export async function GET() {
     await dbConnect();
     const surveys = await Survey.find().sort({ createdAt: -1 });
     return NextResponse.json({ surveys }, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch surveys' }, { status: 500 });
   }
 }
