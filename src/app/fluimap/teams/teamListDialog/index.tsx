@@ -6,12 +6,7 @@ import { Cards } from "@/components/cards";
 import { MemberModal } from "@/components/modal/memberModal";
 import { type EditTeamType } from "@/models/Team";
 
-interface Team {
-  name: string;
-  description: string;
-}
-
-interface TeamListProps {
+type TeamListProps = {
   teams: EditTeamType[];
   onDelete?: (team: EditTeamType) => void;
   onEdit?: (team: EditTeamType) => void;

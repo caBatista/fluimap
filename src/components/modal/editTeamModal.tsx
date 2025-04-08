@@ -4,13 +4,7 @@ import { useState, useEffect } from "react";
 import { GenericModal } from "../modal/genericModal";
 import { DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { type EditTeamType, type TeamType } from "@/models/Team";
-
-type Team = {
-  _id: string;
-  name: string;
-  description: string;
-};
+import { type EditTeamType } from "@/models/Team";
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -19,20 +13,6 @@ interface TeamModalProps {
   team: EditTeamType | null;
 }
 
-interface SuccessResponse {
-  team: EditTeamType;
-}
-
-interface ErrorResponse {
-  error: string;
-}
-
-type EditTeamResponse = SuccessResponse | ErrorResponse;
-
-// Type guard para verificar se a resposta é de sucesso
-function isSuccessResponse(data: EditTeamResponse): data is SuccessResponse {
-  return (data as SuccessResponse).team !== undefined;
-}
 
 export function EditTeamModal({
   isOpen,
@@ -52,7 +32,7 @@ export function EditTeamModal({
       setTeamName(team.name); // Limpa o nome da equipe
       setTeamDescription(team.description); // Limpa a descrição da equipe
     }
-  }, [isOpen]);
+  }, [isOpen, team]);
 
   const handleEdit = () => {
     const validDescription = teamDescription ?? ""; // Se for undefined, usa uma string vazia

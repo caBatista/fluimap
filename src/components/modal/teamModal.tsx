@@ -4,28 +4,11 @@ import { useState, useEffect } from 'react';
 import { GenericModal } from '../modal/genericModal';
 import { DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { type TeamType } from '@/models/Team';
 
 interface TeamModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (teamName: string, teamDescription: string) => void;
-}
-
-// Usando o tipo inferido TeamType
-interface SuccessResponse {
-  team: TeamType;
-}
-
-interface ErrorResponse {
-  error: string;
-}
-
-type CreateTeamResponse = SuccessResponse | ErrorResponse;
-
-// Type guard para verificar se a resposta é de sucesso
-function isSuccessResponse(data: CreateTeamResponse): data is SuccessResponse {
-  return (data as SuccessResponse).team !== undefined;
 }
 
 export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {

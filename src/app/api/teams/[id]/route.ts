@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Team, { TeamSchemaZod } from '@/models/Team';
 import TeamRespondent from '@/models/teamRespondents';
 import { auth } from '@clerk/nextjs/server';

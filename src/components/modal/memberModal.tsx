@@ -6,12 +6,7 @@ import { DownloadIcon } from "lucide-react";
 import { DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { type EditTeamType } from "@/models/Team";
-interface Team {
-  name: string;
-  description: string;
-}
-
-interface MemberModalProps {
+type MemberModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (

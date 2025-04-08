@@ -17,12 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { type EditTeamType } from "@/models/Team";
 
-type Team = {
-  _id: string;
-  name: string;
-  description: string;
-};
-
 function isTeam(item: unknown): item is EditTeamType {
   return (
     typeof item === "object" &&
@@ -75,7 +69,7 @@ export default function TeamPage() {
 
   const filteredTeams = teams.filter(
     (team) =>
-      team.name.toLowerCase().includes(search.toLowerCase()) ||
+      typeof team.name === "string" && team.name.toLowerCase().includes(search.toLowerCase()) ||
       team.description?.toLowerCase().includes(search.toLowerCase()),
   );
 
