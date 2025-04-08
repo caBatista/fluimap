@@ -19,7 +19,7 @@ export default function Sidebar() {
     typeof user?.publicMetadata?.cargo === 'string' ? user.publicMetadata.cargo : 'gestor';
 
   return (
-    <div className="flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
+    <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <h1 className="text-2xl font-bold">
@@ -30,33 +30,39 @@ export default function Sidebar() {
       {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
-          href="/home"
+          href="/fluimap/home"
           icon={<Home size={20} />}
           label="Dashboard"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/surveys"
+          href="/fluimap/surveys"
           icon={<ClipboardList size={20} />}
           label="Formulário"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/teams"
+          href="/fluimap/teams"
           icon={<Users size={20} />}
           label="Times"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/reports"
+          href="/fluimap/reports"
           icon={<BarChart4 size={20} />}
           label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/settings"
+          href="/fluimap/settings"
           icon={<Settings size={20} />}
           label="Configuração"
+          currentPath={pathname}
+        />
+        <SidebarItem
+          href="/questionnaire/selectUsers"
+          icon={<ClipboardList size={20} />}
+          label="Questionário"
           currentPath={pathname}
         />
       </nav>

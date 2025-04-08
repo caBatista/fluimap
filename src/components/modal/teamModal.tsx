@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { GenericModal } from "../modal/genericModal";
-import { DialogFooter } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { type TeamType } from "@/models/team";
+import { useState, useEffect } from 'react';
+import { GenericModal } from '../modal/genericModal';
+import { DialogFooter } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { type TeamType } from '@/models/Team';
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -29,23 +29,23 @@ function isSuccessResponse(data: CreateTeamResponse): data is SuccessResponse {
 }
 
 export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
-  const [teamName, setTeamName] = useState<string>("");
-  const [teamDescription, setTeamDescription] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>('');
+  const [teamDescription, setTeamDescription] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
-      setTeamName(""); // Limpa o nome da equipe
-      setTeamDescription(""); // Limpa a descrição da equipe
+      setTeamName(''); // Limpa o nome da equipe
+      setTeamDescription(''); // Limpa a descrição da equipe
     }
   }, [isOpen]);
 
   // Função para lidar com o envio do formulário
   async function handleSubmit() {
     try {
-      const response = await fetch("/api/teams", {
-        method: "POST",
+      const response = await fetch('/api/teams', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: teamName,
@@ -56,14 +56,14 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
       const data = (await response.json()) as CreateTeamResponse;
 
       if (isSuccessResponse(data)) {
-        console.log("Time criado com sucesso:", data.team);
-        onSubmit(data.team.name, data.team.description ?? "");
+        console.log('Time criado com sucesso:', data.team);
+        onSubmit(data.team.name, data.team.description ?? '');
         onClose(); // Fecha a modal
       } else {
-        console.error("Erro ao criar time:", data.error);
+        console.error('Erro ao criar time:', data.error);
       }
     } catch (error) {
-      console.error("Erro de requisição:", error);
+      console.error('Erro de requisição:', error);
     }
   }
 
@@ -76,10 +76,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
     >
       {/* Campo para o nome da equipe */}
       <div className="mb-4">
-        <label
-          htmlFor="teamName"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
           Nome da Equipe
         </label>
         <input
@@ -95,10 +92,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
 
       {/* Campo para descrição */}
       <div className="mb-4">
-        <label
-          htmlFor="teamDescription"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700">
           Descrição da Equipe
         </label>
         <textarea

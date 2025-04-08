@@ -1,16 +1,15 @@
-import { ThemeProvider } from '@/components/theme-provider';
-import '@/styles/globals.css';
-import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs';
-
+import { ClerkProvider } from '@clerk/nextjs';
 import { GeistSans } from 'geist/font/sans';
-import { type Metadata } from 'next';
-import { Toaster } from '@/components/ui/sonner';
-import Sidebar from '@/components/sidebar';
-import { QueryProvider } from '@/components/query-provider';
-import "@/styles/globals.css";
+import { ptBR } from '@clerk/localizations';
 
-import Auth from "./auth/page";
-import { ptBR } from '@clerk/localizations'
+import { ThemeProvider } from '@/components/theme-provider';
+import { QueryProvider } from '@/components/query-provider';
+import { Toaster } from '@/components/ui/sonner';
+
+import RootLayoutClient from './RootLayoutClient';
+import '@/styles/globals.css';
+
+import { type Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'FluiMap',
@@ -18,15 +17,10 @@ export const metadata: Metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider 
-      localization={ptBR}
-    >
-      <html
-        className={`${GeistSans.variable}`}
-        suppressHydrationWarning
-      >
+    <ClerkProvider localization={ptBR}>
+      <html className={`${GeistSans.variable}`} lang="pt" suppressHydrationWarning>
         <body className="h-screen w-screen overflow-hidden">
           <ThemeProvider
             attribute="class"
@@ -35,17 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             disableTransitionOnChange
           >
             <QueryProvider>
-              <SignedOut>
-                <div className="flex h-full flex-row items-center justify-center gap-8">
-                  <Auth></Auth>
-                </div>
-              </SignedOut>
-              <SignedIn>
-                <div className="flex h-full">
-                  <Sidebar />
-                  <div className="flex-1 overflow-auto">{children}</div>
-                </div>
-            </SignedIn>
+              <RootLayoutClient>{children}</RootLayoutClient>
             </QueryProvider>
           </ThemeProvider>
           <Toaster />
