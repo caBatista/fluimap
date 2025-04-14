@@ -38,7 +38,7 @@ export default function SelectUsersPage() {
       </h1>
 
       <div className="flex w-full items-center justify-center">
-        <div className="flex w-full flex-wrap justify-center gap-6">
+        <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {mockUsers.map((user, index) => (
             <SelectUser
               key={index}
@@ -51,10 +51,10 @@ export default function SelectUsersPage() {
         </div>
       </div>
 
-      <div className="mt-8 flex w-full justify-end">
+      <div className="mt-8 flex w-full justify-center px-2 sm:justify-end">
         <Button
           variant="default"
-          className="h-auto px-8 py-4 text-base"
+          className="h-auto w-full px-8 py-4 text-base sm:w-auto"
           onClick={handleContinue}
           disabled={selectedUsers.length === 0}
         >

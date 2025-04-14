@@ -1,15 +1,9 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { Button } from "@/components/ui/button";
-import { type LucideIcon } from "lucide-react";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { type LucideIcon } from 'lucide-react';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { PencilIcon, TrashIcon } from 'lucide-react';
 
 interface CardsProps {
   name: string;
@@ -42,15 +36,13 @@ export function Cards({
 
           <div className="mr-2 flex gap-2">
             <Button
-              className={
-                "flex items-center gap-2 rounded-md border-none bg-white px-3 py-3 text-black shadow-none hover:bg-accent dark:border-0 dark:bg-transparent dark:text-white dark:hover:bg-accent"
-              }
+              className="hover:bg-accent dark:hover:bg-accent flex items-center gap-2 rounded-md border-none bg-white px-3 py-3 text-black shadow-none dark:border-0 dark:bg-transparent dark:text-white"
               onClick={onEdit}
             >
               <PencilIcon className="h-5 w-5 text-gray-800 dark:text-white" />
             </Button>
             <Button
-              className="flex items-center gap-2 rounded-md border-none bg-white px-3 py-3 text-black shadow-none hover:bg-accent dark:border-0 dark:bg-transparent dark:text-white dark:hover:bg-accent"
+              className="hover:bg-accent dark:hover:bg-accent flex items-center gap-2 rounded-md border-none bg-white px-3 py-3 text-black shadow-none dark:border-0 dark:bg-transparent dark:text-white"
               onClick={onDelete}
             >
               <TrashIcon className="h-5 w-5 text-black dark:text-white" />
@@ -63,20 +55,20 @@ export function Cards({
         <CardDescription>{description}</CardDescription>
       </div>
 
-      <CardFooter className="mb-2 mt-auto flex justify-center gap-x-2">
+      <CardFooter className="mb-2 mt-auto flex w-full flex-col gap-2 px-4 sm:flex-row sm:justify-center">
         <Button
           variant="outline"
-          className="border border-black dark:border-white"
+          className="w-full min-w-0 justify-center truncate text-ellipsis border border-black dark:border-white sm:w-auto"
         >
-          {Icon1 && <Icon1 className="h-4 w-4" />}
+          {Icon1 && <Icon1 className="mr-2 h-4 w-4" />}
           {button1}
         </Button>
         <Button
           variant="outline"
-          className="border border-black dark:border-white"
+          className="w-full min-w-0 justify-center truncate text-ellipsis border border-black dark:border-white sm:w-auto"
           onClick={onOpenModal}
         >
-          {Icon2 && <Icon2 className="h-4 w-4" />}
+          {Icon2 && <Icon2 className="mr-2 h-4 w-4" />}
           {button2}
         </Button>
       </CardFooter>
