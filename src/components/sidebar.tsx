@@ -22,8 +22,9 @@ export default function Sidebar() {
     <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
       <header className="flex h-[96px] w-[256px] items-center justify-center gap-3 border-b border-[hsl(var(--sidebar-border))] px-4">
-        <img src="/logo-fluimap.svg" alt="Logo FluiMap" className="h-12 w-auto object-contain" />
-        <h1 className="text-2xl font-bold text-[hsl(var(--primary))]">FluiMap</h1>
+        <img src="/logo-fluimap.svg" alt="Logo FluiMap" className="h-32 w-auto object-contain" />
+        {/* <h1 className="text-2xl font-bold text-[hsl(var(--primary))]">FluiMap</h1>
+         */}
       </header>
 
       {/* Navegação */}
