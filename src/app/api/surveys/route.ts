@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
 
     const { dateClosing, ...rest } = parseResult.data;
 
-    // Validação de data explícita
     if (!dateClosing || isNaN(new Date(dateClosing).getTime())) {
       return NextResponse.json({ error: 'Data de fechamento inválida' }, { status: 400 });
     }

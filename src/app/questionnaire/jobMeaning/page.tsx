@@ -18,10 +18,8 @@ export default function JobMeaningPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch('/job-meaning.json')
       .then((res) => res.json())
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       .then((json) => setData(json));
   }, []);
 
@@ -29,17 +27,6 @@ export default function JobMeaningPage() {
     const key = `question-${questionIndex}`;
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
-
-  //   const totalQuestions = data?.itens.length || 0;
-  //   const allAnswered = Object.keys(answers).length === totalQuestions;
-
-  //     const handleContinue = () => {
-  //       if (!allAnswered) {
-  //         alert('Por favor, responda todas as perguntas antes de continuar.');
-  //         return;
-  //       }
-  //       router.push(`/questionnaire/success`);
-  //     };
 
   const handleContinue = () => {
     router.push(`/questionnaire/success`);
@@ -87,12 +74,7 @@ export default function JobMeaningPage() {
         >
           Cancelar
         </Button>
-        <Button
-          variant="default"
-          className="h-auto px-8 py-4 text-base"
-          onClick={handleContinue}
-          // disabled={!allAnswered}
-        >
+        <Button variant="default" className="h-auto px-8 py-4 text-base" onClick={handleContinue}>
           Finalizar
         </Button>
       </div>

@@ -76,8 +76,6 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
 
   console.log('SurveyList: surveys filtrados =', filtered.length);
 
-  // Modal de confirmação
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return (
     <>
       {confirmAction && (
@@ -110,7 +108,6 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                         throw new Error('Erro ao atualizar status');
                       }
 
-                      // Atualiza o status localmente para refletir na interface
                       const updatedSurveys = surveys.map((survey) =>
                         survey._id === confirmAction.id
                           ? { ...survey, status: confirmAction.nextStatus }
@@ -133,7 +130,6 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
       )}
       <div className="grid grid-cols-1 gap-[29px] md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((survey) => {
-          // Status ajustado apenas manualmente, não automaticamente pela data de expiração
           const adjustedStatus: 'ativo' | 'rascunho' | 'fechado' = survey.status ?? 'ativo';
 
           const progressValue = survey.progress ?? 0;
@@ -144,17 +140,11 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
               key={survey._id}
               className="relative h-[138px] w-[364px] rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm"
             >
-              {/* Linha superior: Título e Badge de status */}
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-sml font-semibold text-[hsl(var(--foreground))]">
                     {survey.title}
                   </h2>
-                  {/* 
-                    <p className="text-sml text-[hsl(var(--muted-foreground))]">
-                      {survey.description ?? "Sem descrição"}
-                    </p>
-                  */}
                 </div>
                 <button
                   onClick={() =>
@@ -177,12 +167,10 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                 </button>
               </div>
 
-              {/* Número de respostas */}
               <p className="mt-[5px] text-xs text-[hsl(var(--muted-foreground))]">
                 {survey.responsesCount ?? 0} respostas
               </p>
 
-              {/* Barra de progresso + percentual */}
               <div className="mb-[16px] mt-2 flex items-center gap-2">
                 <Progress
                   value={progressValue}
@@ -193,7 +181,6 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                 </span>
               </div>
 
-              {/* Rodapé: Exibir respostas + data de expiração */}
               <div className="mt-2 flex items-center justify-between">
                 <Link
                   href={`/surveys/${survey._id}`}

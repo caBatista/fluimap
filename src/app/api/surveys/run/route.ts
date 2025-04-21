@@ -6,9 +6,7 @@ import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import dbConnect from '@/server/database/db';
 
-// Helper function to generate a unique survey ID
 function generateSurveyId(): string {
-  // Generate a random 10-character string for the survey ID
   return crypto.randomBytes(5).toString('hex');
 }
 
@@ -40,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     const { teamId } = body;
 
-    // Verify that the team exists and the user is the owner
     const team = await Team.findById(teamId);
 
     if (!team) {
@@ -51,25 +48,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Get all respondees for this team
     const respondees = await Respondee.find({ teamId });
 
     if (respondees.length === 0) {
       return NextResponse.json({ error: 'No respondees found for this team' }, { status: 400 });
     }
 
-    // Generate a unique survey ID
     const surveyId = generateSurveyId();
 
-    // Base URL from environment or default
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
-    // Generate unique links for each respondee
     const respondeeLinks = respondees.map((respondee) => {
       const uniqueLink = `${baseUrl}/surveys/${surveyId}/${String(respondee._id)}`;
 
-      // In a real implementation, you would send emails here
-      // For now, just log the email and link
       console.log(`Sending email to ${respondee.email}:`);
       console.log(`Survey link: ${uniqueLink}`);
 
