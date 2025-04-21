@@ -36,7 +36,7 @@ export default function Sidebar() {
           currentPath={pathname}
         />
         <SidebarItem
-          href="/fluimap/surveys"
+          href="/fluimap/surveys/create"
           icon={<ClipboardList size={20} />}
           label="Formulário"
           currentPath={pathname}
