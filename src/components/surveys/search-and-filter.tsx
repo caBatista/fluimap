@@ -53,12 +53,6 @@ export function SearchAndFilter({
             <SelectItem className="pl-[52px]" value="fechado">
               Fechado
             </SelectItem>
-            <SelectItem className="pl-[52px]" value="rascunho">
-              Rascunho
-            </SelectItem>
-            <SelectItem className="pl-[52px]" value="em processo">
-              Em processo
-            </SelectItem>
           </SelectContent>
         </Select>
       </div>

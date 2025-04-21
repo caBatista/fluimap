@@ -1,6 +1,12 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
 
 const surveyFormSchema = z.object({
   title: z.string().min(2, 'Título deve ter pelo menos 2 caracteres.'),
@@ -85,7 +90,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
       const response = await fetch('/api/surveys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, status: "ativo" }),
       });
 
       if (!response.ok) {
@@ -101,11 +106,16 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
         throw new Error(errorMessage);
       }
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push('/surveys');
-      }
+      const result: unknown = await response.json();
+      const newSurveyId =
+        typeof result === 'object' &&
+        result !== null &&
+        'survey' in result &&
+        typeof (result as { survey?: { _id?: string } }).survey?._id === 'string'
+          ? (result as { survey: { _id: string } }).survey._id
+          : null;
+      router.push(`/fluimap/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
+
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
@@ -162,7 +172,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                 </FormItem>
               )}
             />
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-end">
               <FormField
                 control={form.control}
                 name="teamId"
@@ -190,18 +200,42 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                 control={form.control}
                 name="dateClosing"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel className="text-[hsl(var(--muted-foreground))]">
                       Término em
                     </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="DD/MM/AAAA"
-                        {...field}
-                        className="h-[40px] w-[150px] rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm"
-                      />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-[240px] justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value
+                            ? format(new Date(field.value), "dd/MM/yyyy")
+                            : "Selecione uma data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date.toISOString());
+                            }
+                          }}
+                          disabled={(date) =>
+                            date < new Date(new Date().setHours(0, 0, 0, 0))
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -212,7 +246,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               variant="outline"
               type="button"
               className="h-[40px] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))]"
-              onClick={() => router.push('/surveys')}
+              onClick={() => router.push('/fluimap/surveys')}
             >
               Cancelar
             </Button>
