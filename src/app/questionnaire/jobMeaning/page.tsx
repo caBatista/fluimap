@@ -18,9 +18,30 @@ export default function JobMeaningPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch('/job-meaning.json')
-      .then((res) => res.json())
-      .then((json) => setData(json));
+    const loadData = async () => {
+      try {
+        const res = await fetch('/job-meaning.json');
+        const json: unknown = await res.json();
+
+        if (
+          typeof json === 'object' &&
+          json !== null &&
+          'titulo' in json &&
+          'instrucoes' in json &&
+          'escala' in json &&
+          'pergunta' in json &&
+          'itens' in json
+        ) {
+          setData(json as Questionnaire);
+        } else {
+          throw new Error('Estrutura inválida no JSON');
+        }
+      } catch (err) {
+        console.error('Erro ao carregar o questionário:', err);
+      }
+    };
+
+    void loadData();
   }, []);
 
   const handleAnswer = (questionIndex: number, value: string) => {

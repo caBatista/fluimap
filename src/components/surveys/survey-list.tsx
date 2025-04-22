@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 export type SurveyResponse = {
   _id: string;
@@ -44,16 +44,18 @@ function capitalize(text: string): string {
 }
 
 export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyListProps) {
-  const finalSurveys = Array.isArray(surveys) ? surveys : [];
-
+  const [localSurveys, setLocalSurveys] = useState<SurveyResponse[]>(surveys);
   const [confirmAction, setConfirmAction] = useState<null | {
     id: string;
     nextStatus: 'ativo' | 'fechado';
   }>(null);
   const [isPending, startTransition] = useTransition();
 
-  console.log('SurveyList: surveys recebidos =', surveys);
-  console.log('SurveyList: filtro =', statusFilter, '| search =', search);
+  useEffect(() => {
+    setLocalSurveys(surveys);
+  }, [surveys]);
+
+  const finalSurveys = Array.isArray(localSurveys) ? localSurveys : [];
 
   const filtered = finalSurveys.filter((survey) => {
     const matchesSearch = survey.title.toLowerCase().includes(search.toLowerCase());
@@ -67,14 +69,9 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
     return <p className="text-[hsl(var(--muted-foreground))]">Carregando...</p>;
   }
 
-  console.log('SurveyList: recebidos', surveys);
-  console.log('SurveyList: filtro status =', statusFilter);
-
   if (filtered.length === 0) {
     return <p className="text-[hsl(var(--muted-foreground))]">Nenhum formulário encontrado.</p>;
   }
-
-  console.log('SurveyList: surveys filtrados =', filtered.length);
 
   return (
     <>
@@ -108,12 +105,13 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                         throw new Error('Erro ao atualizar status');
                       }
 
-                      const updatedSurveys = surveys.map((survey) =>
-                        survey._id === confirmAction.id
-                          ? { ...survey, status: confirmAction.nextStatus }
-                          : survey
+                      setLocalSurveys((prev) =>
+                        prev.map((survey) =>
+                          survey._id === confirmAction.id
+                            ? { ...survey, status: confirmAction.nextStatus }
+                            : survey
+                        )
                       );
-                      (surveys as any).splice(0, surveys.length, ...updatedSurveys);
                     } catch (err) {
                       console.error(err);
                     } finally {
@@ -131,7 +129,6 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
       <div className="grid grid-cols-1 gap-[29px] md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((survey) => {
           const adjustedStatus: 'ativo' | 'rascunho' | 'fechado' = survey.status ?? 'ativo';
-
           const progressValue = survey.progress ?? 0;
           const statusText = adjustedStatus;
 

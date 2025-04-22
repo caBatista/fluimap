@@ -2,11 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,13 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -90,18 +84,18 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
       const response = await fetch('/api/surveys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, status: "ativo" }),
+        body: JSON.stringify({ ...data, status: 'ativo' }),
       });
 
       if (!response.ok) {
-      const err: unknown = await response.json();
-      const errorMessage =
-        typeof err === 'object' &&
-        err !== null &&
-        'error' in err &&
-        typeof (err as { error: unknown }).error === 'string'
-          ? (err as { error: string }).error
-          : JSON.stringify(err) || 'Erro ao criar formulário';
+        const err: unknown = await response.json();
+        const errorMessage =
+          typeof err === 'object' &&
+          err !== null &&
+          'error' in err &&
+          typeof (err as { error: unknown }).error === 'string'
+            ? (err as { error: string }).error
+            : JSON.stringify(err) || 'Erro ao criar formulário';
 
         throw new Error(errorMessage);
       }
@@ -114,8 +108,12 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
         typeof (result as { survey?: { _id?: string } }).survey?._id === 'string'
           ? (result as { survey: { _id: string } }).survey._id
           : null;
-      router.push(`/fluimap/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
 
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      router.push(`/fluimap/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
@@ -172,7 +170,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                 </FormItem>
               )}
             />
-            <div className="flex gap-4 items-end">
+            <div className="flex items-end gap-4">
               <FormField
                 control={form.control}
                 name="teamId"
@@ -209,14 +207,14 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-[240px] justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            'w-[240px] justify-start text-left font-normal',
+                            !field.value && 'text-muted-foreground'
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value
-                            ? format(new Date(field.value), "dd/MM/yyyy")
-                            : "Selecione uma data"}
+                            ? format(new Date(field.value), 'dd/MM/yyyy')
+                            : 'Selecione uma data'}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -228,9 +226,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                               field.onChange(date.toISOString());
                             }
                           }}
-                          disabled={(date) =>
-                            date < new Date(new Date().setHours(0, 0, 0, 0))
-                          }
+                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                           initialFocus
                         />
                       </PopoverContent>
