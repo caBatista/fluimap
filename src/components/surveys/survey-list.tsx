@@ -45,10 +45,6 @@ function capitalize(text: string): string {
 
 export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyListProps) {
   const [localSurveys, setLocalSurveys] = useState<SurveyResponse[]>(surveys);
-  const [confirmAction, setConfirmAction] = useState<null | {
-    id: string;
-    nextStatus: 'ativo' | 'fechado';
-  }>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -75,62 +71,16 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
 
   return (
     <>
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="rounded-md bg-white p-6 shadow-md">
-            <p className="mb-4 text-sm text-gray-700">
-              Deseja realmente {confirmAction.nextStatus === 'fechado' ? 'fechar' : 'abrir'} este
-              formulário?
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                onClick={() => setConfirmAction(null)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
-                disabled={isPending}
-                onClick={() => {
-                  startTransition(async () => {
-                    try {
-                      const response = await fetch(`/api/surveys/${confirmAction.id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: confirmAction.nextStatus }),
-                      });
-
-                      if (!response.ok) {
-                        throw new Error('Erro ao atualizar status');
-                      }
-
-                      setLocalSurveys((prev) =>
-                        prev.map((survey) =>
-                          survey._id === confirmAction.id
-                            ? { ...survey, status: confirmAction.nextStatus }
-                            : survey
-                        )
-                      );
-                    } catch (err) {
-                      console.error(err);
-                    } finally {
-                      setConfirmAction(null);
-                    }
-                  });
-                }}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="grid grid-cols-1 gap-[29px] md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((survey) => {
-          const adjustedStatus: 'ativo' | 'rascunho' | 'fechado' = survey.status ?? 'ativo';
+          const isExpired =
+            survey.dateClosing && new Date(survey.dateClosing).getTime() < Date.now();
+          const statusText: 'ativo' | 'rascunho' | 'fechado' = isExpired
+            ? 'fechado'
+            : survey.status === 'fechado'
+              ? 'ativo'
+              : (survey.status ?? 'ativo');
           const progressValue = survey.progress ?? 0;
-          const statusText = adjustedStatus;
 
           return (
             <Card
@@ -143,25 +93,16 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                     {survey.title}
                   </h2>
                 </div>
-                <button
-                  onClick={() =>
-                    setConfirmAction({
-                      id: survey._id,
-                      nextStatus: statusText === 'ativo' ? 'fechado' : 'ativo',
-                    })
-                  }
+                <Badge
+                  variant="default"
+                  className={cn(
+                    'pointer-events-none rounded-full px-2 py-1 text-xs font-medium',
+                    getBadgeClasses(statusText),
+                    statusText === 'fechado' ? 'bg-red-500 text-white' : ''
+                  )}
                 >
-                  <Badge
-                    variant="default"
-                    className={cn(
-                      'rounded-full px-2 py-1 text-xs font-medium',
-                      getBadgeClasses(statusText),
-                      statusText === 'fechado' ? 'bg-red-500 text-white' : ''
-                    )}
-                  >
-                    {capitalize(statusText)}
-                  </Badge>
-                </button>
+                  {capitalize(statusText)}
+                </Badge>
               </div>
 
               <p className="mt-[5px] text-xs text-[hsl(var(--muted-foreground))]">
