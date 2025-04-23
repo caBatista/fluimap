@@ -175,6 +175,11 @@ export function SignInCard() {
                               </Clerk.Loading>
                             </Button>
                           </SignIn.Action>
+                          <SignIn.Action navigate="start" asChild>
+                            <Button type="button" variant="outline" size="sm">
+                              Voltar
+                            </Button>
+                          </SignIn.Action>
                           <SignIn.Action navigate="choose-strategy" asChild>
                             <Button type="button" size="sm" variant="link">
                               Use outro método
