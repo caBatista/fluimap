@@ -30,7 +30,7 @@ export default function SelectUsersPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-[hsl(var(--background))] px-4 pb-12">
-      <h1 className="mt-6 items-center text-4xl font-bold">
+      <h1 className="items-center p-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
       <h1 className="mt-[-10px] text-center text-2xl text-[#6B7280]">
@@ -38,7 +38,7 @@ export default function SelectUsersPage() {
       </h1>
 
       <div className="flex w-full items-center justify-center">
-        <div className="flex w-full flex-wrap justify-center gap-6">
+        <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-4">
           {mockUsers.map((user, index) => (
             <SelectUser
               key={index}
@@ -51,10 +51,10 @@ export default function SelectUsersPage() {
         </div>
       </div>
 
-      <div className="mt-8 flex w-full justify-end">
+      <div className="mt-8 flex w-full justify-center px-2 sm:justify-end">
         <Button
           variant="default"
-          className="h-auto px-8 py-4 text-base"
+          className="h-auto w-full px-8 py-4 text-base sm:w-auto"
           onClick={handleContinue}
           disabled={selectedUsers.length === 0}
         >

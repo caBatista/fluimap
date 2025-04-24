@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-react';
@@ -22,8 +23,16 @@ export default function Sidebar() {
     <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
-        <h1 className="text-2xl font-bold">
-          <span className="text-[hsl(var(--primary))]">FluiMap</span>
+        <Image
+          src="/LogoFluiMap.png"
+          alt="Logo do FluiMap"
+          width={100}
+          height={100}
+          className="mb-2 mt-3 dark:invert"
+        />
+
+        <h1 className="text-xl font-bold">
+          {/* <span className="text-[hsl(var(--primary))]">FluiMap</span> */}
         </h1>
       </header>
 
