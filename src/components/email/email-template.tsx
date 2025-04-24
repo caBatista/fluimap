@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 import {
   Body,
@@ -12,17 +12,15 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 interface WelcomeEmailProps {
   username?: string;
 }
 
-const baseUrl = process.env.URL
-  ? `https://${process.env.URL}`
-  : "http://localhost:3000";
+const baseUrl = process.env.URL ? `https://${process.env.URL}` : 'http://localhost:3000';
 
-const SurveyEmail = ({ username = "Steve" }: WelcomeEmailProps) => {
+const SurveyEmail = ({ username = 'Steve' }: WelcomeEmailProps) => {
   const previewText = `Anwser you survey, ${username}!`;
 
   return (
@@ -46,8 +44,8 @@ const SurveyEmail = ({ username = "Steve" }: WelcomeEmailProps) => {
             </Heading>
             <Text className="text-sm">Hello {username},</Text>
             <Text className="text-sm">
-              You have been invited to answer a the FluiMap survey. Please click
-              the button below to answer the survey.
+              You have been invited to answer a the FluiMap survey. Please click the button below to
+              answer the survey.
             </Text>
             <Section className="mb-[32px] mt-[32px] text-center">
               <Button
