@@ -1,10 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -22,21 +22,22 @@ export default function Sidebar() {
   return (
     <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
-      <header className="flex h-[96px] w-[256px] items-center justify-center gap-3 border-b border-[hsl(var(--sidebar-border))] px-4">
+      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <Image
-          src="/logo-fluimap.svg"
-          alt="Logo FluiMap"
-          width={128}
-          height={32}
-          className="object-contain"
+          src="/LogoFluiMap.png"
+          alt="Logo do FluiMap"
+          width={100}
+          height={100}
+          className="mb-2 mt-3 dark:invert"
         />
-        {/* <h1 className="text-2xl font-bold text-[hsl(var(--primary))]">FluiMap</h1>
-         */}
-        ,
+
+        <h1 className="text-xl font-bold">
+          {/* <span className="text-[hsl(var(--primary))]">FluiMap</span> */}
+        </h1>
       </header>
 
       {/* Navegação */}
-      <nav className="flex flex-col items-start gap-[4px] px-2 pt-4">
+      <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
           href="/fluimap/home"
           icon={<Home size={20} />}
