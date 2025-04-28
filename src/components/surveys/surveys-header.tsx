@@ -15,7 +15,7 @@ export function SurveysHeader() {
       </div>
 
       <div className="mb-[32px] mt-[40px]">
-        <Link href="/surveys/create">
+        <Link href="/fluimap/surveys/create">
           <Button className="flex h-[40px] w-[190px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90">
             <PlusCircle className="h-4 w-4" />
             Criar novo Formulário

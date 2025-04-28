@@ -7,7 +7,21 @@ export async function GET() {
   try {
     await dbConnect();
     const surveys = await Survey.find().sort({ createdAt: -1 });
-    return NextResponse.json({ surveys }, { status: 200 });
+
+    const now = new Date();
+
+    const updatedSurveys = await Promise.all(
+      surveys.map(async (survey) => {
+        const isExpired = survey.dateClosing && new Date(survey.dateClosing) < now;
+        if (isExpired && survey.status !== 'fechado') {
+          survey.status = 'fechado';
+          await survey.save();
+        }
+        return survey.toObject();
+      })
+    );
+
+    return NextResponse.json({ surveys: updatedSurveys }, { status: 200 });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch surveys' }, { status: 500 });
   }
@@ -25,13 +39,25 @@ export async function POST(request: NextRequest) {
 
     const parseResult = SurveySchemaZod.safeParse(body);
     if (!parseResult.success) {
+      console.error('Erro no Zod:', parseResult.error);
       return NextResponse.json({ error: parseResult.error }, { status: 400 });
     }
 
-    const newSurvey = await Survey.create(parseResult.data);
-    return NextResponse.json({ survey: newSurvey }, { status: 201 });
+    const { dateClosing, ...rest } = parseResult.data;
+
+    if (!dateClosing || isNaN(new Date(dateClosing).getTime())) {
+      return NextResponse.json({ error: 'Data de fechamento inválida' }, { status: 400 });
+    }
+
+    const surveyData = {
+      ...rest,
+      dateClosing: new Date(dateClosing),
+    };
+
+    const newSurvey = await Survey.create(surveyData);
+    return NextResponse.json({ survey: newSurvey.toObject() }, { status: 201 });
   } catch (error) {
-    console.error(error);
+    console.error('Erro ao criar survey:', error);
     return NextResponse.json({ error: 'Failed to create survey' }, { status: 500 });
   }
 }

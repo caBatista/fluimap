@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Search, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Search, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface SearchAndFilterProps {
   search: string;
@@ -36,7 +36,6 @@ export function SearchAndFilter({
         />
       </div>
 
-      {/* Filtro de status usando Radix Select */}
       <div className="relative flex h-[40px] w-[231px] items-center">
         <Filter className="pointer-events-none absolute top-1/2 ml-[13px] h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -52,12 +51,6 @@ export function SearchAndFilter({
             </SelectItem>
             <SelectItem className="pl-[52px]" value="fechado">
               Fechado
-            </SelectItem>
-            <SelectItem className="pl-[52px]" value="rascunho">
-              Rascunho
-            </SelectItem>
-            <SelectItem className="pl-[52px]" value="em processo">
-              Em processo
             </SelectItem>
           </SelectContent>
         </Select>

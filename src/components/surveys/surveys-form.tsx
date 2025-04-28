@@ -1,10 +1,16 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -12,32 +18,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
-
-const questionSchema = z.object({
-  id: z.string(),
-  text: z.string().min(5, "Pergunta deve ter ao menos 5 caracteres."),
-  type: z.enum(["relacionamento", "rating", "text"]),
-});
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const surveyFormSchema = z.object({
-  title: z.string().min(2, "Título deve ter ao menos 2 caracteres."),
-  description: z.string().optional(),
-  teamId: z.string().min(1, "Selecione um time."),
-  questions: z.array(questionSchema).min(1, "É preciso ao menos 1 pergunta"),
+  title: z.string().min(2, 'Título deve ter pelo menos 2 caracteres.'),
+  description: z.string(),
+  teamId: z.string().min(1, 'Selecione um time.'),
+  dateClosing: z.string().nonempty('Insira a data de fechamento'),
 });
 
-type SurveyFormValues = z.infer<typeof surveyFormSchema>;
+export type SurveyFormValues = z.infer<typeof surveyFormSchema>;
 
 interface SurveyFormProps {
   onSuccess?: () => void;
@@ -45,48 +46,81 @@ interface SurveyFormProps {
 
 export function SurveyForm({ onSuccess }: SurveyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const { data: teams = [] } = useQuery<{ _id: string; name: string }[]>({
+    queryKey: ['teams'],
+    queryFn: async (): Promise<{ _id: string; name: string }[]> => {
+      const response = await fetch('/api/teams');
+      if (!response.ok) {
+        throw new Error('Falha ao buscar times');
+      }
+
+      const json: unknown = await response.json();
+      if (
+        typeof json !== 'object' ||
+        json === null ||
+        !Array.isArray((json as { teams?: unknown }).teams)
+      ) {
+        throw new Error('Resposta da API em formato inválido');
+      }
+      return (json as { teams: { _id: string; name: string }[] }).teams;
+    },
+  });
 
   const form = useForm<SurveyFormValues>({
     resolver: zodResolver(surveyFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      teamId: "",
-      questions: [
-        {
-          id: crypto.randomUUID(),
-          text: "Texto da pergunta",
-          type: "relacionamento",
-        },
-      ],
+      title: '',
+      description: '',
+      teamId: '',
+      dateClosing: '',
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "questions",
-  });
-
-  async function onSubmit(data: SurveyFormValues) {
+  async function onSubmit(data: SurveyFormValues): Promise<void> {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/surveys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      const response = await fetch('/api/surveys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, status: 'ativo' }),
       });
+
       if (!response.ok) {
-        const err = (await response.json()) as { error: string };
-        throw new Error(err.error || "Erro ao criar formulário");
+        const err: unknown = await response.json();
+        const errorMessage =
+          typeof err === 'object' &&
+          err !== null &&
+          'error' in err &&
+          typeof (err as { error: unknown }).error === 'string'
+            ? (err as { error: string }).error
+            : JSON.stringify(err) || 'Erro ao criar formulário';
+
+        throw new Error(errorMessage);
       }
-      if (onSuccess) onSuccess();
+
+      const result: unknown = await response.json();
+      const newSurveyId =
+        typeof result === 'object' &&
+        result !== null &&
+        'survey' in result &&
+        typeof (result as { survey?: { _id?: string } }).survey?._id === 'string'
+          ? (result as { survey: { _id: string } }).survey._id
+          : null;
+
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      router.push(`/fluimap/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
-        alert("Falha ao criar formulário: " + error.message);
+        alert('Falha ao criar formulário: ' + error.message);
       } else {
         console.error(error);
-        alert("Falha ao criar formulário. Ver console.");
+        alert('Falha ao criar formulário. Ver console.');
       }
     } finally {
       setIsSubmitting(false);
@@ -97,182 +131,127 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="ml-[27px] mt-[24px] w-[1161px] space-y-6"
+        className="mb-[27px] ml-[27px] mt-[25px] h-screen w-[1161px] space-y-6"
       >
-        <Card className="border border-[#E7E5E4] bg-[#FFFFFF]">
+        <Card className="border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <CardHeader>
-            <CardTitle className="text-[#111827]">
+            <CardTitle className="text-2xl font-bold text-[hsl(var(--foreground))]">
               Cadastrar Formulário
             </CardTitle>
+            <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+              Crie uma pesquisa para avaliar a dinâmica e os relacionamentos da equipe
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Título */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#4B5563]">
+                  <FormLabel className="text-[hsl(var(--muted-foreground))]">
                     Título do Formulário
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="ex: Pesquisa de Satisfação"
-                      {...field}
-                    />
+                    <Input placeholder="Digite o título do formulário" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Descrição */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#4B5563]">Descrição</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Breve descrição do objetivo da pesquisa"
-                      {...field}
-                    />
+                  <FormLabel className="text-[hsl(var(--muted-foreground))]">Descrição</FormLabel>
+                  <FormControl className="h-[71px] w-[1110px]">
+                    <Textarea placeholder="Breve descrição do objetivo do formulário" {...field} />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Time */}
-            <FormField
-              control={form.control}
-              name="teamId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[#4B5563]">Time</FormLabel>
-                  <FormControl>
-                    <select
-                      className="w-full rounded-md border border-[#E7E5E4] bg-white px-3 py-2 text-[#4B5563]"
-                      {...field}
-                    >
-                      <option value="">Selecione um time</option>
-                      <option value="time-exemplo-1">Exemplo de Time 1</option>
-                      <option value="time-exemplo-2">Exemplo de Time 2</option>
-                      <option value="time-exemplo-3">Exemplo de Time 3</option>
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Perguntas */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-[#111827]">
-                  Perguntas da Pesquisa
-                </h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-[#E7E5E4] text-[#4B5563]"
-                  onClick={() =>
-                    append({
-                      id: crypto.randomUUID(),
-                      text: "",
-                      type: "relacionamento",
-                    })
-                  }
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar pergunta
-                </Button>
-              </div>
-
-              {fields.map((field, index) => (
-                <Card
-                  key={field.id}
-                  className="border border-[#E7E5E4] bg-white p-4"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="font-medium text-[#111827]">
-                      Pergunta {index + 1}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="text-[#4B5563]"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  {/* Texto da pergunta */}
-                  <FormField
-                    control={form.control}
-                    name={`questions.${index}.text`}
-                    render={({ field: f }) => (
-                      <FormItem>
-                        <FormLabel className="text-[#4B5563]">
-                          Texto da pergunta
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Ex: Como você avalia o relacionamento com a equipe?"
-                            {...f}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Tipo da pergunta */}
-                  <FormField
-                    control={form.control}
-                    name={`questions.${index}.type`}
-                    render={({ field: f }) => (
-                      <FormItem className="mt-4">
-                        <FormLabel className="text-[#4B5563]">
-                          Tipo de pergunta
-                        </FormLabel>
-                        <FormControl>
-                          <select
-                            className="w-full rounded-md border border-[#E7E5E4] bg-white px-3 py-2 text-[#4B5563]"
-                            {...f}
-                          >
-                            <option value="relacionamento">
-                              Relacionamento
-                            </option>
-                            <option value="rating">Escala (1-5)</option>
-                            <option value="text">Texto aberto</option>
-                          </select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </Card>
-              ))}
+            <div className="flex items-end gap-4">
+              <FormField
+                control={form.control}
+                name="teamId"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="text-[hsl(var(--muted-foreground))]">Time</FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger className="h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--muted-foreground))]">
+                          <SelectValue placeholder="Selecione um time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teams.map((team) => (
+                            <SelectItem key={team._id} value={team._id}>
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="dateClosing"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-[hsl(var(--muted-foreground))]">
+                      Término em
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'w-[240px] justify-start text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value
+                            ? format(new Date(field.value), 'dd/MM/yyyy')
+                            : 'Selecione uma data'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date.toISOString());
+                            }
+                          }}
+                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </CardContent>
-          <CardFooter className="justify-end space-x-2">
+          <CardFooter className="justify-between space-x-2">
             <Button
               variant="outline"
               type="button"
-              className="border-[#E7E5E4] text-[#4B5563]"
+              className="h-[40px] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))]"
+              onClick={() => router.push('/fluimap/surveys')}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="bg-[#3C83F6] text-white hover:bg-[#3C83F6]/90"
+              className="h-[40px] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Criando..." : "Criar Pesquisa"}
+              {isSubmitting ? 'Criando...' : 'Criar Pesquisa'}
             </Button>
           </CardFooter>
         </Card>

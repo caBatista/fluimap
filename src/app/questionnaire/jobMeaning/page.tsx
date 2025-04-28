@@ -18,28 +18,36 @@ export default function JobMeaningPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetch('/job-meaning.json')
-      .then((res) => res.json())
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      .then((json) => setData(json));
+    const loadData = async () => {
+      try {
+        const res = await fetch('/job-meaning.json');
+        const json: unknown = await res.json();
+
+        if (
+          typeof json === 'object' &&
+          json !== null &&
+          'titulo' in json &&
+          'instrucoes' in json &&
+          'escala' in json &&
+          'pergunta' in json &&
+          'itens' in json
+        ) {
+          setData(json as Questionnaire);
+        } else {
+          throw new Error('Estrutura inválida no JSON');
+        }
+      } catch (err) {
+        console.error('Erro ao carregar o questionário:', err);
+      }
+    };
+
+    void loadData();
   }, []);
 
   const handleAnswer = (questionIndex: number, value: string) => {
     const key = `question-${questionIndex}`;
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
-
-  //   const totalQuestions = data?.itens.length || 0;
-  //   const allAnswered = Object.keys(answers).length === totalQuestions;
-
-  //     const handleContinue = () => {
-  //       if (!allAnswered) {
-  //         alert('Por favor, responda todas as perguntas antes de continuar.');
-  //         return;
-  //       }
-  //       router.push(`/questionnaire/success`);
-  //     };
 
   const handleContinue = () => {
     router.push(`/questionnaire/success`);
@@ -87,12 +95,7 @@ export default function JobMeaningPage() {
         >
           Cancelar
         </Button>
-        <Button
-          variant="default"
-          className="h-auto px-8 py-4 text-base"
-          onClick={handleContinue}
-          // disabled={!allAnswered}
-        >
+        <Button variant="default" className="h-auto px-8 py-4 text-base" onClick={handleContinue}>
           Finalizar
         </Button>
       </div>
