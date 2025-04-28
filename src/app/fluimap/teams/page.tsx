@@ -1,42 +1,40 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { PlusIcon } from "lucide-react";
-import { toast } from "sonner";
+import { useEffect, useState } from 'react';
+import { PlusIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
-import { TeamModal } from "@/components/modal/teamModal";
-import { EditTeamModal } from "@/components/modal/editTeamModal";
-import TeamListDialog from "./teamListDialog";
+import { TeamModal } from '@/components/modal/teamModal';
+import { EditTeamModal } from '@/components/modal/editTeamModal';
+import TeamListDialog from './teamListDialog';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { type EditTeamType } from "@/models/Team";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { type EditTeamType } from '@/models/Team';
 
 function isTeam(item: unknown): item is EditTeamType {
   return (
-    typeof item === "object" &&
+    typeof item === 'object' &&
     item !== null &&
-    "name" in item &&
-    typeof (item as Record<string, unknown>).name === "string"
+    'name' in item &&
+    typeof (item as Record<string, unknown>).name === 'string'
   );
 }
 
 function isApiTeamResponse(data: unknown): data is { teams: unknown[] } {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    Array.isArray((data as { teams?: unknown }).teams)
+    typeof data === 'object' && data !== null && Array.isArray((data as { teams?: unknown }).teams)
   );
 }
 
 export default function TeamPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [teams, setTeams] = useState<EditTeamType[]>([]);
   const [teamToDelete, setTeamToDelete] = useState<EditTeamType | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -46,22 +44,22 @@ export default function TeamPage() {
   useEffect(() => {
     async function fetchTeams() {
       try {
-        const res = await fetch("/api/teams");
-        if (!res.ok) throw new Error("Erro ao buscar times");
+        const res = await fetch('/api/teams');
+        if (!res.ok) throw new Error('Erro ao buscar times');
 
         const json: unknown = await res.json();
-        console.log("Resposta bruta da API:", json); // ← debug
+        console.log('Resposta bruta da API:', json); // ← debug
 
         if (!isApiTeamResponse(json)) {
-          throw new Error("Formato inválido da resposta da API");
+          throw new Error('Formato inválido da resposta da API');
         }
 
         const data: EditTeamType[] = json.teams.filter(isTeam);
-        console.log("Times carregados:", data);
+        console.log('Times carregados:', data);
         setTeams(data);
       } catch (error) {
         console.error(error);
-        toast.error("Erro ao carregar os times");
+        toast.error('Erro ao carregar os times');
       }
     }
     void fetchTeams();
@@ -69,58 +67,54 @@ export default function TeamPage() {
 
   const filteredTeams = teams.filter(
     (team) =>
-      typeof team.name === "string" && team.name.toLowerCase().includes(search.toLowerCase()) ||
-      team.description?.toLowerCase().includes(search.toLowerCase()),
+      (typeof team.name === 'string' && team.name.toLowerCase().includes(search.toLowerCase())) ||
+      team.description?.toLowerCase().includes(search.toLowerCase())
   );
 
   async function handleCreateTeam(name: string, description: string) {
     if (!name.trim()) {
-      toast.error("O nome do time é obrigatório");
+      toast.error('O nome do time é obrigatório');
       return;
     }
 
     try {
-      const response = await fetch("/api/teams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description }),
       });
 
-      if (!response.ok) throw new Error("Erro ao criar time");
+      if (!response.ok) throw new Error('Erro ao criar time');
 
       const createdJson: unknown = await response.json();
       const created = (createdJson as { team?: unknown }).team;
 
       if (isTeam(created)) {
         setTeams((prev) => [...prev, created]);
-        toast.success("Time criado com sucesso");
+        toast.success('Time criado com sucesso');
         setIsModalOpen(false);
       }
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao criar time");
+      toast.error('Erro ao criar time');
     }
   }
 
-  async function handleEditTeam(
-    id: string,
-    name: string,
-    description?: string,
-  ) {
+  async function handleEditTeam(id: string, name: string, description?: string) {
     if (!name.trim()) {
-      toast.error("O nome do time é obrigatório");
+      toast.error('O nome do time é obrigatório');
       return;
     }
 
     try {
       // Realiza a requisição PUT para editar o time
       const response = await fetch(`/api/teams/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description }),
       });
 
-      if (!response.ok) throw new Error("Erro ao editar time");
+      if (!response.ok) throw new Error('Erro ao editar time');
 
       // Obtém a resposta e atualiza o estado com o time editado
       const updatedJson: unknown = await response.json();
@@ -129,16 +123,14 @@ export default function TeamPage() {
       if (isTeam(updatedTeam)) {
         // Atualiza o time na lista
         setTeams((prev) =>
-          prev.map((team) =>
-            team._id === id ? { ...team, name, description } : team,
-          ),
+          prev.map((team) => (team._id === id ? { ...team, name, description } : team))
         );
-        toast.success("Time editado com sucesso");
+        toast.success('Time editado com sucesso');
         setIsModalOpen(false);
       }
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao editar time");
+      toast.error('Erro ao editar time');
     }
   }
 
@@ -157,16 +149,16 @@ export default function TeamPage() {
 
     try {
       const res = await fetch(`/api/teams/${teamToDelete._id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
-      if (!res.ok) throw new Error("Erro ao excluir time");
+      if (!res.ok) throw new Error('Erro ao excluir time');
 
       setTeams((prev) => prev.filter((t) => t._id !== teamToDelete._id));
-      toast.success("Time excluído com sucesso");
+      toast.success('Time excluído com sucesso');
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao excluir o time");
+      toast.error('Erro ao excluir o time');
     } finally {
       setTeamToDelete(null);
       setIsDeleteDialogOpen(false);
@@ -175,17 +167,15 @@ export default function TeamPage() {
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
-      <div className="mx-8 mb-4 flex flex-col items-center justify-between sm:flex-row">
+      <div className="flex flex-col items-center justify-between px-8 pb-4 sm:flex-row">
         <div>
-          <h1 className="mt-4 text-2xl font-bold sm:text-3xl">Times</h1>
-          <h2 className="text-sm sm:text-base">
-            Gerencie suas equipes e membros de equipe
-          </h2>
+          <h1 className="pt-4 text-2xl font-bold sm:text-3xl">Times</h1>
+          <h2 className="text-sm sm:text-base">Gerencie suas equipes e membros de equipe</h2>
         </div>
 
         <Button
           size="lg"
-          className="mt-4 flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-white sm:mt-0"
+          className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 pt-2 text-white sm:mt-0"
           onClick={() => setIsModalOpen(true)}
         >
           <span className="flex items-center justify-center rounded-full border-2 border-white bg-blue-500 p-1 text-white">
@@ -196,7 +186,7 @@ export default function TeamPage() {
       </div>
 
       {/* Campo de busca */}
-      <div className="mb-2 w-full px-8">
+      <div className="w-full px-8 pb-2">
         <input
           type="text"
           value={search}
@@ -225,14 +215,11 @@ export default function TeamPage() {
             <DialogTitle>Excluir Time</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-gray-500">
-            Tem certeza que deseja apagar este time? Os dados relacionados ao
-            time serão excluídos após a confirmação.
+            Tem certeza que deseja apagar este time? Os dados relacionados ao time serão excluídos
+            após a confirmação.
           </p>
           <DialogFooter className="flex justify-between sm:justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancelar
             </Button>
             <Button
@@ -246,11 +233,7 @@ export default function TeamPage() {
         </DialogContent>
       </Dialog>
 
-      <TeamListDialog
-        teams={filteredTeams}
-        onDelete={confirmDeleteTeam}
-        onEdit={confirmEditTeam}
-      />
+      <TeamListDialog teams={filteredTeams} onDelete={confirmDeleteTeam} onEdit={confirmEditTeam} />
     </div>
   );
 }

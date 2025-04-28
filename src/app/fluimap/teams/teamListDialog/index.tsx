@@ -1,6 +1,5 @@
 'use client';
 
-import { UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Cards } from '@/components/cards';
 import { MemberModal } from '@/components/modal/memberModal';
@@ -30,32 +29,31 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   }
 
   return (
-    <div className="w-full px-6 py-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+    <div className="bg-white p-6 text-black dark:bg-black dark:text-white">
+      <div className="grid max-h-[500px] grid-cols-1 justify-center gap-3 overflow-y-auto sm:grid-cols-2 lg:grid-cols-3">
         {teams.map((team, index) => (
-          <div key={index} className="flex justify-center">
-            <div className="w-full max-w-sm">
+          <div
+            key={index}
+            className="justify-center rounded-none bg-white p-4 shadow-none dark:bg-black dark:shadow-lg"
+          >
+            <div className="flex items-center pb-2">
               <Cards
                 name={team.name}
                 description={team.description}
-                button1="Ver Membros"
-                icon1={Users}
-                button2="Adicionar Membros"
-                icon2={UserPlus}
                 onOpenModal={() => openModal(team)}
                 onDelete={() => onDelete?.(team)}
                 onEdit={() => onEdit?.(team)}
               />
+
+              <MemberModal
+                isOpen={isMemberModalOpen}
+                onClose={closeModal}
+                onSubmit={handleAddMember}
+                selectedTeam={selectedTeam}
+              />
             </div>
           </div>
         ))}
-
-        <MemberModal
-          isOpen={isMemberModalOpen}
-          onClose={closeModal}
-          onSubmit={handleAddMember}
-          selectedTeam={selectedTeam}
-        />
       </div>
     </div>
   );
