@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { TeamModal } from '@/components/modal/teamModal';
 import { EditTeamModal } from '@/components/modal/editTeamModal';
@@ -35,35 +36,110 @@ function isApiTeamResponse(data: unknown): data is { teams: unknown[] } {
 export default function TeamPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [teams, setTeams] = useState<EditTeamType[]>([]);
   const [teamToDelete, setTeamToDelete] = useState<EditTeamType | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [teamToEdit, setTeamToEdit] = useState<EditTeamType | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  useEffect(() => {
-    async function fetchTeams() {
-      try {
-        const res = await fetch('/api/teams');
-        if (!res.ok) throw new Error('Erro ao buscar times');
-
-        const json: unknown = await res.json();
-        console.log('Resposta bruta da API:', json); // ← debug
-
-        if (!isApiTeamResponse(json)) {
-          throw new Error('Formato inválido da resposta da API');
-        }
-
-        const data: EditTeamType[] = json.teams.filter(isTeam);
-        console.log('Times carregados:', data);
-        setTeams(data);
-      } catch (error) {
-        console.error(error);
-        toast.error('Erro ao carregar os times');
+  const {
+    data: teams = [],
+    isLoading,
+    isError,
+  } = useQuery<EditTeamType[]>({
+    queryKey: ['teams'],
+    queryFn: async () => {
+      const res = await fetch('/api/teams');
+      if (!res.ok) throw new Error('Erro ao buscar times');
+      const json: unknown = await res.json();
+      if (!isApiTeamResponse(json)) {
+        throw new Error('Formato inválido da resposta da API');
       }
-    }
-    void fetchTeams();
-  }, []);
+      return json.teams.filter(isTeam);
+    },
+  });
+
+  const queryClient = useQueryClient();
+
+  const createTeamMutation = useMutation({
+    mutationFn: async ({ name, description }: { name: string; description: string }) => {
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description }),
+      });
+      if (!response.ok) throw new Error('Erro ao criar time');
+      const createdJson: unknown = await response.json();
+      const created = (createdJson as { team?: unknown }).team;
+      if (!isTeam(created)) throw new Error('Time criado inválido');
+      return created;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      toast.success('Time criado com sucesso');
+      setIsModalOpen(false);
+    },
+    onError: () => {
+      toast.error('Erro ao criar time');
+    },
+  });
+
+  const editTeamMutation = useMutation({
+    mutationFn: async ({
+      id,
+      name,
+      description,
+    }: {
+      id: string;
+      name: string;
+      description?: string;
+    }) => {
+      const response = await fetch(`/api/teams/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description }),
+      });
+      if (!response.ok) throw new Error('Erro ao editar time');
+      const updatedJson: unknown = await response.json();
+      const updatedTeam = (updatedJson as { team?: unknown }).team;
+      if (!isTeam(updatedTeam)) throw new Error('Time editado inválido');
+      return updatedTeam;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      toast.success('Time editado com sucesso');
+      setIsEditDialogOpen(false);
+    },
+    onError: () => {
+      toast.error('Erro ao editar time');
+    },
+  });
+
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/teams/${id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Erro ao excluir time');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      toast.success('Time excluído com sucesso');
+      setIsDeleteDialogOpen(false);
+      setTeamToDelete(null);
+    },
+    onError: () => {
+      toast.error('Erro ao excluir o time');
+    },
+  });
+
+  if (isLoading) {
+    return <div className="p-8">Carregando times...</div>;
+  }
+
+  if (isError) {
+    return <div className="p-8 text-red-500">Erro ao carregar os times</div>;
+  }
 
   const filteredTeams = teams.filter(
     (team) =>
@@ -71,67 +147,20 @@ export default function TeamPage() {
       team.description?.toLowerCase().includes(search.toLowerCase())
   );
 
-  async function handleCreateTeam(name: string, description: string) {
+  function handleCreateTeam(name: string, description: string) {
     if (!name.trim()) {
       toast.error('O nome do time é obrigatório');
       return;
     }
-
-    try {
-      const response = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description }),
-      });
-
-      if (!response.ok) throw new Error('Erro ao criar time');
-
-      const createdJson: unknown = await response.json();
-      const created = (createdJson as { team?: unknown }).team;
-
-      if (isTeam(created)) {
-        setTeams((prev) => [...prev, created]);
-        toast.success('Time criado com sucesso');
-        setIsModalOpen(false);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Erro ao criar time');
-    }
+    createTeamMutation.mutate({ name, description });
   }
 
-  async function handleEditTeam(id: string, name: string, description?: string) {
+  function handleEditTeam(id: string, name: string, description?: string) {
     if (!name.trim()) {
       toast.error('O nome do time é obrigatório');
       return;
     }
-
-    try {
-      // Realiza a requisição PUT para editar o time
-      const response = await fetch(`/api/teams/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description }),
-      });
-
-      if (!response.ok) throw new Error('Erro ao editar time');
-
-      // Obtém a resposta e atualiza o estado com o time editado
-      const updatedJson: unknown = await response.json();
-      const updatedTeam = (updatedJson as { team?: unknown }).team;
-
-      if (isTeam(updatedTeam)) {
-        // Atualiza o time na lista
-        setTeams((prev) =>
-          prev.map((team) => (team._id === id ? { ...team, name, description } : team))
-        );
-        toast.success('Time editado com sucesso');
-        setIsModalOpen(false);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Erro ao editar time');
-    }
+    editTeamMutation.mutate({ id, name, description });
   }
 
   function confirmEditTeam(team: EditTeamType) {
@@ -144,25 +173,9 @@ export default function TeamPage() {
     setIsDeleteDialogOpen(true);
   }
 
-  async function handleDeleteTeam() {
+  function handleDeleteTeam() {
     if (!teamToDelete?._id) return;
-
-    try {
-      const res = await fetch(`/api/teams/${teamToDelete._id}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) throw new Error('Erro ao excluir time');
-
-      setTeams((prev) => prev.filter((t) => t._id !== teamToDelete._id));
-      toast.success('Time excluído com sucesso');
-    } catch (error) {
-      console.error(error);
-      toast.error('Erro ao excluir o time');
-    } finally {
-      setTeamToDelete(null);
-      setIsDeleteDialogOpen(false);
-    }
+    deleteTeamMutation.mutate(teamToDelete._id);
   }
 
   return (

@@ -12,19 +12,19 @@ interface TeamModalProps {
 }
 
 export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
-  const [teamName, setTeamName] = useState<string>("");
-  const [teamDescription, setTeamDescription] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>('');
+  const [teamDescription, setTeamDescription] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
-      setTeamName(""); // Limpa o nome da equipe
-      setTeamDescription(""); // Limpa a descrição da equipe
+      setTeamName(''); // Limpa o nome da equipe
+      setTeamDescription(''); // Limpa a descrição da equipe
     }
   }, [isOpen]);
 
   async function handleSubmit() {
     if (!teamName.trim()) {
-      console.error("O nome do time é obrigatório");
+      console.error('O nome do time é obrigatório');
       return; // Se o nome estiver vazio, não faz o envio
     }
 
@@ -42,10 +42,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
     >
       {/* Campo para o nome da equipe */}
       <div className="mb-4">
-        <label
-          htmlFor="teamName"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
           Nome da Equipe
         </label>
         <input
@@ -60,10 +57,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
       </div>
 
       <div className="mb-4">
-        <label
-          htmlFor="teamDescription"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700">
           Descrição da Equipe
         </label>
         <textarea

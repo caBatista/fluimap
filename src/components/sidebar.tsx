@@ -7,6 +7,7 @@ import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-
 import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -20,7 +21,7 @@ export default function Sidebar() {
     typeof user?.publicMetadata?.cargo === 'string' ? user.publicMetadata.cargo : 'gestor';
 
   return (
-    <div className="z-50 flex h-screen w-[256px] flex-col bg-[hsl(var(--sidebar-bg))] shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
+    <div className="z-50 flex h-screen w-[256px] flex-col bg-background shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
       <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
         <Image
@@ -91,6 +92,7 @@ export default function Sidebar() {
             <div className="text-xs text-[hsl(var(--sidebar-text))]">{cargo}</div>
           </div>
         </div>
+        <ModeToggle />
         <Button
           variant="default"
           size="icon"

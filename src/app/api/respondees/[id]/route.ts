@@ -31,13 +31,13 @@ async function checkAuth(userId: string | null, respondeeId: string) {
 }
 
 // GET handler to retrieve a specific respondee
-export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     await dbConnect();
 
     const { userId } = await auth();
-    const authResult = await checkAuth(userId, params.id);
+    const authResult = await checkAuth(userId, id);
 
     if (!authResult.authorized) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status! });
@@ -103,19 +103,20 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
 }
 
 // DELETE handler to delete a specific respondee
-export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  console.log('Deleting respondee');
+  const { id } = await params;
   try {
     await dbConnect();
 
     const { userId } = await auth();
-    const authResult = await checkAuth(userId, params.id);
+    const authResult = await checkAuth(userId, id);
 
     if (!authResult.authorized) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status! });
     }
 
-    await Respondee.findByIdAndDelete(params.id);
+    await Respondee.findByIdAndDelete(id);
 
     revalidatePath(`/dashboard`);
 

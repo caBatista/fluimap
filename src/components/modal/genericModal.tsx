@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 // Tipagem para as propriedades da modal genérica
 interface GenericModalProps {
@@ -17,16 +17,10 @@ interface GenericModalProps {
   children: React.ReactNode; // conteúdo dinâmico
 }
 
-export function GenericModal({
-  isOpen,
-  onClose,
-  title,
-  description,
-  children,
-}: GenericModalProps) {
+export function GenericModal({ isOpen, onClose, title, description, children }: GenericModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-lg bg-white text-black shadow-xl dark:bg-black dark:text-white sm:max-w-[425px]">
+      <DialogContent className="rounded-lg bg-white text-black shadow-xl dark:bg-black dark:text-white sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

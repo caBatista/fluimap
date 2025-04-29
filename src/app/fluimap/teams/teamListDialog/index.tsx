@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Cards } from '@/components/cards';
 import { MemberModal } from '@/components/modal/memberModal';
 import { type EditTeamType } from '@/models/Team';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 type TeamListProps = {
   teams: EditTeamType[];
@@ -14,9 +16,58 @@ type TeamListProps = {
 export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<EditTeamType | null>(null);
+  const queryClient = useQueryClient();
+
+  const addMemberMutation = useMutation({
+    mutationFn: async ({
+      name,
+      email,
+      role,
+      teamId,
+    }: {
+      name: string;
+      email: string;
+      role: string;
+      teamId: string;
+    }) => {
+      const response = await fetch('/api/respondees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, role, teamId }),
+      });
+      console.log('============================================');
+      console.log('Adicionando membro', response);
+      console.log('============================================');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao adicionar membro');
+      }
+      return response.json();
+    },
+    onSuccess: (_data, variables) => {
+      toast.success('Membro adicionado com sucesso!');
+      setIsMemberModalOpen(false);
+      // Invalida a lista de membros do time
+      if (variables.teamId) {
+        queryClient.invalidateQueries({ queryKey: ['respondees', variables.teamId] });
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erro ao adicionar membro');
+    },
+  });
 
   function handleAddMember(memberName: string, memberEmail: string, memberPosition: string) {
-    console.log('Adicionando membro:', memberName, memberEmail, memberPosition);
+    if (!selectedTeam?._id) {
+      toast.error('Selecione um time válido');
+      return;
+    }
+    addMemberMutation.mutate({
+      name: memberName,
+      email: memberEmail,
+      role: memberPosition || 'Membro',
+      teamId: selectedTeam._id,
+    });
   }
 
   function openModal(team: EditTeamType) {
@@ -43,6 +94,8 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
                 onOpenModal={() => openModal(team)}
                 onDelete={() => onDelete?.(team)}
                 onEdit={() => onEdit?.(team)}
+                teamId={team._id}
+                team={team}
               />
 
               <MemberModal

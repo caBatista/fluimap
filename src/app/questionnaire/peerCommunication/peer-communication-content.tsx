@@ -1,8 +1,9 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface QuestionItem {
   question: string;
@@ -21,16 +22,33 @@ export function PeerCommunicationContent() {
   const users = searchParams.getAll('users');
   const router = useRouter();
 
-  const [data, setData] = useState<QuestionnaireData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetch('/peer-communication.json')
-      .then((res) => res.json())
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      .then((json) => setData(json));
-  }, []);
+  // Fetch questionnaire data with React Query
+  const { data, isLoading, error } = useQuery<QuestionnaireData>({
+    queryKey: ['peer-communication'],
+    queryFn: async () => {
+      const res = await fetch('/peer-communication.json');
+      if (!res.ok) throw new Error('Erro ao carregar o questionário');
+      return res.json();
+    },
+  });
+
+  // Mutation for submitting answers
+  const mutation = useMutation({
+    mutationFn: async (payload: { answers: Record<string, string>; users: string[] }) => {
+      const res = await fetch('/api/peer-communication-answers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Erro ao enviar respostas');
+      return res.json();
+    },
+    onSuccess: () => {
+      router.push(`/questionnaire/wellBeingPage`);
+    },
+  });
 
   const handleAnswer = (userIndex: number, questionIndex: number, value: string) => {
     const key = `user-${userIndex}-q${questionIndex}`;
@@ -41,7 +59,21 @@ export function PeerCommunicationContent() {
     router.push(`/questionnaire/wellBeingPage`);
   };
 
-  if (!data) return null;
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Carregando questionário...
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-red-500">
+        Erro ao carregar o questionário
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center p-6">
@@ -85,6 +117,7 @@ export function PeerCommunicationContent() {
                 className="h-auto px-8 py-4 text-base"
                 variant="outline"
                 onClick={() => router.back()}
+                disabled={mutation.status === 'pending'}
               >
                 Cancelar
               </Button>
@@ -92,8 +125,9 @@ export function PeerCommunicationContent() {
                 variant="default"
                 className="h-auto px-8 py-4 text-base"
                 onClick={handleContinue}
+                disabled={mutation.status === 'pending'}
               >
-                Continuar
+                {mutation.status === 'pending' ? 'Enviando...' : 'Continuar'}
               </Button>
             </div>
           )}

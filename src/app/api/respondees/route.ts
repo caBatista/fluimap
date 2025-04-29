@@ -111,3 +111,31 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create respondees' }, { status: 500 });
   }
 }
+
+// GET handler to fetch respondees by teamId
+export async function GET(request: NextRequest) {
+  try {
+    await dbConnect();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { searchParams } = new URL(request.url);
+    const teamId = searchParams.get('teamId');
+    if (!teamId) {
+      return NextResponse.json({ error: 'Missing teamId parameter' }, { status: 400 });
+    }
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+    }
+    if (team.ownerId !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+    const respondees = await Respondee.find({ teamId });
+    return NextResponse.json({ respondees }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching respondees:', error);
+    return NextResponse.json({ error: 'Failed to fetch respondees' }, { status: 500 });
+  }
+}

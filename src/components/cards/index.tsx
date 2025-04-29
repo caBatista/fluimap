@@ -1,9 +1,33 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { UserIcon, UserPlus } from 'lucide-react';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PencilIcon, TrashIcon } from 'lucide-react';
+import { GenericModal } from '@/components/modal/genericModal';
+import { RespondeeList } from '@/components/respondees/respondee-list';
+import { type EditTeamType } from '@/models/Team';
+
+// New modal for viewing members, following EditTeamModal structure
+interface ViewMembersModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  team: EditTeamType | null;
+}
+
+function ViewMembersModal({ isOpen, onClose, team }: ViewMembersModalProps) {
+  return (
+    <GenericModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={team ? `Membros do time: ${team.name}` : 'Membros do time'}
+      description="Veja e gerencie os membros deste time."
+    >
+      {team && <RespondeeList teamId={team._id} />}
+    </GenericModal>
+  );
+}
 
 interface CardsProps {
   name: string;
@@ -11,9 +35,21 @@ interface CardsProps {
   onOpenModal?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  teamId: string;
+  team?: EditTeamType; // Add the full team object for modal
 }
 
-export function Cards({ name, description, onOpenModal, onDelete, onEdit }: CardsProps) {
+export function Cards({
+  name,
+  description,
+  onOpenModal,
+  onDelete,
+  onEdit,
+  teamId,
+  team,
+}: CardsProps) {
+  const [isViewMembersOpen, setIsViewMembersOpen] = useState(false);
+
   return (
     <Card className="w-35 flex h-[200px] flex-col rounded-lg border-2 border-white pt-4 shadow-lg dark:border-2 dark:border-white dark:shadow-[0_10px_15px_-3px_rgba(255,255,255,0.1),_0_4px_6px_-2px_rgba(255,255,255,0.05)]">
       <CardHeader className="flex items-center justify-between p-0">
@@ -47,6 +83,7 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit }: Card
         <Button
           variant="outline"
           className="w-full min-w-[120px] max-w-[120px] flex-1 text-ellipsis whitespace-nowrap border border-black dark:border-white sm:w-auto"
+          onClick={() => setIsViewMembersOpen(true)}
         >
           <UserIcon className="h-4 w-4 shrink-0" />
           Ver Membros
@@ -60,6 +97,11 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit }: Card
           Adicionar Membros
         </Button>
       </CardFooter>
+      <ViewMembersModal
+        isOpen={isViewMembersOpen}
+        onClose={() => setIsViewMembersOpen(false)}
+        team={team || null}
+      />
     </Card>
   );
 }

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { GenericModal } from "../modal/genericModal";
-import { DialogFooter } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { type EditTeamType } from "@/models/Team";
+import { useState, useEffect } from 'react';
+import { GenericModal } from '../modal/genericModal';
+import { DialogFooter } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { type EditTeamType } from '@/models/Team';
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -13,18 +13,10 @@ interface TeamModalProps {
   team: EditTeamType | null;
 }
 
-
-export function EditTeamModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  team,
-}: TeamModalProps) {
-  const [teamName, setTeamName] = useState<string>("");
-  const [teamDescription, setTeamDescription] = useState<string | undefined>(
-    "",
-  );
-  const [teamId, setTeamId] = useState<string>("");
+export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProps) {
+  const [teamName, setTeamName] = useState<string>('');
+  const [teamDescription, setTeamDescription] = useState<string | undefined>('');
+  const [teamId, setTeamId] = useState<string>('');
 
   useEffect(() => {
     if (isOpen && team) {
@@ -35,7 +27,7 @@ export function EditTeamModal({
   }, [isOpen, team]);
 
   const handleEdit = () => {
-    const validDescription = teamDescription ?? ""; // Se for undefined, usa uma string vazia
+    const validDescription = teamDescription ?? ''; // Se for undefined, usa uma string vazia
 
     onSubmit(teamId, teamName, validDescription);
     onClose();
@@ -50,10 +42,7 @@ export function EditTeamModal({
     >
       {/* Campo para o nome da equipe */}
       <div className="mb-4">
-        <label
-          htmlFor="teamName"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
           Nome da Equipe
         </label>
         <input
@@ -69,10 +58,7 @@ export function EditTeamModal({
 
       {/* Campo para descrição */}
       <div className="mb-4">
-        <label
-          htmlFor="teamDescription"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700">
           Descrição da Equipe
         </label>
         <textarea
