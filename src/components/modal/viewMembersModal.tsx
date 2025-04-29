@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { GenericModal } from './genericModal';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 interface ViewMembersModalProps {
@@ -21,10 +21,10 @@ type Respondee = {
 async function fetchRespondees(teamId: string): Promise<Respondee[]> {
   const response = await fetch(`/api/respondees?teamId=${teamId}`);
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to fetch team members');
+    const errorData = (await response.json()) as { error?: string };
+    throw new Error(errorData.error ?? 'Failed to fetch team members');
   }
-  const data = await response.json();
+  const data = (await response.json()) as { respondees: Respondee[] };
   return data.respondees;
 }
 
@@ -42,19 +42,17 @@ export function ViewMembersModal({ isOpen, onClose, teamId }: ViewMembersModalPr
 
   async function deleteRespondee(respondeeId: string) {
     if (!confirm('Are you sure you want to delete this team member?')) return;
-    console.log('============================================');
-    console.log('Deleting respondee', respondeeId);
-    console.log('============================================');
+
     try {
       const response = await fetch(`/api/respondees/${respondeeId}`, { method: 'DELETE' });
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete team member');
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? 'Failed to delete team member');
       }
       toast.success('Team member deleted successfully');
       void queryClient.invalidateQueries({ queryKey: ['respondees', teamId] });
-    } catch (err: any) {
-      toast.error(err.message || 'An unknown error occurred');
+    } catch (err: unknown) {
+      toast.error((err as Error).message ?? 'An unknown error occurred');
     }
   }
 
@@ -68,7 +66,7 @@ export function ViewMembersModal({ isOpen, onClose, teamId }: ViewMembersModalPr
       {isLoading ? (
         <div className="p-4 text-center">Loading team members...</div>
       ) : error ? (
-        <div className="p-4 text-center text-red-500">{(error as Error).message}</div>
+        <div className="p-4 text-center text-red-500">{error.message}</div>
       ) : respondees.length === 0 ? (
         <div className="p-4 text-center text-muted-foreground">No team members found.</div>
       ) : (

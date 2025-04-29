@@ -74,7 +74,7 @@ export default function TeamPage() {
       return created;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      void queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast.success('Time criado com sucesso');
       setIsModalOpen(false);
     },
@@ -105,7 +105,7 @@ export default function TeamPage() {
       return updatedTeam;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      void queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast.success('Time editado com sucesso');
       setIsEditDialogOpen(false);
     },
@@ -123,7 +123,7 @@ export default function TeamPage() {
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      void queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast.success('Time excluído com sucesso');
       setIsDeleteDialogOpen(false);
       setTeamToDelete(null);
@@ -152,7 +152,7 @@ export default function TeamPage() {
       toast.error('O nome do time é obrigatório');
       return;
     }
-    createTeamMutation.mutate({ name, description });
+    void createTeamMutation.mutate({ name, description });
   }
 
   function handleEditTeam(id: string, name: string, description?: string) {
@@ -160,7 +160,7 @@ export default function TeamPage() {
       toast.error('O nome do time é obrigatório');
       return;
     }
-    editTeamMutation.mutate({ id, name, description });
+    void editTeamMutation.mutate({ id, name, description });
   }
 
   function confirmEditTeam(team: EditTeamType) {
@@ -175,7 +175,7 @@ export default function TeamPage() {
 
   function handleDeleteTeam() {
     if (!teamToDelete?._id) return;
-    deleteTeamMutation.mutate(teamToDelete._id);
+    void deleteTeamMutation.mutate(teamToDelete._id);
   }
 
   return (

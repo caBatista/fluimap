@@ -20,7 +20,7 @@ export default function WellBeingPage() {
     queryFn: async () => {
       const res = await fetch('/well-being.json');
       if (!res.ok) throw new Error('Network response was not ok');
-      return res.json();
+      return res.json() as Promise<Questionnaire>;
     },
   });
 

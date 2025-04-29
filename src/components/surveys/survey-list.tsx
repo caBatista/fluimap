@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 
 export type SurveyResponse = {
   _id: string;
@@ -45,7 +45,6 @@ function capitalize(text: string): string {
 
 export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyListProps) {
   const [localSurveys, setLocalSurveys] = useState<SurveyResponse[]>(surveys);
-  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setLocalSurveys(surveys);

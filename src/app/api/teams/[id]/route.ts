@@ -13,7 +13,7 @@ async function getUserIdOrThrow(): Promise<string> {
 }
 
 // GET: Retorna um time específico e seus membros
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -77,7 +77,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // DELETE: Remove um time e seus membros
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
     const { id } = await params;

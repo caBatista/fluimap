@@ -39,15 +39,7 @@ interface CardsProps {
   team?: EditTeamType; // Add the full team object for modal
 }
 
-export function Cards({
-  name,
-  description,
-  onOpenModal,
-  onDelete,
-  onEdit,
-  teamId,
-  team,
-}: CardsProps) {
+export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }: CardsProps) {
   const [isViewMembersOpen, setIsViewMembersOpen] = useState(false);
 
   return (
@@ -100,7 +92,7 @@ export function Cards({
       <ViewMembersModal
         isOpen={isViewMembersOpen}
         onClose={() => setIsViewMembersOpen(false)}
-        team={team || null}
+        team={team ?? null}
       />
     </Card>
   );

@@ -55,10 +55,13 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: async (results: Papa.ParseResult<any>) => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      complete: async (
+        results: Papa.ParseResult<{ name: string; email: string; role: string }>
+      ) => {
         try {
           // Expect columns: name, email, role
-          const respondees = (results.data as any[])
+          const respondees = results.data
             .map((row) => ({
               name: row.name?.trim() || '',
               email: row.email?.trim() || '',
@@ -76,18 +79,18 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
             body: JSON.stringify({ respondees, teamId: selectedTeam._id }),
           });
           if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erro ao importar membros.');
+            const errorData = (await response.json()) as { error?: string };
+            throw new Error(errorData.error ?? 'Erro ao importar membros.');
           }
           toast.success(`Importação de ${respondees.length} membros realizada com sucesso!`);
           onClose();
-        } catch (err: any) {
-          toast.error(err.message || 'Erro desconhecido ao importar CSV.');
+        } catch (err: unknown) {
+          toast.error((err as Error).message ?? 'Erro desconhecido ao importar CSV.');
         } finally {
           setIsUploading(false);
         }
       },
-      error: (err: Error) => {
+      error: (_err: Error) => {
         toast.error('Erro ao ler o arquivo CSV.');
         setIsUploading(false);
       },

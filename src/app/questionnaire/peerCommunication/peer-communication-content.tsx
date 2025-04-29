@@ -30,7 +30,7 @@ export function PeerCommunicationContent() {
     queryFn: async () => {
       const res = await fetch('/peer-communication.json');
       if (!res.ok) throw new Error('Erro ao carregar o questionário');
-      return res.json();
+      return res.json() as Promise<QuestionnaireData>;
     },
   });
 
@@ -43,10 +43,11 @@ export function PeerCommunicationContent() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Erro ao enviar respostas');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return res.json();
     },
     onSuccess: () => {
-      router.push(`/questionnaire/wellBeingPage`);
+      void router.push(`/questionnaire/wellBeingPage`);
     },
   });
 

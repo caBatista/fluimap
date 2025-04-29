@@ -31,7 +31,7 @@ async function checkAuth(userId: string | null, respondeeId: string) {
 }
 
 // GET handler to retrieve a specific respondee
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     await dbConnect();
