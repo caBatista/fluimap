@@ -24,26 +24,47 @@ export function PeerCommunicationContent() {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  // Fetch questionnaire data with React Query
   const { data, isLoading, error } = useQuery<QuestionnaireData>({
     queryKey: ['peer-communication'],
     queryFn: async () => {
-      const res = await fetch('/peer-communication.json');
-      if (!res.ok) throw new Error('Erro ao carregar o questionário');
-      return res.json() as Promise<QuestionnaireData>;
+      console.log('PeerCommunicationContent: fetching /api/questionnaires');
+      const res = await fetch('/api/questionnaires');
+      console.log('PeerCommunicationContent: response status', res.status);
+      if (!res.ok) throw new Error('Erro ao carregar questionários');
+
+      const { questionnaires } = (await res.json()) as {
+        questionnaires: Array<{
+          section: string;
+          name: string;
+          instructions: string;
+          questions: Array<{ text: string; options: { value: string; label: string }[] }>;
+        }>;
+      };
+      console.log('PeerCommunicationContent: raw data', { questionnaires });
+
+      const qp = questionnaires.find((q) => q.section === 'communicationPeers');
+      if (!qp) throw new Error('Questionário de comunicação não encontrado');
+
+      return {
+        titulo: qp.name,
+        instrucoes: qp.instructions,
+        pergunta: '',
+        questoes: qp.questions.map((q) => ({
+          question: q.text,
+          options: q.options.map((o) => o.label),
+        })),
+      };
     },
   });
 
-  // Mutation for submitting answers
   const mutation = useMutation({
     mutationFn: async (payload: { answers: Record<string, string>; users: string[] }) => {
-      const res = await fetch('/api/peer-communication-answers', {
+      const res = await fetch('/api/questionnaires', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Erro ao enviar respostas');
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return res.json();
     },
     onSuccess: () => {
@@ -57,7 +78,7 @@ export function PeerCommunicationContent() {
   };
 
   const handleContinue = () => {
-    router.push(`/questionnaire/wellBeingPage`);
+    mutation.mutate({ answers, users });
   };
 
   if (isLoading) {
@@ -81,7 +102,7 @@ export function PeerCommunicationContent() {
       <h1 className="mb-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
-      <h2 className="mb-4 text-center text-2xl font-semibold">{data?.titulo}</h2>
+      <h2 className="mb-4 text-center text-2xl font-semibold">{data.titulo}</h2>
       <p className="mb-8 max-w-2xl text-center text-sm">{data.instrucoes}</p>
 
       {users.map((user, userIndex) => (

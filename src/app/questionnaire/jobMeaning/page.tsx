@@ -6,11 +6,13 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 interface Questionnaire {
-  titulo: string;
-  instrucoes: string;
-  escala: Record<string, string>;
-  pergunta: string;
-  itens: string[];
+  name: string;
+  instructions: string;
+  section: string;
+  questions: Array<{
+    text: string;
+    options: { value: string; label: string }[];
+  }>;
 }
 
 export default function JobMeaningPage() {
@@ -18,24 +20,18 @@ export default function JobMeaningPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useQuery<Questionnaire>({
-    queryKey: ['job-meaning'],
+    queryKey: ['questionnaire', 'jobMeaning'],
     queryFn: async () => {
-      const res = await fetch('/job-meaning.json');
-      if (!res.ok) throw new Error('Erro ao carregar o questionário');
-      const json: unknown = await res.json();
-      if (
-        typeof json === 'object' &&
-        json !== null &&
-        'titulo' in json &&
-        'instrucoes' in json &&
-        'escala' in json &&
-        'pergunta' in json &&
-        'itens' in json
-      ) {
-        return json as Questionnaire;
-      } else {
-        throw new Error('Estrutura inválida no JSON');
-      }
+      const res = await fetch('/api/questionnaires');
+      if (!res.ok) throw new Error('Erro ao carregar questionários');
+      const { questionnaires } = (await res.json()) as {
+        questionnaires: Questionnaire[];
+      };
+
+      const qm = questionnaires.find((q) => q.section === 'jobMeaning');
+      if (!qm) throw new Error('Questionário “jobMeaning” não encontrado');
+
+      return qm;
     },
   });
 
@@ -69,27 +65,26 @@ export default function JobMeaningPage() {
       <h1 className="mb-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
-      <h2 className="mb-4 text-center text-2xl font-semibold">{data.titulo}</h2>
-      <p className="mb-8 max-w-2xl text-center text-sm">{data.instrucoes}</p>
-      <h3 className="mb-6 text-xl font-semibold text-[hsl(var(--primary))]">{data.pergunta}</h3>
+      <h2 className="mb-4 text-center text-2xl font-semibold">{data.name}</h2>
+      <p className="mb-8 max-w-2xl text-center text-sm">{data.instructions}</p>
 
       <div className="w-full max-w-4xl space-y-6">
-        {data.itens.map((item, index) => (
+        {data.questions.map((q, index) => (
           <div key={index} className="rounded-xl border bg-background p-4 shadow-sm">
-            <p className="mb-3 font-medium">{item}</p>
+            <p className="mb-3 font-medium">{q.text}</p>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              {Object.entries(data.escala).map(([key, label]) => (
-                <label key={key} className="flex items-center gap-2">
+              {q.options.map((opt) => (
+                <label key={opt.value} className="flex items-center gap-2">
                   <input
                     type="radio"
                     name={`question-${index}`}
-                    value={key}
+                    value={opt.value}
                     className="accent-[hsl(var(--primary))] hover:cursor-pointer"
-                    checked={answers[`question-${index}`] === key}
-                    onChange={() => handleAnswer(index, key)}
+                    checked={answers[`question-${index}`] === opt.value}
+                    onChange={() => handleAnswer(index, opt.value)}
                   />
                   <span className="text-sm">
-                    {key} - {label}
+                    {opt.value} – {opt.label}
                   </span>
                 </label>
               ))}
