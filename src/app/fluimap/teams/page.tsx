@@ -179,34 +179,38 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
-      <div className="flex flex-col items-center justify-between px-8 pb-4 sm:flex-row">
-        <div>
-          <h1 className="pt-4 text-2xl font-bold sm:text-3xl">Times</h1>
-          <h2 className="text-sm sm:text-base">Gerencie suas equipes e membros de equipe</h2>
+    <div className="flex min-h-screen flex-col items-center justify-between bg-white text-black dark:bg-black dark:text-white">
+      <div className="flex w-[100%] flex-col">
+        <div className="flex flex-row items-center justify-between px-8 py-4 pb-4 sm:flex-row">
+          <div>
+            <h1 className="h-[32px] w-[141px] text-2xl font-bold">Times</h1>
+            <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+              Gerencie suas equipes e membros de equipe
+            </p>
+          </div>
+
+          <Button
+            size="lg"
+            className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 pt-2 text-white sm:mt-0"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span className="flex items-center justify-center rounded-full border-2 border-white bg-blue-500 p-1 text-white">
+              <PlusIcon className="h-5 w-5" />
+            </span>
+            Criar Novo Time
+          </Button>
         </div>
 
-        <Button
-          size="lg"
-          className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 pt-2 text-white sm:mt-0"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <span className="flex items-center justify-center rounded-full border-2 border-white bg-blue-500 p-1 text-white">
-            <PlusIcon className="h-5 w-5" />
-          </span>
-          Criar Novo Time
-        </Button>
-      </div>
-
-      {/* Campo de busca */}
-      <div className="w-full px-8 pb-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nome ou descrição"
-          className="w-full rounded-md border border-gray-300 px-4 py-2"
-        />
+        {/* Campo de busca */}
+        <div className="w-full px-8 pb-2">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nome ou descrição"
+            className="w-full rounded-md border border-gray-300 px-4 py-2"
+          />
+        </div>
       </div>
 
       <TeamModal
