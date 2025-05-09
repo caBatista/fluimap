@@ -29,7 +29,7 @@ export default function SelectUsersPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-[hsl(var(--background))] px-4 pb-12">
+    <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-background px-4 pb-12">
       <h1 className="items-center p-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>

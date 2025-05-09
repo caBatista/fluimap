@@ -102,7 +102,7 @@ export default function WellBeingPage() {
 
       <div className="w-full max-w-4xl space-y-6">
         {data.itens.map((item, idx) => (
-          <div key={idx} className="rounded-xl border bg-secondary p-4 shadow-sm">
+          <div key={idx} className="rounded-xl border bg-background p-4 shadow-sm">
             <p className="mb-3 font-medium">{item}</p>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {Object.entries(data.escala).map(([value, label]) => (

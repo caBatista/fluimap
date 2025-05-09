@@ -112,7 +112,7 @@ export function PeerCommunicationContent() {
           {data.questoes.map((q, qIndex) => {
             const questionKey = `user-${userIndex}-q${qIndex}`;
             return (
-              <div key={qIndex} className="mb-6 rounded-xl border bg-secondary p-4 shadow-sm">
+              <div key={qIndex} className="mb-6 rounded-xl border bg-background p-4 shadow-sm">
                 <p className="mb-3 font-semibold">{q.question.replace('{nome}', user)}</p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   {q.options.map((option, optIndex) => (
