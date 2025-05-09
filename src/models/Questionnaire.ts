@@ -58,5 +58,5 @@ const QuestionnaireSchema = new Schema<QuestionnaireType>(
   }
 );
 
-export default (mongoose.models.Questionnaire as Model<IQuestionnaire>) ??
-  mongoose.model<IQuestionnaire>('Questionnaire', QuestionnaireSchema);
+export default (mongoose.models.Questionnaire as Model<QuestionnaireType>) ??
+  mongoose.model<QuestionnaireType>('Questionnaire', QuestionnaireSchema);

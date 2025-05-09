@@ -1,11 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface Questionnaire {
+  _id: string;
   name: string;
   instructions: string;
   section: string;
@@ -16,11 +17,17 @@ interface Questionnaire {
 }
 
 export default function JobMeaningPage() {
+  const searchParams = useSearchParams();
+  const surveyId = searchParams.get('surveyId')!;
+  const email = searchParams.get('email')!;
+  if (!surveyId || !email) {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useQuery<Questionnaire>({
-    queryKey: ['questionnaire', 'jobMeaning'],
+    queryKey: ['jobMeaning', surveyId],
     queryFn: async () => {
       const res = await fetch('/api/questionnaires');
       if (!res.ok) throw new Error('Erro ao carregar questionários');
@@ -35,12 +42,34 @@ export default function JobMeaningPage() {
     },
   });
 
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!data) throw new Error('Dados do questionário ausentes');
+      const payload = {
+        surveyId,
+        questionnaireId: data._id,
+        email,
+        answers: Object.values(answers),
+      };
+      const res = await fetch('/api/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Erro ao enviar respostas');
+    },
+    onSuccess: () => {
+      // router.push('/surveys');
+    },
+  });
+
   const handleAnswer = (questionIndex: number, value: string) => {
     const key = `question-${questionIndex}`;
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleContinue = () => {
+    mutation.mutate();
     router.push(`/questionnaire/success`);
   };
 

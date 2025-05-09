@@ -59,7 +59,10 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
     const respondeeLinks = respondees.map((respondee) => {
-      const uniqueLink = `${baseUrl}/surveys/${surveyId}/${String(respondee._id)}`;
+      const uniqueLink =
+        `${baseUrl}/questionnaire/peerCommunication` +
+        `?surveyId=${surveyId}` +
+        `&email=${encodeURIComponent(respondee.email)}`;
 
       console.log(`Sending email to ${respondee.email}:`);
       console.log(`Survey link: ${uniqueLink}`);

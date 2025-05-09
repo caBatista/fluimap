@@ -1,32 +1,74 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { SelectUser } from '@/components/select-user';
 import { Button } from '@/components/ui/button';
 
 const mockUsers = [
-  { name: 'João Paulo Pereira', role: 'Gerente', imageUrl: 'https://i.pravatar.cc/150?img=7' },
-  { name: 'Maria Oliveira', role: 'Analista', imageUrl: 'https://i.pravatar.cc/150?img=1' },
-  { name: 'Carlos Souza', role: 'Coordenador', imageUrl: 'https://i.pravatar.cc/150?img=2' },
-  { name: 'Ana Lima', role: 'Estagiária', imageUrl: 'https://i.pravatar.cc/150?img=3' },
-  { name: 'Lucas Ferreira', role: 'Supervisor', imageUrl: 'https://i.pravatar.cc/150?img=5' },
-  { name: 'Jonas Ferreira', role: 'Estagiário', imageUrl: 'https://i.pravatar.cc/150?img=4' },
-  { name: 'Emanuel Costa Pereira', role: 'Dono', imageUrl: 'https://i.pravatar.cc/150?img=6' },
+  {
+    name: 'João Paulo Pereira',
+    email: 'joao.p@exemplo.com',
+    role: 'Gerente',
+    imageUrl: 'https://i.pravatar.cc/150?img=7',
+  },
+  {
+    name: 'Maria Oliveira',
+    email: 'maria.o@exemplo.com',
+    role: 'Analista',
+    imageUrl: 'https://i.pravatar.cc/150?img=1',
+  },
+  {
+    name: 'Carlos Souza',
+    email: 'carlos.s@exemplo.com',
+    role: 'Coordenador',
+    imageUrl: 'https://i.pravatar.cc/150?img=2',
+  },
+  {
+    name: 'Ana Lima',
+    email: 'ana.l@exemplo.com',
+    role: 'Estagiária',
+    imageUrl: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    name: 'Lucas Ferreira',
+    email: 'lucas.f@exemplo.com',
+    role: 'Supervisor',
+    imageUrl: 'https://i.pravatar.cc/150?img=5',
+  },
+  {
+    name: 'Jonas Ferreira',
+    email: 'jonas.f@exemplo.com',
+    role: 'Estagiário',
+    imageUrl: 'https://i.pravatar.cc/150?img=4',
+  },
+  {
+    name: 'Emanuel Costa Pereira',
+    email: 'emanuel.c@exemplo.com',
+    role: 'Dono',
+    imageUrl: 'https://i.pravatar.cc/150?img=6',
+  },
 ];
 
 export default function SelectUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const surveyId = searchParams.get('surveyId')!;
+  const email = searchParams.get('email')!;
 
   const handleSelect = (name: string, selected: boolean) => {
     setSelectedUsers((prev) => (selected ? [...prev, name] : prev.filter((n) => n !== name)));
   };
 
-  const handleContinue = () => {
-    const query = selectedUsers.map((name) => `users=${encodeURIComponent(name)}`).join('&');
-    router.push(`/questionnaire/peerCommunication?${query}`);
-  };
+  function handleContinue() {
+    const qs = [
+      `surveyId=${surveyId}`,
+      `email=${encodeURIComponent(email)}`,
+      ...selectedUsers.map((u) => `users=${encodeURIComponent(u)}`),
+    ].join('&');
+    router.push(`/questionnaire/peerCommunication?${qs}`);
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-background px-4 pb-12">

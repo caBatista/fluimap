@@ -1,10 +1,11 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 export const ResponseSchemaZod = z.object({
-  formId: z.string(),
+  sureveyId: z.string(),
+  questionnaireId: z.string(),
   email: z.string().email(),
-  answers: z.array(z.string()),
+  answers: z.record(z.string(), z.string()),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
@@ -12,15 +13,16 @@ export type ResponseType = z.infer<typeof ResponseSchemaZod>;
 
 const ResponseMongooseSchema: Schema = new Schema(
   {
-    formId: { type: String, required: true },
+    surveyId: { type: String, required: true, ref: 'Survey' },
+    questionnaireId: { type: String, required: true, ref: 'Questionnaire' },
     email: {
       type: String,
       required: true,
       match: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
     },
-    answers: { type: [String], required: true },
+    answers: { type: Map, of: String, required: true },
   },
-  { timestamps: true },
+  { collection: 'responses', timestamps: true }
 );
 
 interface IResponse extends ResponseType, Document {}
@@ -29,7 +31,7 @@ function createResponseModel(): Model<IResponse> {
   if (mongoose.models.Response) {
     return mongoose.models.Response as Model<IResponse>;
   }
-  return mongoose.model<IResponse>("Response", ResponseMongooseSchema);
+  return mongoose.model<IResponse>('Response', ResponseMongooseSchema);
 }
 
 const Response = createResponseModel();

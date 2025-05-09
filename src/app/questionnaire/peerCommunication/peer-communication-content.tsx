@@ -10,7 +10,15 @@ interface QuestionItem {
   options: string[];
 }
 
+interface QuestionnaireRaw {
+  _id: string;
+  name: string;
+  instructions: string;
+  section: string;
+  questions: Array<{ text: string; options: { value: string; label: string }[] }>;
+}
 interface QuestionnaireData {
+  questionnaireId: string;
   titulo: string;
   instrucoes: string;
   pergunta: string;
@@ -20,32 +28,28 @@ interface QuestionnaireData {
 export function PeerCommunicationContent() {
   const searchParams = useSearchParams();
   const users = searchParams.getAll('users');
+  const surveyId = searchParams.get('surveyId')!;
+  const email = searchParams.get('email')!;
+  if (!surveyId || !email) {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
+
   const router = useRouter();
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useQuery<QuestionnaireData>({
-    queryKey: ['peer-communication'],
+    queryKey: ['peer-communication', surveyId],
     queryFn: async () => {
-      console.log('PeerCommunicationContent: fetching /api/questionnaires');
       const res = await fetch('/api/questionnaires');
-      console.log('PeerCommunicationContent: response status', res.status);
       if (!res.ok) throw new Error('Erro ao carregar questionários');
 
-      const { questionnaires } = (await res.json()) as {
-        questionnaires: Array<{
-          section: string;
-          name: string;
-          instructions: string;
-          questions: Array<{ text: string; options: { value: string; label: string }[] }>;
-        }>;
-      };
-      console.log('PeerCommunicationContent: raw data', { questionnaires });
-
-      const qp = questionnaires.find((q) => q.section === 'communicationPeers');
+      const body = (await res.json()) as { questionnaires: QuestionnaireRaw[] };
+      const qp = body.questionnaires.find((q) => q.section === 'communicationPeers');
       if (!qp) throw new Error('Questionário de comunicação não encontrado');
 
       return {
+        questionnaireId: qp._id,
         titulo: qp.name,
         instrucoes: qp.instructions,
         pergunta: '',
@@ -58,17 +62,25 @@ export function PeerCommunicationContent() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (payload: { answers: Record<string, string>; users: string[] }) => {
-      const res = await fetch('/api/questionnaires', {
+    mutationFn: async () => {
+      if (!data) throw new Error('Dados do questionário ausentes');
+      const payload = {
+        surveyId,
+        questionnaireId: data.questionnaireId,
+        email,
+        answers: Object.values(answers),
+      };
+      const res = await fetch('/api/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Erro ao enviar respostas');
-      return res.json();
     },
     onSuccess: () => {
-      void router.push(`/questionnaire/wellBeingPage`);
+      router.push(
+        `/questionnaire/wellBeing?surveyId=${surveyId}&email=${encodeURIComponent(email)}`
+      );
     },
   });
 
@@ -78,7 +90,7 @@ export function PeerCommunicationContent() {
   };
 
   const handleContinue = () => {
-    mutation.mutate({ answers, users });
+    mutation.mutate();
   };
 
   if (isLoading) {

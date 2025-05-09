@@ -2,11 +2,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 interface QuestionnaireRaw {
+  _id: string;
   name: string;
   instructions: string;
   section: string;
@@ -17,6 +18,7 @@ interface QuestionnaireRaw {
 }
 
 interface WellBeingData {
+  questionnaireId: string;
   titulo: string;
   instrucoes: string;
   escala: Record<string, string>;
@@ -24,11 +26,17 @@ interface WellBeingData {
 }
 
 export default function WellBeingPage() {
+  const searchParams = useSearchParams();
+  const surveyId = searchParams.get('surveyId')!;
+  const email = searchParams.get('email')!;
+  if (!surveyId || !email) {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useQuery<WellBeingData>({
-    queryKey: ['well-being'],
+    queryKey: ['well-being', surveyId],
     queryFn: async (): Promise<WellBeingData> => {
       const res = await fetch('/api/questionnaires');
       if (!res.ok) throw new Error('Erro ao carregar questionários');
@@ -49,6 +57,7 @@ export default function WellBeingPage() {
       const itens = questions.map((q) => q.text);
 
       return {
+        questionnaireId: wbRaw._id,
         titulo: wbRaw.name,
         instrucoes: wbRaw.instructions,
         escala,
@@ -58,17 +67,25 @@ export default function WellBeingPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (payload: { answers: Record<string, string> }) => {
-      const res = await fetch('/api/questionnaires', {
+    mutationFn: async () => {
+      if (!data) throw new Error('Dados do questionário ausentes');
+      const payload = {
+        surveyId,
+        questionnaireId: data.questionnaireId,
+        email,
+        answers: Object.values(answers),
+      };
+      const res = await fetch('/api/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Erro ao enviar respostas');
-      return res.json();
     },
     onSuccess: () => {
-      void router.push('/questionnaire/jobMeaning');
+      router.push(
+        `/questionnaire/jobMeaning?surveyId=${surveyId}&email=${encodeURIComponent(email)}`
+      );
     },
   });
 
@@ -78,7 +95,7 @@ export default function WellBeingPage() {
   };
 
   const handleContinue = () => {
-    mutation.mutate({ answers });
+    mutation.mutate();
   };
 
   if (isLoading) {
