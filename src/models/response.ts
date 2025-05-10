@@ -2,13 +2,14 @@ import mongoose, { Schema, type Document, type Model } from 'mongoose';
 import { z } from 'zod';
 
 export const ResponseSchemaZod = z.object({
-  sureveyId: z.string(),
+  surveyId: z.string(),
   questionnaireId: z.string(),
   email: z.string().email(),
   answers: z.record(z.string(), z.string()),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
+
 export type ResponseType = z.infer<typeof ResponseSchemaZod>;
 
 const ResponseMongooseSchema: Schema = new Schema(

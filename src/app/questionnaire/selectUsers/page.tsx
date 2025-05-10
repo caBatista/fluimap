@@ -54,8 +54,16 @@ export default function SelectUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId')!;
-  const email = searchParams.get('email')!;
+  const rawSurveyId = searchParams.get('surveyId');
+  const rawEmail = searchParams.get('email');
+
+  if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
+    console.error('Parâmetros surveyId/email inválidos na página de seleção de usuários');
+    return;
+  }
+
+  const surveyId = rawSurveyId;
+  const email = rawEmail;
 
   const handleSelect = (name: string, selected: boolean) => {
     setSelectedUsers((prev) => (selected ? [...prev, name] : prev.filter((n) => n !== name)));

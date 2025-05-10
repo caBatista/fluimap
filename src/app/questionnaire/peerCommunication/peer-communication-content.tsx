@@ -28,11 +28,15 @@ interface QuestionnaireData {
 export function PeerCommunicationContent() {
   const searchParams = useSearchParams();
   const users = searchParams.getAll('users');
-  const surveyId = searchParams.get('surveyId')!;
-  const email = searchParams.get('email')!;
-  if (!surveyId || !email) {
+  const rawSurveyId = searchParams.get('surveyId');
+  const rawEmail = searchParams.get('email');
+
+  if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
     throw new Error('Parâmetros surveyId/email não definidos');
   }
+
+  const surveyId = rawSurveyId;
+  const email = rawEmail;
 
   const router = useRouter();
 
@@ -68,18 +72,29 @@ export function PeerCommunicationContent() {
         surveyId,
         questionnaireId: data.questionnaireId,
         email,
-        answers: Object.values(answers),
+        answers,
       };
+      console.log('Payload enviado para /api/responses:', payload);
       const res = await fetch('/api/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Erro ao enviar respostas');
+      if (!res.ok) {
+        type ZodIssue = {
+          path: (string | number)[];
+          message: string;
+          code: string;
+        };
+
+        const err = (await res.json()) as { error: ZodIssue[] };
+        console.error('Erro de envio:', err);
+        throw new Error('Erro ao enviar respostas');
+      }
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/wellBeing?surveyId=${surveyId}&email=${encodeURIComponent(email)}`
+        `/questionnaire/wellBeing?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
       );
     },
   });

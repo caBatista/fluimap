@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   // 2) valida com Zod
   const parse = ResponseSchemaZod.safeParse(raw);
   if (!parse.success) {
-    // se falhar, devolve só os issues para o cliente
+    console.log('Zod Issues:', parse.error.issues);
     return NextResponse.json({ error: parse.error.issues }, { status: 400 });
   }
 
