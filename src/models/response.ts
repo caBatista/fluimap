@@ -5,9 +5,12 @@ export const ResponseSchemaZod = z.object({
   surveyId: z.string(),
   questionnaireId: z.string(),
   email: z.string().email(),
-  answers: z.record(z.string(), z.string()),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  answersByUser: z.array(
+    z.object({
+      name: z.string(),
+      answers: z.record(z.string(), z.string())
+    })
+  ),
 });
 
 export type ResponseType = z.infer<typeof ResponseSchemaZod>;
@@ -21,7 +24,12 @@ const ResponseMongooseSchema: Schema = new Schema(
       required: true,
       match: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
     },
-    answers: { type: Map, of: String, required: true },
+    answersByUser: [
+      {
+        name: { type: String, required: true },
+        answers: { type: Map, of: String, required: true },
+      },
+    ],
   },
   { collection: 'responses', timestamps: true }
 );

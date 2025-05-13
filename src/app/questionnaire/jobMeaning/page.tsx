@@ -49,7 +49,12 @@ export default function JobMeaningPage() {
         surveyId,
         questionnaireId: data._id,
         email,
-        answers: Object.values(answers),
+          answersByUser: [
+          {
+            name: email,
+            answers: answers,
+          },
+        ],
       };
       const res = await fetch('/api/responses', {
         method: 'POST',

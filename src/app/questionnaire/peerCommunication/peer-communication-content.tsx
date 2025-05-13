@@ -68,13 +68,28 @@ export function PeerCommunicationContent() {
   const mutation = useMutation({
     mutationFn: async () => {
       if (!data) throw new Error('Dados do questionário ausentes');
+      const groupedAnswers = users.map((user, userIndex) => {
+        const answersByQuestion: Record<string, string> = {};
+
+        data.questoes.forEach((_, qIndex) => {
+          const key = `user-${userIndex}-q${qIndex}`;
+          if (answers[key]) {
+            answersByQuestion[`q${qIndex}`] = answers[key];
+          }
+        });
+
+        return {
+          name: user,
+          answers: answersByQuestion,
+        };
+      });
+
       const payload = {
         surveyId,
         questionnaireId: data.questionnaireId,
         email,
-        answers,
+        answersByUser: groupedAnswers,
       };
-      console.log('Payload enviado para /api/responses:', payload);
       const res = await fetch('/api/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,7 +109,7 @@ export function PeerCommunicationContent() {
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/wellBeing?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+        `/questionnaire/wellBeingPage?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
       );
     },
   });
@@ -111,7 +126,7 @@ export function PeerCommunicationContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Carregando questionário...
+        Loading questionnaire...
       </div>
     );
   }
@@ -119,7 +134,7 @@ export function PeerCommunicationContent() {
   if (error || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center text-red-500">
-        Erro ao carregar o questionário
+        Failed to load questionnaire
       </div>
     );
   }

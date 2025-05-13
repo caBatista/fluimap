@@ -1,4 +1,3 @@
-// src/app/questionnaire/wellBeing/page.tsx
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -27,11 +26,15 @@ interface WellBeingData {
 
 export default function WellBeingPage() {
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId')!;
-  const email = searchParams.get('email')!;
-  if (!surveyId || !email) {
+  const rawSurveyId = searchParams.get('surveyId');
+  const rawEmail = searchParams.get('email');
+
+  if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
     throw new Error('Parâmetros surveyId/email não definidos');
   }
+
+  const surveyId = rawSurveyId;
+  const email = rawEmail;
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -73,7 +76,12 @@ export default function WellBeingPage() {
         surveyId,
         questionnaireId: data.questionnaireId,
         email,
-        answers: Object.values(answers),
+        answersByUser: [
+          {
+            name: email,
+            answers: answers,
+          },
+        ],
       };
       const res = await fetch('/api/responses', {
         method: 'POST',
@@ -84,7 +92,7 @@ export default function WellBeingPage() {
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/jobMeaning?surveyId=${surveyId}&email=${encodeURIComponent(email)}`
+        `/questionnaire/jobMeaning?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
       );
     },
   });

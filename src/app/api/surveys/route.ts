@@ -13,7 +13,12 @@ const InputSurveySchema = SurveySchemaZod.omit({ questionnaireIds: true }).exten
 export async function GET() {
   await dbConnect();
 
-  const surveys = await Survey.find().sort({ createdAt: -1 }).lean();
+const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
+
+const surveys = await Survey.find({ ownerId: userId }).sort({ createdAt: -1 }).lean();
   const now = new Date();
 
   const detailed = await Promise.all(
@@ -53,9 +58,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body: unknown = await request.json();
+    const rawBody: unknown = await request.json();
 
-    const parseResult = InputSurveySchema.safeParse(body);
+    const bodyWithOwner = {
+      ...(rawBody as Record<string, unknown>),
+      ownerId: userId,
+    };
+
+    const parseResult = InputSurveySchema.safeParse(bodyWithOwner);
     if (!parseResult.success) {
       console.error('Erro no Zod:', parseResult.error);
       return NextResponse.json({ error: parseResult.error }, { status: 400 });
@@ -79,6 +89,7 @@ export async function POST(request: NextRequest) {
 
     const surveyData: SurveyType = {
       ...input,
+      ownerId: userId,
       questionnaireIds,
       dateClosing: new Date(input.dateClosing),
     };
