@@ -1,138 +1,108 @@
-import { type NextRequest, NextResponse } from "next/server";
-import Team from "@/models/Team";
-import Respondee from "@/models/Respondee";
-import { auth } from "@clerk/nextjs/server";
-import dbConnect from "@/server/db";
-import { revalidatePath } from "next/cache";
+import { NextResponse } from 'next/server';
+import Team, { TeamSchemaZod } from '@/models/Team';
+import TeamRespondent from '@/models/teamRespondents';
+import { auth } from '@clerk/nextjs/server';
+import dbConnect from '@/server/database/db';
+import { revalidatePath } from 'next/cache';
 
-// GET handler to retrieve a specific team
-export async function GET(
-  request: NextRequest,
-  props: { params: Promise<{ id: string }> },
-) {
-  const params = await props.params;
+// Helpers
+async function getUserIdOrThrow(): Promise<string> {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+  return userId;
+}
+
+// GET: Retorna um time específico e seus membros
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
+    const { id } = await params;
 
-    const { userId } = await auth();
+    console.log('id', id);
 
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const userId: string = await getUserIdOrThrow();
 
-    const team = await Team.findById(params.id);
-
+    const team = await Team.findById(id).lean();
     if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
-    // Check if the authenticated user is the owner of the team
-    if (team.ownerId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (team.ownerId?.toString() !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Get all respondees for this team
-    const respondees = await Respondee.find({ teamId: params.id });
+    const members = await TeamRespondent.find({ teamId: id }).lean();
 
-    return NextResponse.json({ team, respondees }, { status: 200 });
-  } catch (error) {
-    console.error("Error retrieving team:", error);
-    return NextResponse.json(
-      { error: "Failed to retrieve team" },
-      { status: 500 },
-    );
+    return NextResponse.json({ team, members }, { status: 200 });
+  } catch (err: unknown) {
+    console.error('GET /api/teams/[id] error:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    const status = errorMessage === 'Unauthorized' ? 401 : 500;
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }
 
-// PUT handler to update a specific team
-export async function PUT(
-  request: NextRequest,
-  props: { params: Promise<{ id: string }> },
-) {
-  const params = await props.params;
+// PUT: Atualiza os dados de um time
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
+    const { id } = await params;
+    console.log('id', id);
+    const userId: string = await getUserIdOrThrow();
 
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const team = await Team.findById(params.id);
-
+    const team = await Team.findById(id);
     if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
-    // Check if the authenticated user is the owner of the team
-    if (team.ownerId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (team.ownerId?.toString() !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const body = (await request.json()) as {
-      name?: string;
-      description?: string;
-    };
+    const rawBody: unknown = await request.json();
+    const body = TeamSchemaZod.partial().parse(rawBody);
 
-    const updatedTeam = await Team.findByIdAndUpdate(
-      params.id,
-      { $set: body },
-      { new: true },
-    );
+    const updatedTeam = await Team.findByIdAndUpdate(id, { $set: body }, { new: true }).lean();
 
-    revalidatePath("/dashboard");
+    revalidatePath('/dashboard');
+    revalidatePath('/teamPage');
 
     return NextResponse.json({ team: updatedTeam }, { status: 200 });
-  } catch (error) {
-    console.error("Error updating team:", error);
-    return NextResponse.json(
-      { error: "Failed to update team" },
-      { status: 500 },
-    );
+  } catch (err: unknown) {
+    console.error('PUT /api/teams/[id] error:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    const status = errorMessage === 'Unauthorized' ? 401 : 500;
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }
 
-// DELETE handler to delete a specific team
-export async function DELETE(
-  request: NextRequest,
-  props: { params: Promise<{ id: string }> },
-) {
-  const params = await props.params;
+// DELETE: Remove um time e seus membros
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
+    const { id } = await params;
+    const userId: string = await getUserIdOrThrow();
 
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const team = await Team.findById(params.id);
-
+    const team = await Team.findById(id);
     if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
-    // Check if the authenticated user is the owner of the team
-    if (team.ownerId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (team.ownerId?.toString() !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Delete the team
-    await Team.findByIdAndDelete(params.id);
+    await Team.findByIdAndDelete(id);
+    await TeamRespondent.deleteMany({ teamId: id });
 
-    // Delete all respondees associated with this team
-    await Respondee.deleteMany({ teamId: params.id });
-
-    revalidatePath("/dashboard");
+    revalidatePath('/dashboard');
+    revalidatePath('/teamPage');
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error("Error deleting team:", error);
-    return NextResponse.json(
-      { error: "Failed to delete team" },
-      { status: 500 },
-    );
+  } catch (err: unknown) {
+    console.error('DELETE /api/teams/[id] error:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    const status = errorMessage === 'Unauthorized' ? 401 : 500;
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

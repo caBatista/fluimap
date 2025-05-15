@@ -1,9 +1,9 @@
-import { type NextRequest, NextResponse } from "next/server";
-import Respondee from "@/models/Respondee";
-import Team from "@/models/Team";
-import { auth } from "@clerk/nextjs/server";
-import dbConnect from "@/server/db";
-import { revalidatePath } from "next/cache";
+import { type NextRequest, NextResponse } from 'next/server';
+import Respondee from '@/models/Respondee';
+import Team from '@/models/Team';
+import { auth } from '@clerk/nextjs/server';
+import { revalidatePath } from 'next/cache';
+import dbConnect from '@/server/database/db';
 
 // POST handler to create a new respondee
 export async function POST(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = (await request.json()) as {
@@ -29,11 +29,11 @@ export async function POST(request: NextRequest) {
     const team = await Team.findById(teamId);
 
     if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
     if (team.ownerId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Check if a respondee with this email already exists in the team
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
 
     if (existingRespondee) {
       return NextResponse.json(
-        { error: "A respondee with this email already exists in this team" },
-        { status: 400 },
+        { error: 'A respondee with this email already exists in this team' },
+        { status: 400 }
       );
     }
 
@@ -57,11 +57,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ respondee }, { status: 201 });
   } catch (error) {
-    console.error("Error creating respondee:", error);
-    return NextResponse.json(
-      { error: "Failed to create respondee" },
-      { status: 500 },
-    );
+    console.error('Error creating respondee:', error);
+    return NextResponse.json({ error: 'Failed to create respondee' }, { status: 500 });
   }
 }
 
@@ -73,7 +70,7 @@ export async function PUT(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = (await request.json()) as {
@@ -87,11 +84,11 @@ export async function PUT(request: NextRequest) {
     const team = await Team.findById(teamId);
 
     if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
     if (team.ownerId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Add teamId to each respondee
@@ -103,20 +100,42 @@ export async function PUT(request: NextRequest) {
     // Create all respondees in one operation
     const createdRespondees = await Respondee.insertMany(
       respondeesWithTeamId,
-      { ordered: false }, // Continue processing even if some documents fail
+      { ordered: false } // Continue processing even if some documents fail
     );
 
     revalidatePath(`/dashboard`);
 
-    return NextResponse.json(
-      { respondees: createdRespondees },
-      { status: 201 },
-    );
+    return NextResponse.json({ respondees: createdRespondees }, { status: 201 });
   } catch (error) {
-    console.error("Error creating respondees in bulk:", error);
-    return NextResponse.json(
-      { error: "Failed to create respondees" },
-      { status: 500 },
-    );
+    console.error('Error creating respondees in bulk:', error);
+    return NextResponse.json({ error: 'Failed to create respondees' }, { status: 500 });
+  }
+}
+
+// GET handler to fetch respondees by teamId
+export async function GET(request: NextRequest) {
+  try {
+    await dbConnect();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { searchParams } = new URL(request.url);
+    const teamId = searchParams.get('teamId');
+    if (!teamId) {
+      return NextResponse.json({ error: 'Missing teamId parameter' }, { status: 400 });
+    }
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+    }
+    if (team.ownerId !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+    const respondees = await Respondee.find({ teamId });
+    return NextResponse.json({ respondees }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching respondees:', error);
+    return NextResponse.json({ error: 'Failed to fetch respondees' }, { status: 500 });
   }
 }
