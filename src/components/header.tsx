@@ -3,12 +3,12 @@ import { ModeToggle } from "./mode-toggle";
 
 export function Header() {
   return (
-    <div className="flex h-8 w-full items-center justify-between p-8">
-      <h1 className="text-2xl font-bold">FluiMap</h1>
-      <div className="flex flex-row items-center gap-4">
+    <header className="flex h-16 w-full items-center justify-between border-b bg-white px-6 shadow-sm">
+      <h1 className="text-2xl font-bold text-primary">FluiMap</h1>
+      <div className="flex items-center gap-4">
         <UserButton />
         <ModeToggle />
       </div>
-    </div>
+    </header>
   );
 }
