@@ -1,35 +1,25 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import "@/styles/globals.css";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-} from "@clerk/nextjs";
+import { ClerkProvider } from '@clerk/nextjs';
+import { GeistSans } from 'geist/font/sans';
+import { ptBR } from '@clerk/localizations';
 
-import { GeistSans } from "geist/font/sans";
-import { type Metadata } from "next";
-import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/header";
-import { QueryProvider } from "@/components/query-provider";
+import { ThemeProvider } from '@/components/theme-provider';
+import { QueryProvider } from '@/components/query-provider';
+import { Toaster } from '@/components/ui/sonner';
+
+import RootLayoutClient from './RootLayoutClient';
+import '@/styles/globals.css';
+
+import { type Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "FluiMap",
-  description: "generate your team analytics",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  description: 'generate your team analytics',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${GeistSans.variable}`}
-        suppressHydrationWarning
-      >
+    <ClerkProvider localization={ptBR}>
+      <html className={`${GeistSans.variable}`} lang="pt" suppressHydrationWarning>
         <body className="h-screen w-screen overflow-hidden">
           <ThemeProvider
             attribute="class"
@@ -38,14 +28,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <QueryProvider>
-              <Header />
-              <SignedOut>
-                <div className="flex h-full flex-row items-center justify-center gap-8">
-                  <SignInButton />
-                  <SignUpButton />
-                </div>
-              </SignedOut>
-              <SignedIn>{children}</SignedIn>
+              <RootLayoutClient>{children}</RootLayoutClient>
             </QueryProvider>
           </ThemeProvider>
           <Toaster />

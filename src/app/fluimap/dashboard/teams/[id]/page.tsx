@@ -1,15 +1,15 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import dbConnect from "@/server/db";
-import Team from "@/models/Team";
-import User from "@/models/User";
-import { RespondeeForm } from "@/components/respondees/respondee-form";
-import { RespondeeList } from "@/components/respondees/respondee-list";
-import { BulkImportForm } from "@/components/respondees/bulk-import-form";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import Team from '@/models/Team';
+import User from '@/models/User';
+import { RespondeeForm } from '@/components/respondees/respondee-form';
+import { RespondeeList } from '@/components/respondees/respondee-list';
+import { BulkImportForm } from '@/components/respondees/bulk-import-form';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import dbConnect from '@/server/database/db';
 
 async function createUser(clerkId: string, name: string | null) {
   const user = await User.findOne({ clerkId });
@@ -18,9 +18,7 @@ async function createUser(clerkId: string, name: string | null) {
   }
 }
 
-export default async function TeamDetailPage(props: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function TeamDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   await dbConnect();
 
@@ -51,9 +49,7 @@ export default async function TeamDetailPage(props: {
               <Link href="/dashboard">← Back to Teams</Link>
             </Button>
             <h1 className="mt-4 text-3xl font-bold">{team.name}</h1>
-            {team.description && (
-              <p className="mt-1 text-muted-foreground">{team.description}</p>
-            )}
+            {team.description && <p className="mt-1 text-muted-foreground">{team.description}</p>}
           </div>
         </div>
 
