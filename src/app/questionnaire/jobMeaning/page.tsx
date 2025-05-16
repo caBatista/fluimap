@@ -49,7 +49,7 @@ export default function JobMeaningPage() {
         surveyId,
         questionnaireId: data._id,
         email,
-          answersByUser: [
+        answersByUser: [
           {
             name: email,
             answers: answers,
@@ -74,6 +74,13 @@ export default function JobMeaningPage() {
   };
 
   const handleContinue = () => {
+    if (!data) return;
+
+    const allAnswered = data.questions.every((_, index) => answers[`question-${index}`]);
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
     mutation.mutate();
     router.push(`/questionnaire/success`);
   };
@@ -133,7 +140,7 @@ export default function JobMeaningPage() {
           variant="outline"
           onClick={() => router.back()}
         >
-          Cancelar
+          Voltar
         </Button>
         <Button variant="default" className="h-auto px-8 py-4 text-base" onClick={handleContinue}>
           Finalizar

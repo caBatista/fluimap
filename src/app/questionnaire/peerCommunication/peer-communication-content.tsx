@@ -126,6 +126,20 @@ export function PeerCommunicationContent() {
   };
 
   const handleContinue = () => {
+    if (!data) return;
+
+    const allAnswered = users.every((_, userIndex) =>
+      data.questoes.every((_, qIndex) => {
+        const key = `user-${userIndex}-q${qIndex}`;
+        return answers[key];
+      })
+    );
+
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
+
     mutation.mutate();
   };
 
@@ -187,7 +201,7 @@ export function PeerCommunicationContent() {
                 onClick={() => router.back()}
                 disabled={mutation.status === 'pending'}
               >
-                Cancelar
+                Voltar
               </Button>
               <Button
                 variant="default"

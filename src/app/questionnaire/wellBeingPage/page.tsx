@@ -103,6 +103,14 @@ export default function WellBeingPage() {
   };
 
   const handleContinue = () => {
+    if (!data) return;
+
+    const allAnswered = data.itens.every((_, index) => answers[`question-${index}`]);
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
+
     mutation.mutate();
   };
 
@@ -157,7 +165,7 @@ export default function WellBeingPage() {
           onClick={() => router.back()}
           disabled={mutation.status === 'pending'}
         >
-          Cancelar
+          Voltar
         </Button>
         <Button
           variant="default"
