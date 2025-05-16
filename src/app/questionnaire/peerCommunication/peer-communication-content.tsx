@@ -27,12 +27,18 @@ interface QuestionnaireData {
 
 export function PeerCommunicationContent() {
   const searchParams = useSearchParams();
-  const users = searchParams.getAll('users');
+  const users = searchParams.getAll('users').filter((u) => !!u && u !== 'null');
   const rawSurveyId = searchParams.get('surveyId');
   const rawEmail = searchParams.get('email');
 
-  if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
-    throw new Error('Parâmetros surveyId/email não definidos');
+  if (
+    !rawSurveyId ||
+    rawSurveyId === 'null' ||
+    !rawEmail ||
+    rawEmail === 'null' ||
+    users.length === 0
+  ) {
+    throw new Error('Parâmetros surveyId/email/users não definidos');
   }
 
   const surveyId = rawSurveyId;
@@ -125,9 +131,7 @@ export function PeerCommunicationContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        Loading questionnaire...
-      </div>
+      <div className="flex min-h-screen items-center justify-center">Loading questionnaire...</div>
     );
   }
 
