@@ -2,6 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardCards } from '@/components/dashboard/dashboard-cards';
+import { DashboardNetworkGraph } from '@/components/dashboard/dashboard-network-graph';
 import { DashboardRecentForms } from '@/components/dashboard/dashboard-recent-forms';
 import { DashboardEngagement } from '@/components/dashboard/dashboard-engagement';
 
@@ -10,6 +11,7 @@ export default function CreateDashboardPage() {
     <div className="flex min-h-screen flex-col px-8 py-4">
       <DashboardHeader />
       <DashboardCards />
+      <DashboardNetworkGraph />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-5">
         <DashboardRecentForms />
