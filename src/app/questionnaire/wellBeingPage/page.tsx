@@ -72,10 +72,9 @@ export default function WellBeingPage() {
   const mutation = useMutation({
     mutationFn: async () => {
       if (!data) throw new Error('Dados do questionário ausentes');
-      const payload = {
-        surveyId,
-        questionnaireId: data.questionnaireId,
-        email,
+
+      const currentAnswers = {
+        section: 'wellBeing',
         answersByUser: [
           {
             name: email,
@@ -83,12 +82,26 @@ export default function WellBeingPage() {
           },
         ],
       };
-      const res = await fetch('/api/responses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('Erro ao enviar respostas');
+
+      const previousRaw = sessionStorage.getItem('partialResponses');
+      let previous: { section: string; answersByUser: Record<string, string>[] }[] = [];
+      try {
+        previous = previousRaw
+          ? (JSON.parse(previousRaw) as {
+              section: string;
+              answersByUser: Record<string, string>[];
+            }[])
+          : [];
+      } catch (e) {
+        console.error('Erro ao parsear partialResponses do sessionStorage:', e);
+        previous = [];
+      }
+
+      const allSections = Array.isArray(previous)
+        ? [...previous, currentAnswers]
+        : [previous, currentAnswers];
+
+      sessionStorage.setItem('partialResponses', JSON.stringify(allSections));
     },
     onSuccess: () => {
       router.push(

@@ -45,10 +45,9 @@ export default function JobMeaningPage() {
   const mutation = useMutation({
     mutationFn: async () => {
       if (!data) throw new Error('Dados do questionário ausentes');
-      const payload = {
-        surveyId,
-        questionnaireId: data._id,
-        email,
+
+      const currentAnswers = {
+        section: 'jobMeaning',
         answersByUser: [
           {
             name: email,
@@ -56,12 +55,45 @@ export default function JobMeaningPage() {
           },
         ],
       };
+
+      const previousRaw = sessionStorage.getItem('partialResponses');
+      let previous: { section: string; answersByUser: Record<string, string>[] }[] = [];
+      try {
+        previous = previousRaw
+          ? (JSON.parse(previousRaw) as {
+              section: string;
+              answersByUser: Record<string, string>[];
+            }[])
+          : [];
+      } catch (e) {
+        console.error('Erro ao parsear partialResponses do sessionStorage:', e);
+        previous = [];
+      }
+
+      const allSections = Array.isArray(previous)
+        ? [...previous, currentAnswers]
+        : [previous, currentAnswers];
+
+      const combinedAnswersByUser = allSections.flatMap((entry) =>
+        entry.answersByUser.map((item) => ('name' in item ? item : { name: email, answers: item }))
+      );
+
+      const payload = {
+        surveyId,
+        questionnaireId: data._id,
+        email,
+        answersByUser: combinedAnswersByUser,
+      };
+
       const res = await fetch('/api/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) throw new Error('Erro ao enviar respostas');
+
+      sessionStorage.removeItem('partialResponses');
     },
     onSuccess: () => {
       // router.push('/surveys');
