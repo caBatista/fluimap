@@ -133,7 +133,7 @@ export default function WellBeingPage() {
   if (error || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center text-red-500">
-        Erro ao carregar dados.
+        Erro ao carregar dados!
       </div>
     );
   }
