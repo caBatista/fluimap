@@ -24,25 +24,25 @@ export function SearchAndFilter({
   setStatusFilter,
 }: SearchAndFilterProps) {
   return (
-    <div className="mt-[24px] flex h-[74px] w-[1151px] items-center gap-[17px] rounded-[8px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-[17px]">
+    <div className="mt-[24px] flex flex-wrap items-center gap-4 rounded-[8px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4">
       {/* Barra de pesquisa */}
-      <div className="relative h-[40px] w-[873px]">
+      <div className="relative h-[40px] min-w-[200px] flex-1">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
         <Input
           placeholder="Pesquisar formulário..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] pl-9 text-sm"
+          className="w-full rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] pl-9 text-sm"
         />
       </div>
 
-      <div className="relative flex h-[40px] w-[231px] items-center">
+      <div className="relative h-[40px] w-full min-w-[200px] max-w-[231px]">
         <Filter className="pointer-events-none absolute top-1/2 ml-[13px] h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="h-[40px] w-[231px] pl-[52px] text-sm">
-            <SelectValue className="" placeholder="Todos os status" />
+          <SelectTrigger className="h-[40px] w-full pl-[52px] text-sm">
+            <SelectValue placeholder="Todos os status" />
           </SelectTrigger>
-          <SelectContent className="w-[231px] text-sm">
+          <SelectContent className="w-full text-sm">
             <SelectItem className="pl-[52px]" value="todos">
               Todos os status
             </SelectItem>

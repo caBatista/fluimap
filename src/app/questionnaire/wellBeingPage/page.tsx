@@ -171,7 +171,7 @@ export default function WellBeingPage() {
         ))}
       </div>
 
-      <div className="mt-10 flex w-full max-w-4xl justify-between">
+      <div className="mb-[80] mt-10 flex w-full justify-between">
         <Button
           variant="outline"
           className="h-auto px-8 py-4 text-base"

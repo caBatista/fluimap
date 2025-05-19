@@ -196,7 +196,7 @@ export function PeerCommunicationContent() {
           })}
 
           {userIndex === users.length - 1 && (
-            <div className="mt-10 flex w-full justify-between">
+            <div className="mb-8 mt-10 flex w-full justify-between">
               <Button
                 className="h-auto px-8 py-4 text-base"
                 variant="outline"

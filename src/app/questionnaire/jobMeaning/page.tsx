@@ -166,7 +166,7 @@ export default function JobMeaningPage() {
         ))}
       </div>
 
-      <div className="mt-10 flex w-full max-w-4xl justify-between">
+      <div className="mb-[80] mt-10 flex w-full max-w-4xl justify-between">
         <Button
           className="h-auto px-8 py-4 text-base"
           variant="outline"

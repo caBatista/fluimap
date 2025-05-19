@@ -110,7 +110,7 @@ export default function SelectUsersPage() {
         </div>
       </div>
 
-      <div className="mt-8 flex w-full justify-center px-2 sm:justify-end">
+      <div className="mb-[80] mt-8 flex w-full justify-center px-2 sm:justify-end">
         <Button
           variant="default"
           className="h-auto w-full px-8 py-4 text-base sm:w-auto"
