@@ -13,12 +13,12 @@ const InputSurveySchema = SurveySchemaZod.omit({ questionnaireIds: true }).exten
 export async function GET() {
   await dbConnect();
 
-const { userId } = await auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
+  }
 
-const surveys = await Survey.find({ ownerId: userId }).sort({ createdAt: -1 }).lean();
+  const surveys = await Survey.find({ ownerId: userId }).sort({ createdAt: -1 }).lean();
   const now = new Date();
 
   const detailed = await Promise.all(

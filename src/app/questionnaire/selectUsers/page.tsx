@@ -22,21 +22,29 @@ export default function SelectUsersPage() {
   const email = searchParams.get('email')!;
   const teamId = searchParams.get('teamId')!;
 
-  const { data, isLoading, error } = useQuery<{ survey: Survey; members: { _id: string; name: string; email: string; role: string; imageUrl: string }[] }>({
+  const { data, isLoading, error } = useQuery<{
+    survey: Survey;
+    members: { _id: string; name: string; email: string; role: string; imageUrl: string }[];
+  }>({
     queryKey: ['survey', surveyId],
-    queryFn: async (): Promise<{ survey: Survey; members: { _id: string; name: string; email: string; role: string; imageUrl: string }[] }> => {
+    queryFn: async (): Promise<{
+      survey: Survey;
+      members: { _id: string; name: string; email: string; role: string; imageUrl: string }[];
+    }> => {
       const surveyResponse = await fetch(`/api/surveys/${surveyId}`);
       if (!surveyResponse.ok) {
         throw new Error('Failed to fetch survey data');
       }
-      const surveyData = await surveyResponse.json() as { survey: Survey };
+      const surveyData = (await surveyResponse.json()) as { survey: Survey };
       const survey = surveyData.survey;
 
       const membersResponse = await fetch(`/api/teams/${survey.teamId}`);
       if (!membersResponse.ok) {
         throw new Error('Failed to fetch team members');
       }
-      const membersData = await membersResponse.json() as { members: { _id: string; name: string; email: string; role: string; imageUrl: string }[] };
+      const membersData = (await membersResponse.json()) as {
+        members: { _id: string; name: string; email: string; role: string; imageUrl: string }[];
+      };
       const members = membersData.members;
       return { survey, members };
     },
@@ -76,7 +84,6 @@ export default function SelectUsersPage() {
       </main>
     );
   }
-
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-background px-4 pb-12">

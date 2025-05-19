@@ -8,7 +8,7 @@ export const ResponseSchemaZod = z.object({
   answersByUser: z.array(
     z.object({
       name: z.string(),
-      answers: z.record(z.string(), z.string())
+      answers: z.record(z.string(), z.string()),
     })
   ),
 });
