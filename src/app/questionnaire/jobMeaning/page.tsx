@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface Questionnaire {
@@ -16,7 +16,7 @@ interface Questionnaire {
   }>;
 }
 
-export default function JobMeaningPage() {
+function JobMeaningContent() {
   const searchParams = useSearchParams();
   const surveyId = searchParams.get('surveyId')!;
   const email = searchParams.get('email')!;
@@ -36,7 +36,7 @@ export default function JobMeaningPage() {
       };
 
       const qm = questionnaires.find((q) => q.section === 'jobMeaning');
-      if (!qm) throw new Error('Questionário “jobMeaning” não encontrado');
+      if (!qm) throw new Error('Questionário "jobMeaning" não encontrado');
 
       return qm;
     },
@@ -179,5 +179,15 @@ export default function JobMeaningPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function JobMeaningPage() {
+  return (
+    <Suspense
+      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
+    >
+      <JobMeaningContent />
+    </Suspense>
   );
 }

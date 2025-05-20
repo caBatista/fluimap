@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 
 interface QuestionnaireRaw {
   _id: string;
@@ -24,7 +24,7 @@ interface WellBeingData {
   itens: string[];
 }
 
-export default function WellBeingPage() {
+function WellBeingContent() {
   const searchParams = useSearchParams();
   const rawSurveyId = searchParams.get('surveyId');
   const rawEmail = searchParams.get('email');
@@ -46,11 +46,11 @@ export default function WellBeingPage() {
 
       const body = (await res.json()) as { questionnaires: QuestionnaireRaw[] };
       const wbRaw = body.questionnaires.find((q) => q.section === 'wellBeing');
-      if (!wbRaw) throw new Error('Questionário “wellBeing” não encontrado');
+      if (!wbRaw) throw new Error('Questionário "wellBeing" não encontrado');
 
       const questions = wbRaw.questions;
       if (!questions || questions.length === 0)
-        throw new Error('Questionário “wellBeing” sem perguntas');
+        throw new Error('Questionário "wellBeing" sem perguntas');
 
       const escala = questions[0]!.options.reduce<Record<string, string>>((acc, o) => {
         acc[o.value] = o.label;
@@ -190,5 +190,15 @@ export default function WellBeingPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function WellBeingPage() {
+  return (
+    <Suspense
+      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
+    >
+      <WellBeingContent />
+    </Suspense>
   );
 }

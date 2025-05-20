@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { SelectUser } from '@/components/select-user';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
@@ -14,13 +14,12 @@ interface Survey {
   updatedAt: string;
 }
 
-export default function SelectUsersPage() {
+function SelectUsersContent() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const surveyId = searchParams.get('surveyId')!;
   const email = searchParams.get('email')!;
-  const teamId = searchParams.get('teamId')!;
 
   const { data, isLoading, error } = useQuery<{
     survey: Survey;
@@ -121,5 +120,15 @@ export default function SelectUsersPage() {
         </Button>
       </div>
     </main>
+  );
+}
+
+export default function SelectUsersPage() {
+  return (
+    <Suspense
+      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
+    >
+      <SelectUsersContent />
+    </Suspense>
   );
 }

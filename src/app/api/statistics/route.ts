@@ -5,31 +5,48 @@ import Team from '@/models/Team';
 import Response from '@/models/response';
 import TeamRespondent from '@/models/teamRespondents';
 import { format } from 'date-fns';
-import { Types } from 'mongoose';
 import { auth } from '@clerk/nextjs/server';
+import type { Document, Types } from 'mongoose';
 
-interface CategoryCount {
-  [key: string]: number;
+type CategoryCount = Record<string, number>;
+
+interface ITeam extends Document {
+  _id: Types.ObjectId;
+  name: string;
+  ownerId: string;
+  updatedAt: Date;
 }
+
+interface ISurvey extends Document {
+  _id: Types.ObjectId;
+  title: string;
+  teamId: Types.ObjectId;
+  status: string;
+  createdAt: Date;
+}
+
+type LeanSurvey = {
+  _id: string;
+  title: string;
+  teamId: string;
+  status: string;
+  createdAt: Date;
+  __v: number;
+};
 
 export async function GET() {
   try {
-    // Connect to the database
     await dbConnect();
-
-    // Get the current user ID from Clerk authentication
     const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get teams owned by the current user
-    const userTeams = await Team.find({ ownerId: userId });
-    const userTeamIds = userTeams.map((team) => (team._id as any).toString());
+    const userTeams = (await Team.find({ ownerId: userId })) as unknown as ITeam[];
+    const userTeamIds = userTeams.map((team) => team._id.toString());
 
     if (userTeamIds.length === 0) {
-      // Return empty data structure if user has no teams
       return NextResponse.json({
         totalSurveys: 0,
         completedSurveys: 0,
@@ -42,29 +59,26 @@ export async function GET() {
       });
     }
 
-    // Get total surveys and count by status for user's teams
     const totalSurveys = await Survey.countDocuments({ teamId: { $in: userTeamIds } });
     const completedSurveys = await Survey.countDocuments({
       teamId: { $in: userTeamIds },
       status: 'fechado',
     });
 
-    // Get all surveys for user's teams
-    const allSurveys = await Survey.find({ teamId: { $in: userTeamIds } });
-    const surveyIds = allSurveys.map((survey) => (survey._id as any).toString());
+    const allSurveys = (await Survey.find({
+      teamId: { $in: userTeamIds },
+    })) as unknown as ISurvey[];
+    const surveyIds = allSurveys.map((survey) => survey._id.toString());
 
-    // Get responses count for user's surveys
     const responses = await Response.find({ formId: { $in: surveyIds } });
     const totalRespondents = responses.length;
 
-    // Calculate response rate (responses / total possible responses)
     let responseRate = 0;
     if (totalSurveys > 0 && responses.length > 0) {
-      // This is an estimate - calculate based on team respondents
       const teamRespondents = await TeamRespondent.find({ teamId: { $in: userTeamIds } });
       const avgRespondentsPerTeam = teamRespondents.length / userTeamIds.length;
       const totalPossibleResponses = totalSurveys * avgRespondentsPerTeam;
-      responseRate = Math.round((responses.length / (totalPossibleResponses || 1)) * 100);
+      responseRate = Math.round((responses.length / (totalPossibleResponses ?? 1)) * 100);
     }
 
     const surveyCategories: CategoryCount = {};
@@ -72,28 +86,26 @@ export async function GET() {
     allSurveys.forEach((survey) => {
       const title = survey.title.toLowerCase();
       if (title.includes('avaliação')) {
-        surveyCategories['Avaliação'] = (surveyCategories['Avaliação'] || 0) + 1;
+        surveyCategories.Avaliação = (surveyCategories.Avaliação ?? 0) + 1;
       } else if (title.includes('feedback')) {
-        surveyCategories['Feedback'] = (surveyCategories['Feedback'] || 0) + 1;
+        surveyCategories.Feedback = (surveyCategories.Feedback ?? 0) + 1;
       } else if (title.includes('satisfação')) {
-        surveyCategories['Satisfação'] = (surveyCategories['Satisfação'] || 0) + 1;
+        surveyCategories.Satisfação = (surveyCategories.Satisfação ?? 0) + 1;
       } else if (title.includes('nps')) {
-        surveyCategories['NPS'] = (surveyCategories['NPS'] || 0) + 1;
+        surveyCategories.NPS = (surveyCategories.NPS ?? 0) + 1;
       } else {
-        surveyCategories['Outros'] = (surveyCategories['Outros'] || 0) + 1;
+        surveyCategories.Outros = (surveyCategories.Outros ?? 0) + 1;
       }
     });
 
-    // Convert to array format for chart
     const surveyTypes = Object.entries(surveyCategories).map(([name, value]) => ({
       name,
       value,
     }));
 
-    // Monthly activity - last 6 months
     const currentDate = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(currentDate.getMonth() - 5); // Get 6 months including current month
+    sixMonthsAgo.setMonth(currentDate.getMonth() - 5);
 
     const monthlyActivity = [];
     for (let i = 0; i < 6; i++) {
@@ -122,57 +134,54 @@ export async function GET() {
       });
     }
 
-    const recentSurveys = await Survey.find({ teamId: { $in: userTeamIds } })
+    const recentSurveys = (await Survey.find({ teamId: { $in: userTeamIds } })
       .sort({ createdAt: -1 })
       .limit(5)
-      .lean();
+      .lean()) as unknown as LeanSurvey[];
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
-        const surveyId = survey._id.toString();
+        const surveyId = survey._id;
         const responsesForSurvey = await Response.countDocuments({ formId: surveyId });
-
         const respondentsInTeam = await TeamRespondent.countDocuments({ teamId: survey.teamId });
-        const total = Math.max(respondentsInTeam, 1); // Avoid division by zero
+        const total = Math.max(respondentsInTeam, 1);
 
         return {
           id: surveyId,
           title: survey.title,
-          date: survey.createdAt || new Date(),
+          date: survey.createdAt ?? new Date(),
           responses: responsesForSurvey,
           total,
         };
       })
     );
 
-    // Team stats - only for teams owned by the current user
     const teamStats = await Promise.all(
       userTeams.map(async (team) => {
-        const teamId = (team._id as any).toString();
+        const teamId = team._id.toString();
         const members = await TeamRespondent.countDocuments({ teamId });
         const teamSurveys = await Survey.countDocuments({ teamId });
 
-        // Get last activity date - either last survey created or last response for team's surveys
-        const lastSurvey = await Survey.findOne({ teamId }).sort({ createdAt: -1 });
-
-        const teamSurveyIds = await Survey.find({ teamId }).distinct('_id');
+        const lastSurvey = (await Survey.findOne({ teamId }).sort({
+          createdAt: -1,
+        })) as ISurvey | null;
+        const teamSurveyIds = (await Survey.find({ teamId }).distinct('_id')) as Types.ObjectId[];
 
         const lastResponse =
           teamSurveyIds.length > 0
             ? await Response.findOne({
-                formId: { $in: teamSurveyIds.map((id: any) => id.toString()) },
+                formId: { $in: teamSurveyIds.map((id) => id.toString()) },
               }).sort({ createdAt: -1 })
             : null;
 
-        // Fallback to current date if no activity dates are available
         const now = new Date();
         let lastActivity = team.updatedAt ?? now;
 
-        if (lastSurvey && lastSurvey.createdAt && lastSurvey.createdAt > lastActivity) {
+        if (lastSurvey?.createdAt && lastSurvey.createdAt > lastActivity) {
           lastActivity = lastSurvey.createdAt;
         }
 
-        if (lastResponse && lastResponse.createdAt && lastResponse.createdAt > lastActivity) {
+        if (lastResponse?.createdAt && lastResponse.createdAt > lastActivity) {
           lastActivity = lastResponse.createdAt;
         }
 
@@ -186,7 +195,6 @@ export async function GET() {
       })
     );
 
-    // Return the statistics
     return NextResponse.json({
       totalSurveys,
       completedSurveys,

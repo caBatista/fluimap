@@ -9,7 +9,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -28,7 +27,7 @@ import {
   Cell,
   Legend,
 } from '@/components/mocks/recharts';
-import { CalendarDays, Users, ClipboardList, CheckCircle, BarChart3 } from 'lucide-react';
+import { Users, ClipboardList, CheckCircle, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
 
 // Define COLORS array for pie chart
@@ -80,7 +79,8 @@ const fetchStatistics = async (): Promise<StatisticsData> => {
     throw new Error('Failed to fetch statistics');
   }
 
-  return response.json();
+  const data = (await response.json()) as StatisticsData;
+  return data;
 };
 
 export default function StatisticsDashboard() {
@@ -185,7 +185,7 @@ export default function StatisticsDashboard() {
                       <ClipboardList className="h-6 w-6 text-primary" />
                     </div>
                     <div className="mt-3 text-center">
-                      <h2 className="text-4xl font-bold">{stats?.totalSurveys || 0}</h2>
+                      <h2 className="text-4xl font-bold">{stats?.totalSurveys ?? 0}</h2>
                       <p className="text-sm text-muted-foreground">Total de Pesquisas</p>
                     </div>
                   </CardContent>
@@ -197,7 +197,7 @@ export default function StatisticsDashboard() {
                       <CheckCircle className="h-6 w-6 text-primary" />
                     </div>
                     <div className="mt-3 text-center">
-                      <h2 className="text-4xl font-bold">{stats?.completedSurveys || 0}</h2>
+                      <h2 className="text-4xl font-bold">{stats?.completedSurveys ?? 0}</h2>
                       <p className="text-sm text-muted-foreground">Pesquisas Concluídas</p>
                     </div>
                   </CardContent>
@@ -209,7 +209,7 @@ export default function StatisticsDashboard() {
                       <Users className="h-6 w-6 text-primary" />
                     </div>
                     <div className="mt-3 text-center">
-                      <h2 className="text-4xl font-bold">{stats?.totalRespondents || 0}</h2>
+                      <h2 className="text-4xl font-bold">{stats?.totalRespondents ?? 0}</h2>
                       <p className="text-sm text-muted-foreground">Total de Respondentes</p>
                     </div>
                   </CardContent>
@@ -221,7 +221,7 @@ export default function StatisticsDashboard() {
                       <BarChart3 className="h-6 w-6 text-primary" />
                     </div>
                     <div className="mt-3 text-center">
-                      <h2 className="text-4xl font-bold">{stats?.responseRate || 0}%</h2>
+                      <h2 className="text-4xl font-bold">{stats?.responseRate ?? 0}%</h2>
                       <p className="text-sm text-muted-foreground">Taxa de Resposta</p>
                     </div>
                   </CardContent>
@@ -250,18 +250,18 @@ export default function StatisticsDashboard() {
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            data={stats?.surveyTypes || []}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                            label={({ name, percent }: { name: string; percent: number }) =>
+                            _data={stats?.surveyTypes ?? []}
+                            _cx="50%"
+                            _cy="50%"
+                            _labelLine={false}
+                            _outerRadius={80}
+                            _fill="#8884d8"
+                            _dataKey="value"
+                            _label={({ name, percent }: { name: string; percent: number }) =>
                               `${name} ${(percent * 100).toFixed(0)}%`
                             }
                           >
-                            {(stats?.surveyTypes || []).map((entry: SurveyType, index: number) => (
+                            {(stats?.surveyTypes ?? []).map((entry: SurveyType, index: number) => (
                               <Cell
                                 key={`cell-${entry.name}-${index}`}
                                 fill={COLORS[index % COLORS.length]}
@@ -286,21 +286,21 @@ export default function StatisticsDashboard() {
                     <div className="h-80 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                          data={stats?.monthlyActivity || []}
-                          margin={{
+                          _data={stats?.monthlyActivity ?? []}
+                          _margin={{
                             top: 5,
                             right: 30,
                             left: 20,
                             bottom: 5,
                           }}
                         >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
+                          <CartesianGrid _strokeDasharray="3 3" />
+                          <XAxis _dataKey="month" />
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="surveys" fill="#0088FE" name="Pesquisas Criadas" />
-                          <Bar dataKey="responses" fill="#00C49F" name="Respostas Recebidas" />
+                          <Bar _dataKey="surveys" _fill="#0088FE" _name="Pesquisas Criadas" />
+                          <Bar _dataKey="responses" _fill="#00C49F" _name="Respostas Recebidas" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
