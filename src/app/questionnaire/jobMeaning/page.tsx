@@ -1,41 +1,102 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface Questionnaire {
-  titulo: string;
-  instrucoes: string;
-  escala: Record<string, string>;
-  pergunta: string;
-  itens: string[];
+  _id: string;
+  name: string;
+  instructions: string;
+  section: string;
+  questions: Array<{
+    text: string;
+    options: { value: string; label: string }[];
+  }>;
 }
 
 export default function JobMeaningPage() {
+  const searchParams = useSearchParams();
+  const surveyId = searchParams.get('surveyId')!;
+  const email = searchParams.get('email')!;
+  if (!surveyId || !email) {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useQuery<Questionnaire>({
-    queryKey: ['job-meaning'],
+    queryKey: ['jobMeaning', surveyId],
     queryFn: async () => {
-      const res = await fetch('/job-meaning.json');
-      if (!res.ok) throw new Error('Erro ao carregar o questionário');
-      const json: unknown = await res.json();
-      if (
-        typeof json === 'object' &&
-        json !== null &&
-        'titulo' in json &&
-        'instrucoes' in json &&
-        'escala' in json &&
-        'pergunta' in json &&
-        'itens' in json
-      ) {
-        return json as Questionnaire;
-      } else {
-        throw new Error('Estrutura inválida no JSON');
+      const res = await fetch('/api/questionnaires');
+      if (!res.ok) throw new Error('Erro ao carregar questionários');
+      const { questionnaires } = (await res.json()) as {
+        questionnaires: Questionnaire[];
+      };
+
+      const qm = questionnaires.find((q) => q.section === 'jobMeaning');
+      if (!qm) throw new Error('Questionário “jobMeaning” não encontrado');
+
+      return qm;
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!data) throw new Error('Dados do questionário ausentes');
+
+      const currentAnswers = {
+        section: 'jobMeaning',
+        answersByUser: [
+          {
+            name: email,
+            answers: answers,
+          },
+        ],
+      };
+
+      const previousRaw = sessionStorage.getItem('partialResponses');
+      let previous: { section: string; answersByUser: Record<string, string>[] }[] = [];
+      try {
+        previous = previousRaw
+          ? (JSON.parse(previousRaw) as {
+              section: string;
+              answersByUser: Record<string, string>[];
+            }[])
+          : [];
+      } catch (e) {
+        console.error('Erro ao parsear partialResponses do sessionStorage:', e);
+        previous = [];
       }
+
+      const allSections = Array.isArray(previous)
+        ? [...previous, currentAnswers]
+        : [previous, currentAnswers];
+
+      const combinedAnswersByUser = allSections.flatMap((entry) =>
+        entry.answersByUser.map((item) => ('name' in item ? item : { name: email, answers: item }))
+      );
+
+      const payload = {
+        surveyId,
+        questionnaireId: data._id,
+        email,
+        answersByUser: combinedAnswersByUser,
+      };
+
+      const res = await fetch('/api/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Erro ao enviar respostas');
+
+      sessionStorage.removeItem('partialResponses');
+    },
+    onSuccess: () => {
+      // router.push('/surveys');
     },
   });
 
@@ -45,6 +106,14 @@ export default function JobMeaningPage() {
   };
 
   const handleContinue = () => {
+    if (!data) return;
+
+    const allAnswered = data.questions.every((_, index) => answers[`question-${index}`]);
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
+    mutation.mutate();
     router.push(`/questionnaire/success`);
   };
 
@@ -69,27 +138,26 @@ export default function JobMeaningPage() {
       <h1 className="mb-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
-      <h2 className="mb-4 text-center text-2xl font-semibold">{data.titulo}</h2>
-      <p className="mb-8 max-w-2xl text-center text-sm">{data.instrucoes}</p>
-      <h3 className="mb-6 text-xl font-semibold text-[hsl(var(--primary))]">{data.pergunta}</h3>
+      <h2 className="mb-4 text-center text-2xl font-semibold">{data.name}</h2>
+      <p className="mb-8 max-w-2xl text-center text-sm">{data.instructions}</p>
 
       <div className="w-full max-w-4xl space-y-6">
-        {data.itens.map((item, index) => (
+        {data.questions.map((q, index) => (
           <div key={index} className="rounded-xl border bg-background p-4 shadow-sm">
-            <p className="mb-3 font-medium">{item}</p>
+            <p className="mb-3 font-medium">{q.text}</p>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              {Object.entries(data.escala).map(([key, label]) => (
-                <label key={key} className="flex items-center gap-2">
+              {q.options.map((opt) => (
+                <label key={opt.value} className="flex items-center gap-2">
                   <input
                     type="radio"
                     name={`question-${index}`}
-                    value={key}
+                    value={opt.value}
                     className="accent-[hsl(var(--primary))] hover:cursor-pointer"
-                    checked={answers[`question-${index}`] === key}
-                    onChange={() => handleAnswer(index, key)}
+                    checked={answers[`question-${index}`] === opt.value}
+                    onChange={() => handleAnswer(index, opt.value)}
                   />
                   <span className="text-sm">
-                    {key} - {label}
+                    {opt.value} – {opt.label}
                   </span>
                 </label>
               ))}
@@ -98,13 +166,13 @@ export default function JobMeaningPage() {
         ))}
       </div>
 
-      <div className="mt-10 flex w-full max-w-4xl justify-between">
+      <div className="mb-[80] mt-10 flex w-full max-w-4xl justify-between">
         <Button
           className="h-auto px-8 py-4 text-base"
           variant="outline"
           onClick={() => router.back()}
         >
-          Cancelar
+          Voltar
         </Button>
         <Button variant="default" className="h-auto px-8 py-4 text-base" onClick={handleContinue}>
           Finalizar

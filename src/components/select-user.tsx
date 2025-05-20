@@ -23,7 +23,7 @@ export function SelectUser({ name, role, imageUrl, onSelect }: SelectUserProps) 
   return (
     <button onClick={handleClick}>
       <Card
-        className={`h-[120px] w-[160px] border-[5px] bg-secondary transition-all duration-200 sm:h-[150px] sm:w-[200px] ${selected ? 'border-primary' : 'border-transparent'} flex items-center justify-center hover:border-primary`}
+        className={`h-[120px] w-[160px] border-[5px] bg-background transition-all duration-200 sm:h-[150px] sm:w-[200px] ${selected ? 'border-primary' : 'border-transparent'} flex items-center justify-center hover:border-primary`}
       >
         <CardHeader className="flex items-center gap-3 p-2 sm:p-4">
           <Avatar className="h-10 w-10 sm:h-[50px] sm:w-[50px]">

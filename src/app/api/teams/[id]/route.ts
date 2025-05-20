@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Team, { TeamSchemaZod } from '@/models/Team';
-import TeamRespondent from '@/models/teamRespondents';
+import Respondee from '@/models/Respondee';
+import { Types } from 'mongoose';
 import { auth } from '@clerk/nextjs/server';
 import dbConnect from '@/server/database/db';
 import { revalidatePath } from 'next/cache';
@@ -18,6 +19,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     await dbConnect();
     const { id } = await params;
 
+    console.log('id', id);
+
     const userId: string = await getUserIdOrThrow();
 
     const team = await Team.findById(id).lean();
@@ -29,7 +32,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const members = await TeamRespondent.find({ teamId: id }).lean();
+    const members = await Respondee.find({ teamId: new Types.ObjectId(id) }).lean();
 
     return NextResponse.json({ team, members }, { status: 200 });
   } catch (err: unknown) {
@@ -91,7 +94,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     }
 
     await Team.findByIdAndDelete(id);
-    await TeamRespondent.deleteMany({ teamId: id });
+    await Respondee.deleteMany({ teamId: new Types.ObjectId(id) });
 
     revalidatePath('/dashboard');
     revalidatePath('/teamPage');
