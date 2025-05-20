@@ -3,11 +3,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ClipboardList, Users, BarChart2, Star } from "lucide-react";
 
-export function DashboardCards() {
+interface DashboardCardsProps {
+  activeTab: number;
+  totalTeams: number;
+}
+
+export function DashboardCards({activeTab, totalTeams}: DashboardCardsProps) {
   const cards = [
     {
       title: "Formulários Ativos",
-      value: "2",
+      value: activeTab,
       icon: <ClipboardList className="text-blue-500" />,
       trend: "+12%",
       trendDescription: "do mês passado",
@@ -15,7 +20,7 @@ export function DashboardCards() {
     },
     {
       title: "Membros da equipe",
-      value: "16",
+      value: totalTeams,
       icon: <Users className="text-green-500" />,
       trend: "+3%",
       trendDescription: "Novos Membros",
