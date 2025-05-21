@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { GenericModal } from '../modal/genericModal';
 import { DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -42,31 +44,31 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
     >
       {/* Campo para o nome da equipe */}
       <div className="mb-4">
-        <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="teamName" className="block text-[hsl(var(--muted-foreground))]">
           Nome da Equipe
         </label>
-        <input
+        <Input
           type="text"
           id="teamName"
           value={teamName}
           onChange={(e) => setTeamName(e.target.value)}
           required
           placeholder="Digite o nome da equipe"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border text-[hsl(var(--primary-foreground))]"
         />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="teamDescription" className="block text-[hsl(var(--muted-foreground))]">
           Descrição da Equipe
         </label>
-        <textarea
+        <Textarea
           id="teamDescription"
           value={teamDescription}
           onChange={(e) => setTeamDescription(e.target.value)}
           required
           placeholder="Digite uma breve descrição da equipe"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border text-[hsl(var(--primary-foreground))]"
           rows={4}
         />
       </div>
@@ -77,7 +79,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
             variant="outline"
             size="lg"
             type="button"
-            className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
+            className="flex h-[40px] w-[78px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={onClose}
           >
             Cancelar
@@ -86,10 +88,10 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
             variant="outline"
             size="lg"
             type="submit"
-            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={handleSubmit}
           >
-            Salvar
+            Criar Time
           </Button>
         </div>
       </DialogFooter>

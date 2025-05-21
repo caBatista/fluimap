@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { UserIcon, UserPlus } from 'lucide-react';
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { UsersIcon, UserPlus } from 'lucide-react';
+import { Card, CardFooter } from '@/components/ui/card';
+import { EditIcon, Trash2Icon } from 'lucide-react';
 import { GenericModal } from '@/components/modal/genericModal';
 import { RespondeeList } from '@/components/respondees/respondee-list';
 import { type EditTeamType } from '@/models/Team';
@@ -43,49 +43,47 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }
   const [isViewMembersOpen, setIsViewMembersOpen] = useState(false);
 
   return (
-    <Card className="w-35 flex h-[200px] flex-col rounded-lg border-2 border-white pt-4 shadow-lg dark:border-2 dark:border-white dark:shadow-[0_10px_15px_-3px_rgba(255,255,255,0.1),_0_4px_6px_-2px_rgba(255,255,255,0.05)]">
-      <CardHeader className="flex items-center justify-between p-0">
-        <div className="flex w-full items-center justify-between">
-          <CardTitle className="pl-4 pt-2 text-left text-xl">{name}</CardTitle>
-
-          <div className="flex gap-2 pr-2">
-            <Button
-              className={
-                'hover:bg-accent dark:hover:bg-accent flex items-center gap-2 rounded-md border-none px-3 py-3 text-secondary shadow-none dark:border-0 dark:bg-transparent dark:text-foreground'
-              }
-              onClick={onEdit}
-            >
-              <PencilIcon className="h-5 w-5 text-secondary dark:text-foreground" />
-            </Button>
-            <Button
-              className="hover:bg-accent dark:hover:bg-accent flex items-center gap-2 rounded-md border-none px-3 py-3 text-secondary shadow-none dark:border-0 dark:bg-transparent dark:text-foreground"
-              onClick={onDelete}
-            >
-              <TrashIcon className="h-5 w-5 text-secondary dark:text-foreground" />
-            </Button>
-          </div>
+    <Card className="relative h-[201px] w-full rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm">
+      <div className="ml-4 mt-4 flex items-start justify-between">
+        <div>
+          <h2 className="text-sml font-semibold text-[hsl(var(--foreground))]">{name}</h2>
         </div>
-      </CardHeader>
 
-      <div className="flex flex-1 items-center justify-start pb-4 pl-6">
-        <CardDescription>{description}</CardDescription>
+        <div className="flex gap-[11px]">
+          <Button
+            variant="ghost"
+            className="flex flex-1 items-center gap-1 rounded-md text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+            onClick={onEdit}
+          >
+            <EditIcon className="h-5 w-5 text-[hsl(var(--muted-foreground))]" />
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex flex-1 items-center gap-1 rounded-md text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+            onClick={onDelete}
+          >
+            <Trash2Icon className="h-5 w-5 text-[hsl(var(--muted-foreground))]" />
+          </Button>
+        </div>
       </div>
+
+      <p className="mb-7 ml-4 mt-7 text-xs text-[hsl(var(--muted-foreground))]">{description}</p>
 
       <CardFooter className="flex flex-col justify-center gap-2 px-4 pb-6 sm:flex-row">
         <Button
           variant="outline"
-          className="w-full min-w-[120px] max-w-[120px] flex-1 text-ellipsis whitespace-nowrap border border-black dark:border-white sm:w-auto"
+          className="flex h-[40px] w-[190px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
           onClick={() => setIsViewMembersOpen(true)}
         >
-          <UserIcon className="h-4 w-4 shrink-0" />
+          <UsersIcon className="h-5 w-5 shrink-0" />
           Ver Membros
         </Button>
         <Button
           variant="outline"
-          className="w-full min-w-[160px] max-w-[160px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap border border-black dark:border-white sm:w-auto"
+          className="flex h-[40px] w-[190px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
           onClick={onOpenModal}
         >
-          <UserPlus className="h-4 w-4 shrink-0" />
+          <UserPlus className="h-5 w-5 shrink-0" />
           Adicionar Membros
         </Button>
       </CardFooter>
