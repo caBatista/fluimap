@@ -6,9 +6,10 @@ import { ClipboardList, Users, BarChart2, Star } from "lucide-react";
 interface DashboardCardsProps {
   activeTab: number;
   totalTeams: number;
+  recentSurvey: number;
 }
 
-export function DashboardCards({activeTab, totalTeams}: DashboardCardsProps) {
+export function DashboardCards({activeTab, totalTeams, recentSurvey}: DashboardCardsProps) {
   const cards = [
     {
       title: "Formulários Ativos",
@@ -28,7 +29,7 @@ export function DashboardCards({activeTab, totalTeams}: DashboardCardsProps) {
     },
     {
       title: "Taxa de Resposta",
-      value: "0%",
+      value: recentSurvey,
       icon: <BarChart2 className="text-indigo-400" />,
       trend: "+7%",
       trendDescription: "da pesquisa anterior",

@@ -57,6 +57,10 @@ export default function CreateDashboardPage() {
   .sort((a, b) => new Date(b.dateClosing!).getTime() - new Date(a.dateClosing!).getTime())
   .slice(0, 3);
 
+  // const recentSurvey = recentSurveys[0].responsesCount ?? 0;
+
+  const recentSurvey = 0;
+  
   function isTeam(item: unknown): item is EditTeamType {
     return (
       typeof item === 'object' &&
@@ -97,6 +101,7 @@ export default function CreateDashboardPage() {
       <DashboardCards 
         activeTab={totalActiveSurveys}
         totalTeams={totalTeams}
+        recentSurvey={recentSurvey}
       />
       
       <DashboardNetworkGraph />

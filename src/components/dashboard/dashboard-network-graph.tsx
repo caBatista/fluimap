@@ -10,22 +10,83 @@ export function DashboardNetworkGraph() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const nodes = [
-      { id: 1, label: "JD", group: "1" },
-      { id: 2, label: "MT", group: "2" },
-      { id: 3, label: "SM", group: "2" },
-      { id: 4, label: "ER", group: "3" },
-      { id: 5, label: "JK", group: "1" },
+    const rawNodes = [
+      {
+        Pessoa: "JD",
+        Papel: "Líder",
+        Frequencia: 5,
+        Direcao: "bidirecional",
+        Clareza: 4,
+        Objetividade: 5,
+        Efetividade: 4,
+        Comunicacao: "Assertiva",
+      },
+      {
+        Pessoa: "MT",
+        Papel: "Dev",
+        Frequencia: 3,
+        Direcao: "unidirecional",
+        Clareza: 3,
+        Objetividade: 3,
+        Efetividade: 3,
+        Comunicacao: "Informal",
+      },
+      {
+        Pessoa: "SM",
+        Papel: "Dev",
+        Frequencia: 4,
+        Direcao: "bidirecional",
+        Clareza: 4,
+        Objetividade: 4,
+        Efetividade: 4,
+        Comunicacao: "Clara",
+      },
+      {
+        Pessoa: "ER",
+        Papel: "QA",
+        Frequencia: 2,
+        Direcao: "unidirecional",
+        Clareza: 2,
+        Objetividade: 3,
+        Efetividade: 2,
+        Comunicacao: "Burocrática",
+      },
+      {
+        Pessoa: "JK",
+        Papel: "PM",
+        Frequencia: 5,
+        Direcao: "bidirecional",
+        Clareza: 5,
+        Objetividade: 5,
+        Efetividade: 5,
+        Comunicacao: "Formal",
+      },
     ];
 
-    const edges = [
-      { from: 1, to: 3 },
-      { from: 1, to: 2 },
-      { from: 2, to: 3 },
-      { from: 3, to: 5 },
-      { from: 3, to: 4 },
-      { from: 4, to: 5 },
+    const rawEdges = [
+      { Pessoa: "JD", Pessoa2: "SM", Equipe: "A", weight: 3 },
+      { Pessoa: "JD", Pessoa2: "MT", Equipe: "A", weight: 4 },
+      { Pessoa: "MT", Pessoa2: "SM", Equipe: "A", weight: 2 },
+      { Pessoa: "SM", Pessoa2: "JK", Equipe: "A", weight: 3 },
+      { Pessoa: "SM", Pessoa2: "ER", Equipe: "A", weight: 1 },
+      { Pessoa: "ER", Pessoa2: "JK", Equipe: "A", weight: 2 },
     ];
+
+    const nodes = rawNodes.map((n, index) => ({
+      id: index + 1,
+      label: n.Pessoa,
+      group: n.Papel,
+      title: `Frequência: ${n.Frequencia}\nClareza: ${n.Clareza}\nObjetividade: ${n.Objetividade}\nEfetividade: ${n.Efetividade}\nComunicação: ${n.Comunicacao}`,
+    }));
+
+    const idMap = new Map(rawNodes.map((n, i) => [n.Pessoa, i + 1]));
+
+    const edges = rawEdges.map((e) => ({
+      from: idMap.get(e.Pessoa),
+      to: idMap.get(e.Pessoa2),
+      value: e.weight,
+      title: `Equipe: ${e.Equipe}\nPeso: ${e.weight}`,
+    }));
 
     const data = { nodes, edges };
 
@@ -36,13 +97,18 @@ export function DashboardNetworkGraph() {
         font: { color: "#fff" },
       },
       groups: {
-        "1": { color: { background: "#1E90FF" } },
-        "2": { color: { background: "#32CD32" } },
-        "3": { color: { background: "#FF8C00" } },
-      },      
+        "Líder": { color: { background: "#1E90FF" } },
+        "Dev": { color: { background: "#32CD32" } },
+        "QA": { color: { background: "#FF8C00" } },
+        "PM": { color: { background: "#800080" } },
+      },
       edges: {
         color: "rgba(150, 150, 150, 0.5)",
         width: 2,
+        scaling: {
+          min: 1,
+          max: 5,
+        },
       },
       physics: {
         stabilization: false,
