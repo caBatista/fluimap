@@ -40,7 +40,7 @@ export default function Sidebar() {
       {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
-          href="/fluimap/dashboard"
+          href="/fluimap/home"
           icon={<Home size={20} />}
           label="Dashboard"
           currentPath={pathname}

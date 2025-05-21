@@ -2,7 +2,7 @@
   "titulo": "Avaliação de Comunicação entre Colegas",
   "instrucoes": "Responda às questões abaixo sobre sua interação com cada colega indicado. Selecione a alternativa que melhor representa sua vivência com essa pessoa. Não há respostas certas ou erradas.",
   "pergunta": "Sobre {nome}, responda:",
-  "questoes": [
+  "itens": [
     {
       "question": "Em uma semana comum, com que frequência você conversa com {nome}?",
       "options": [

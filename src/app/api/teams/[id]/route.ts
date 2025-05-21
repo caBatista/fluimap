@@ -18,8 +18,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     await dbConnect();
     const { id } = await params;
 
-    console.log('id', id);
-
     const userId: string = await getUserIdOrThrow();
 
     const team = await Team.findById(id).lean();
