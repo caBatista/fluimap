@@ -34,7 +34,7 @@ const surveysSchema = z.object({
 });
 
 export default function CreateDashboardPage() {
-  const { data: activeSurveys = [], isLoading } = useQuery<Survey[]>({
+  const { data: activeSurveys = [] } = useQuery<Survey[]>({
     queryKey: ['activeSurveys'],
     queryFn: async () => {
       const response = await fetch('/api/surveys');
@@ -78,7 +78,6 @@ export default function CreateDashboardPage() {
 
   const {
     data: teams = [],
-    isError,
   } = useQuery<EditTeamType[]>({
     queryKey: ['teams'],
     queryFn: async () => {

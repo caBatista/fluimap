@@ -27,7 +27,7 @@ export default async function QuestionnairePage({
 
   // Fetch inviter (owner)
   const inviter = await User.findOne({ clerkId: team.ownerId }).lean();
-  const inviterName = inviter?.name || 'o responsável pelo time';
+  const inviterName = inviter?.name ?? 'o responsável pelo time';
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">

@@ -117,10 +117,15 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
           body: JSON.stringify({ teamId: data.teamId }),
         });
         if (!runResponse.ok) {
-          const runErr = await runResponse.json();
-          alert(
-            'Erro ao iniciar o envio dos questionários: ' + (runErr.error || JSON.stringify(runErr))
-          );
+          const runErr: unknown = await runResponse.json();
+          const runErrorMsg =
+            typeof runErr === 'object' &&
+            runErr !== null &&
+            'error' in runErr &&
+            typeof (runErr as { error: unknown }).error === 'string'
+              ? (runErr as { error: string }).error
+              : JSON.stringify(runErr) || 'Erro ao iniciar o envio dos questionários';
+          alert('Erro ao iniciar o envio dos questionários: ' + runErrorMsg);
         }
       } catch (runError) {
         console.error(runError);

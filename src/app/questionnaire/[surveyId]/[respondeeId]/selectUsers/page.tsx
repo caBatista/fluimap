@@ -19,7 +19,7 @@ export default function SelectUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
   const [email] = useQueryState('email');
-  const [teamId] = useQueryState('teamId');
+  // teamId is not used, so it is removed to avoid the unused variable warning
   const params = useParams();
   const surveyId = params.surveyId as string;
   const respondeeId = params.respondeeId as string;
@@ -59,7 +59,7 @@ export default function SelectUsersPage() {
   async function handleContinue() {
     const searchParams = new URLSearchParams();
     searchParams.set('surveyId', surveyId);
-    searchParams.set('email', email || 'asdfasd@gmail.com');
+    searchParams.set('email', email ?? 'asdfasd@gmail.com');
     selectedUsers.forEach((user) => {
       searchParams.append('users', user);
     });
