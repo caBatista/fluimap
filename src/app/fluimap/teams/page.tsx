@@ -240,7 +240,7 @@ export default function TeamPage() {
           <DialogFooter className="flex justify-between sm:justify-between">
             <Button
               variant="outline"
-              className="flex h-[40px] w-[75px] items-center justify-center gap-1 text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+              className="flex h-[40px] w-[75px] items-center justify-center gap-1 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/90"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Cancelar
