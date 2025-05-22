@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
@@ -18,8 +18,11 @@ interface Questionnaire {
 
 export default function JobMeaningPage() {
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId')!;
+  const params = useParams();
+  const surveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
   const email = searchParams.get('email')!;
+
   if (!surveyId || !email) {
     throw new Error('Parâmetros surveyId/email não definidos');
   }
@@ -114,7 +117,7 @@ export default function JobMeaningPage() {
       return;
     }
     mutation.mutate();
-    router.push(`/questionnaire/success`);
+    router.push(`/questionnaire/${surveyId}/${respondeeId}/success`);
   };
 
   if (isLoading) {

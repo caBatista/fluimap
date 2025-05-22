@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -27,8 +27,10 @@ interface QuestionnaireData {
 
 export function PeerCommunicationContent() {
   const searchParams = useSearchParams();
+  const params = useParams();
+  const rawSurveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
   const users = searchParams.getAll('users').filter((u) => !!u && u !== 'null');
-  const rawSurveyId = searchParams.get('surveyId');
   const rawEmail = searchParams.get('email');
 
   if (
@@ -117,7 +119,7 @@ export function PeerCommunicationContent() {
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/wellBeingPage?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+        `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
       );
     },
   });

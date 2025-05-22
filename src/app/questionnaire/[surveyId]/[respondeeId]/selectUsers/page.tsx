@@ -1,10 +1,11 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SelectUser } from '@/components/select-user';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
+import { useQueryState } from 'nuqs';
 
 interface Survey {
   title: string;
@@ -17,10 +18,11 @@ interface Survey {
 export default function SelectUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId')!;
-  const email = searchParams.get('email')!;
-  const teamId = searchParams.get('teamId')!;
+  const [email] = useQueryState('email');
+  const [teamId] = useQueryState('teamId');
+  const params = useParams();
+  const surveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
 
   const { data, isLoading, error } = useQuery<{
     survey: Survey;
@@ -38,7 +40,7 @@ export default function SelectUsersPage() {
       const surveyData = (await surveyResponse.json()) as { survey: Survey };
       const survey = surveyData.survey;
 
-      const membersResponse = await fetch(`/api/teams/${survey.teamId}`);
+      const membersResponse = await fetch(`/api/teams/${surveyId}`);
       if (!membersResponse.ok) {
         throw new Error('Failed to fetch team members');
       }
@@ -54,13 +56,17 @@ export default function SelectUsersPage() {
     setSelectedUsers((prev) => (selected ? [...prev, name] : prev.filter((n) => n !== name)));
   };
 
-  function handleContinue() {
-    const qs = [
-      `surveyId=${surveyId}`,
-      `email=${encodeURIComponent(email)}`,
-      ...selectedUsers.map((u) => `users=${encodeURIComponent(u)}`),
-    ].join('&');
-    router.push(`/questionnaire/peerCommunication?${qs}`);
+  async function handleContinue() {
+    const searchParams = new URLSearchParams();
+    searchParams.set('surveyId', surveyId);
+    searchParams.set('email', email || 'asdfasd@gmail.com');
+    selectedUsers.forEach((user) => {
+      searchParams.append('users', user);
+    });
+
+    router.push(
+      `/questionnaire/${surveyId}/${respondeeId}/peerCommunication?${searchParams.toString()}`
+    );
   }
 
   if (isLoading) {

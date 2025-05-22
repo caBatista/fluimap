@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
@@ -25,8 +25,11 @@ interface WellBeingData {
 }
 
 export default function WellBeingPage() {
+  const params = useParams();
   const searchParams = useSearchParams();
-  const rawSurveyId = searchParams.get('surveyId');
+
+  const rawSurveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
   const rawEmail = searchParams.get('email');
 
   if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
@@ -105,7 +108,7 @@ export default function WellBeingPage() {
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/jobMeaning?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+        `/questionnaire/${surveyId}/${respondeeId}/jobMeaning?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
       );
     },
   });

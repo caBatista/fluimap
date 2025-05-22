@@ -5,9 +5,37 @@ import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import dbConnect from '@/server/database/db';
+import SurveyEmail from '@/components/email/email-template';
+import { env } from '@/env';
+import { Resend } from 'resend';
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 function generateSurveyId(): string {
   return crypto.randomBytes(5).toString('hex');
+}
+
+async function sendEmail({ name, email, link }: { name: string; email: string; link: string }) {
+  console.log(`Sending email to ${email}:`);
+  console.log(`Survey link: ${link}`);
+
+  const { data, error } = await resend.emails.send({
+    from: 'Fluimap <admin@southlikesoftware.com>',
+    to: [email],
+    subject: 'Your survey is waiting',
+    react: SurveyEmail({
+      username: name,
+      link,
+    }),
+  });
+
+  if (error) {
+    console.error('Error sending email:', error);
+  }
+
+  console.log(`Email sent successfully to ${email}`);
+
+  return data;
 }
 
 interface SurveyRunResponse {
@@ -59,13 +87,7 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
     const respondeeLinks = respondees.map((respondee) => {
-      const uniqueLink =
-        `${baseUrl}/questionnaire/peerCommunication` +
-        `?surveyId=${surveyId}` +
-        `&email=${encodeURIComponent(respondee.email)}`;
-
-      console.log(`Sending email to ${respondee.email}:`);
-      console.log(`Survey link: ${uniqueLink}`);
+      const uniqueLink = `${baseUrl}/questionnaire/${teamId}/${String(respondee._id)}`;
 
       return {
         id: String(respondee._id),
@@ -75,7 +97,13 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    revalidatePath(`/dashboard`);
+    await Promise.allSettled(
+      respondeeLinks.map((respondee) =>
+        sendEmail({ name: respondee.name, email: respondee.email, link: respondee.link })
+      )
+    );
+
+    revalidatePath(`/fluimap/surveys`);
 
     const response: SurveyRunResponse = {
       success: true,
