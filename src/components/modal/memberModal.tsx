@@ -7,6 +7,8 @@ import { DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { type EditTeamType } from '@/models/Team';
 import Papa from 'papaparse';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 type MemberModalProps = {
@@ -130,61 +132,70 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
       >
         {/* Campo para o nome do membro */}
         <div className="mb-4">
-          <label htmlFor="memberName" className="block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="memberName"
+            className="block text-sm font-medium text-[hsl(var(--foreground))]"
+          >
             Nome do Membro
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             id="memberName"
             value={memberName}
             onChange={(e) => setMemberName(e.target.value)}
             required
             placeholder="Digite o nome do membro"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
           />
         </div>
 
         {/* Campo para o e-mail do membro */}
         <div className="mb-4">
-          <label htmlFor="memberEmail" className="block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="memberEmail"
+            className="block text-sm font-medium text-[hsl(var(--foreground))]"
+          >
             E-mail do Membro
-          </label>
-          <input
+          </Label>
+          <Input
             type="email"
             id="memberEmail"
             value={memberEmail}
             onChange={(e) => setMemberEmail(e.target.value)}
             required
             placeholder="Digite o e-mail do membro"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
           />
         </div>
 
         {/* Campo opcional para o cargo */}
         <div className="mb-4">
-          <label htmlFor="memberPosition" className="block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="memberPosition"
+            className="block text-sm font-medium text-[hsl(var(--foreground))]"
+          >
             Cargo (Opcional)
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             id="memberPosition"
             value={memberPosition}
             onChange={(e) => setMemberPosition(e.target.value)}
             placeholder="Digite o cargo do membro"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block h-[40px] w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
           />
         </div>
 
         <DialogFooter>
           <div className="mt-4 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex w-full gap-2 md:w-auto">
-              <label
+              <Label
                 htmlFor="csv-upload"
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black md:w-auto"
+                className="flex h-[40px] w-[110px] items-center justify-center gap-1 rounded-[6px] border bg-[hsl(var(--card))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
               >
                 <DownloadIcon className="h-5 w-5" />
                 Arq. CSV
-                <input
+                <Input
                   id="csv-upload"
                   type="file"
                   accept=".csv,text/csv"
@@ -192,15 +203,17 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                   onChange={handleCsvUpload}
                   disabled={isUploading || !selectedTeam?._id}
                 />
-              </label>
-              <button
+              </Label>
+              <Button
+                variant="outline"
+                size="lg"
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black md:w-auto"
+                className="flex h-[40px] w-[130px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
                 onClick={handleDownloadExampleCsv}
               >
                 <DownloadIcon className="h-5 w-5" />
                 Exemplo CSV
-              </button>
+              </Button>
             </div>
 
             <div className="mt-2 flex w-full justify-end gap-2 md:mt-0 md:w-auto">
@@ -208,7 +221,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 variant="outline"
                 size="lg"
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black md:w-auto"
+                className="flex h-[40px] w-[78px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
                 onClick={onClose}
               >
                 Cancelar
@@ -217,7 +230,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 variant="outline"
                 size="lg"
                 type="submit"
-                className="w-full justify-center rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 md:w-auto"
+                className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               >
                 Salvar
               </Button>

@@ -20,7 +20,7 @@ interface GenericModalProps {
 export function GenericModal({ isOpen, onClose, title, description, children }: GenericModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-lg bg-white text-black shadow-xl dark:bg-black dark:text-white sm:max-w-[600px]">
+      <DialogContent className="rounded-lg bg-[hsl(var(--card))] text-[hsl(var(--foreground))] shadow-xl sm:max-w-[580px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

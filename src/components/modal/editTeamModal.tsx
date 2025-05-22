@@ -42,7 +42,10 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
     >
       {/* Campo para o nome da equipe */}
       <div className="mb-4">
-        <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="teamName"
+          className="block text-sm font-medium text-[hsl(var(--foreground))]"
+        >
           Nome da Equipe
         </label>
         <input
@@ -52,13 +55,16 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
           onChange={(e) => setTeamName(e.target.value)}
           required
           placeholder="Digite o nome da equipe"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-[hsl(var(--border))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
         />
       </div>
 
       {/* Campo para descrição */}
       <div className="mb-4">
-        <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="teamDescription"
+          className="block text-sm font-medium text-[hsl(var(--foreground))]"
+        >
           Descrição da Equipe
         </label>
         <textarea
@@ -67,8 +73,9 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
           onChange={(e) => setTeamDescription(e.target.value)}
           required
           placeholder="Digite uma breve descrição da equipe"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-[hsl(var(--border))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
           rows={4}
+          maxLength={131}
         />
       </div>
 
@@ -78,7 +85,7 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
             variant="outline"
             size="lg"
             type="button"
-            className="flex items-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-black"
+            className="flex h-[40px] w-[78px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={onClose}
           >
             Cancelar
@@ -87,7 +94,7 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
             variant="outline"
             size="lg"
             type="submit"
-            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={handleEdit}
           >
             Salvar
