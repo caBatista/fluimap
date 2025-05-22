@@ -43,13 +43,14 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }
   const [isViewMembersOpen, setIsViewMembersOpen] = useState(false);
 
   return (
-    <Card className="relative h-[201px] w-full rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm">
-      <div className="ml-4 mt-4 flex items-start justify-between">
+    <Card className="flex h-[170px] w-[350px] flex-col justify-between rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm">
+      <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-sml font-semibold text-[hsl(var(--foreground))]">{name}</h2>
+          <h2 className="text-sml ml-[8px] mt-[8px] font-semibold text-[hsl(var(--foreground))]">
+            {name}
+          </h2>
         </div>
-
-        <div className="flex gap-[11px]">
+        <div className="flex gap-[2px]">
           <Button
             variant="ghost"
             className="flex flex-1 items-center gap-1 rounded-md text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
@@ -67,12 +68,16 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }
         </div>
       </div>
 
-      <p className="mb-7 ml-4 mt-7 text-xs text-[hsl(var(--muted-foreground))]">{description}</p>
+      <div className="flex-1">
+        <p className="ml-4 mr-4 mt-1 line-clamp-4 max-w-full overflow-hidden break-words text-xs text-[hsl(var(--muted-foreground))]">
+          {description}
+        </p>
+      </div>
 
-      <CardFooter className="flex flex-col justify-center gap-2 px-4 pb-6 sm:flex-row">
+      <CardFooter className="flex justify-center gap-2 sm:flex-row">
         <Button
           variant="outline"
-          className="flex h-[40px] w-[190px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
+          className="flex h-[40px] w-[145px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
           onClick={() => setIsViewMembersOpen(true)}
         >
           <UsersIcon className="h-5 w-5 shrink-0" />
@@ -80,13 +85,14 @@ export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }
         </Button>
         <Button
           variant="outline"
-          className="flex h-[40px] w-[190px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
+          className="flex h-[40px] w-[145px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
           onClick={onOpenModal}
         >
           <UserPlus className="h-5 w-5 shrink-0" />
-          Adicionar Membros
+          Adicionar
         </Button>
       </CardFooter>
+
       <ViewMembersModal
         isOpen={isViewMembersOpen}
         onClose={() => setIsViewMembersOpen(false)}

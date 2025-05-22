@@ -204,7 +204,7 @@ export default function TeamPage() {
       {/* Campo de busca */}
       <div className="mt-[24px] flex flex-wrap items-center gap-4 rounded-[8px] border-[hsl(var(--input))] bg-[hsl(var(--card))]">
         {/* Barra de pesquisa */}
-        <div className="relative h-[40px] min-w-[200px] flex-1">
+        <div className="relative mb-5 h-[40px] min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
           <Input
             placeholder="Pesquisar time..."

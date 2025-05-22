@@ -75,6 +75,7 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
           placeholder="Digite uma breve descrição da equipe"
           className="mt-1 block w-full rounded-md border border-[hsl(var(--border))] px-4 py-2 shadow-sm focus:outline-none focus:ring-2"
           rows={4}
+          maxLength={131}
         />
       </div>
 

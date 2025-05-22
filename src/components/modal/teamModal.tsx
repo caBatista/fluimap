@@ -54,7 +54,7 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
           onChange={(e) => setTeamName(e.target.value)}
           required
           placeholder="Digite o nome da equipe"
-          className="mt-1 block w-full rounded-md border text-[hsl(var(--primary-foreground))]"
+          className="mt-1 block w-full rounded-md border"
         />
       </div>
 
@@ -68,8 +68,9 @@ export function TeamModal({ isOpen, onClose, onSubmit }: TeamModalProps) {
           onChange={(e) => setTeamDescription(e.target.value)}
           required
           placeholder="Digite uma breve descrição da equipe"
-          className="mt-1 block w-full rounded-md border text-[hsl(var(--primary-foreground))]"
+          className="mt-1 block w-full rounded-md border"
           rows={4}
+          maxLength={131}
         />
       </div>
 

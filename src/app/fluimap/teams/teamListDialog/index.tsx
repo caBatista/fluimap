@@ -81,11 +81,11 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   }
 
   return (
-    <div className="grid w-full gap-[24px] sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="flex w-full flex-wrap justify-start gap-6">
       {teams.map((team, index) => (
         <div
           key={index}
-          className="relative h-[201px] w-full rounded-[6px] border-[hsl(var(--input))] bg-[hsl(var(--card))] py-6 shadow-sm"
+          className="relative rounded-[6px] border-[hsl(var(--input))] bg-[hsl(var(--card))]"
         >
           <Cards
             name={team.name}
