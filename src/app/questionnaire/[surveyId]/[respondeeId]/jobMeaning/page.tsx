@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -14,6 +14,15 @@ interface Questionnaire {
 }
 
 export default function JobMeaningPage() {
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const surveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
+  const email = searchParams.get('email')!;
+
+  if (!surveyId || !email) {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -45,7 +54,15 @@ export default function JobMeaningPage() {
   };
 
   const handleContinue = () => {
-    router.push(`/questionnaire/success`);
+    if (!data) return;
+
+    const allAnswered = data.questions.every((_, index) => answers[`question-${index}`]);
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
+    mutation.mutate();
+    router.push(`/questionnaire/${surveyId}/${respondeeId}/success`);
   };
 
   if (isLoading) {

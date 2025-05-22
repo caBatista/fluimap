@@ -109,6 +109,24 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
           ? (result as { survey: { _id: string } }).survey._id
           : null;
 
+      // Call the run API to generate and send questionnaire links
+      try {
+        const runResponse = await fetch('/api/surveys/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teamId: data.teamId }),
+        });
+        if (!runResponse.ok) {
+          const runErr = await runResponse.json();
+          alert(
+            'Erro ao iniciar o envio dos questionários: ' + (runErr.error || JSON.stringify(runErr))
+          );
+        }
+      } catch (runError) {
+        console.error(runError);
+        alert('Erro inesperado ao iniciar o envio dos questionários');
+      }
+
       if (onSuccess) {
         onSuccess();
       }

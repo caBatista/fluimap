@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import { GeistSans } from 'geist/font/sans';
 import { ptBR } from '@clerk/localizations';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import { QueryProvider } from '@/components/query-provider';
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             <QueryProvider>
-              <RootLayoutClient>{children}</RootLayoutClient>
+              <RootLayoutClient>
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </RootLayoutClient>
             </QueryProvider>
           </ThemeProvider>
           <Toaster />

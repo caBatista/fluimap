@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -19,7 +19,25 @@ interface QuestionnaireData {
 
 export function PeerCommunicationContent() {
   const searchParams = useSearchParams();
-  const users = searchParams.getAll('users');
+  const params = useParams();
+  const rawSurveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
+  const users = searchParams.getAll('users').filter((u) => !!u && u !== 'null');
+  const rawEmail = searchParams.get('email');
+
+  if (
+    !rawSurveyId ||
+    rawSurveyId === 'null' ||
+    !rawEmail ||
+    rawEmail === 'null' ||
+    users.length === 0
+  ) {
+    throw new Error('Parâmetros surveyId/email/users não definidos');
+  }
+
+  const surveyId = rawSurveyId;
+  const email = rawEmail;
+
   const router = useRouter();
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -47,7 +65,9 @@ export function PeerCommunicationContent() {
       return res.json();
     },
     onSuccess: () => {
-      void router.push(`/questionnaire/wellBeingPage`);
+      router.push(
+        `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+      );
     },
   });
 

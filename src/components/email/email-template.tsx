@@ -14,13 +14,14 @@ import {
   Text,
 } from '@react-email/components';
 
-interface WelcomeEmailProps {
+type WelcomeEmailProps = {
   username?: string;
-}
+  link?: string;
+};
 
 const baseUrl = process.env.URL ? `https://${process.env.URL}` : 'http://localhost:3000';
 
-const SurveyEmail = ({ username = 'Steve' }: WelcomeEmailProps) => {
+const SurveyEmail = ({ username = 'Steve', link }: WelcomeEmailProps) => {
   const previewText = `Anwser you survey, ${username}!`;
 
   return (
@@ -50,7 +51,7 @@ const SurveyEmail = ({ username = 'Steve' }: WelcomeEmailProps) => {
             <Section className="mb-[32px] mt-[32px] text-center">
               <Button
                 className="rounded bg-[#00A3FF] px-4 py-2 text-center text-xs font-semibold text-white no-underline"
-                href={`${baseUrl}`}
+                href={link}
               >
                 Get Started
               </Button>

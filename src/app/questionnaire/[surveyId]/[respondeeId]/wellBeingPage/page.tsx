@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 interface Questionnaire {
@@ -14,6 +14,19 @@ interface Questionnaire {
 }
 
 export default function WellBeingPage() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  const rawSurveyId = params.surveyId as string;
+  const respondeeId = params.respondeeId as string;
+  const rawEmail = searchParams.get('email');
+
+  if (!rawSurveyId || rawSurveyId === 'null' || !rawEmail || rawEmail === 'null') {
+    throw new Error('Parâmetros surveyId/email não definidos');
+  }
+
+  const surveyId = rawSurveyId;
+  const email = rawEmail;
   const router = useRouter();
   const { data, isLoading, error } = useQuery<Questionnaire>({
     queryKey: ['well-being'],
@@ -26,8 +39,80 @@ export default function WellBeingPage() {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  const handleAnswer = (questionIndex: number, value: string) => {
-    const key = `question-${questionIndex}`;
+  const { data, isLoading, error } = useQuery<WellBeingData>({
+    queryKey: ['well-being', surveyId],
+    queryFn: async (): Promise<WellBeingData> => {
+      const res = await fetch('/api/questionnaires');
+      if (!res.ok) throw new Error('Erro ao carregar questionários');
+
+      const body = (await res.json()) as { questionnaires: QuestionnaireRaw[] };
+      const wbRaw = body.questionnaires.find((q) => q.section === 'wellBeing');
+      if (!wbRaw) throw new Error('Questionário “wellBeing” não encontrado');
+
+      const questions = wbRaw.questions;
+      if (!questions || questions.length === 0)
+        throw new Error('Questionário “wellBeing” sem perguntas');
+
+      const escala = questions[0]!.options.reduce<Record<string, string>>((acc, o) => {
+        acc[o.value] = o.label;
+        return acc;
+      }, {});
+
+      const itens = questions.map((q) => q.text);
+
+      return {
+        questionnaireId: wbRaw._id,
+        titulo: wbRaw.name,
+        instrucoes: wbRaw.instructions,
+        escala,
+        itens,
+      };
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!data) throw new Error('Dados do questionário ausentes');
+
+      const currentAnswers = {
+        section: 'wellBeing',
+        answersByUser: [
+          {
+            name: email,
+            answers: answers,
+          },
+        ],
+      };
+
+      const previousRaw = sessionStorage.getItem('partialResponses');
+      let previous: { section: string; answersByUser: Record<string, string>[] }[] = [];
+      try {
+        previous = previousRaw
+          ? (JSON.parse(previousRaw) as {
+              section: string;
+              answersByUser: Record<string, string>[];
+            }[])
+          : [];
+      } catch (e) {
+        console.error('Erro ao parsear partialResponses do sessionStorage:', e);
+        previous = [];
+      }
+
+      const allSections = Array.isArray(previous)
+        ? [...previous, currentAnswers]
+        : [previous, currentAnswers];
+
+      sessionStorage.setItem('partialResponses', JSON.stringify(allSections));
+    },
+    onSuccess: () => {
+      router.push(
+        `/questionnaire/${surveyId}/${respondeeId}/jobMeaning?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+      );
+    },
+  });
+
+  const handleAnswer = (idx: number, value: string) => {
+    const key = `question-${idx}`;
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
