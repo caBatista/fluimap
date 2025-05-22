@@ -81,7 +81,7 @@ export default function TeamList({ teams, onDelete, onEdit }: TeamListProps) {
   }
 
   return (
-    <div className="flex w-full flex-wrap justify-start gap-6">
+    <div className="flex w-full flex-wrap justify-start gap-10">
       {teams.map((team, index) => (
         <div
           key={index}
