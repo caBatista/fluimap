@@ -11,6 +11,8 @@ export const ResponseSchemaZod = z.object({
       answers: z.record(z.string(), z.string()),
     })
   ),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 });
 
 export type ResponseType = z.infer<typeof ResponseSchemaZod>;

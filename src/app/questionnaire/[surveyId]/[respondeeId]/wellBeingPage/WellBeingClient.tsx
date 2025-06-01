@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 
 interface QuestionnaireRaw {
   _id: string;
@@ -179,5 +179,15 @@ export default function WellBeingClient({ surveyId, respondeeId }: WellBeingClie
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function WellBeingPage() {
+  return (
+    <Suspense
+      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
+    >
+      <WellBeingContent />
+    </Suspense>
   );
 }

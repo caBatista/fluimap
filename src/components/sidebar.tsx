@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-react';
+import { Home, ClipboardList, Users, BarChart4, Settings, LogOut, PieChart } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -55,6 +55,12 @@ export default function Sidebar() {
           href="/fluimap/teams"
           icon={<Users size={20} />}
           label="Times"
+          currentPath={pathname}
+        />
+        <SidebarItem
+          href="/fluimap/statistics"
+          icon={<PieChart size={20} />}
+          label="Estatísticas"
           currentPath={pathname}
         />
         <SidebarItem
