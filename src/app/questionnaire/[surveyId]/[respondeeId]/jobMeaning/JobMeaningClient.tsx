@@ -32,9 +32,13 @@ function safeJsonParse<T>(raw: string | null, fallback: T): T {
   }
 }
 
-export default function JobMeaningClient() {
+interface JobMeaningClientProps {
+  surveyId: string;
+  respondeeId: string;
+}
+
+export default function JobMeaningClient({ surveyId, respondeeId }: JobMeaningClientProps) {
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId') ?? '';
   const email = searchParams.get('email') ?? '';
 
   if (!surveyId || !email) {
@@ -55,7 +59,7 @@ export default function JobMeaningClient() {
       };
 
       const qm = questionnaires.find((q) => q.section === 'jobMeaning');
-      if (!qm) throw new Error('Questionário “jobMeaning” não encontrado');
+      if (!qm) throw new Error('Questionário "jobMeaning" não encontrado');
 
       return qm;
     },
@@ -92,7 +96,7 @@ export default function JobMeaningClient() {
       sessionStorage.removeItem('partialResponses');
     },
     onSuccess: () => {
-      router.push('/questionnaire/success');
+      router.push(`/questionnaire/${surveyId}/${respondeeId}/success`);
     },
   });
 

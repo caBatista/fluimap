@@ -6,14 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { SelectUser } from '@/components/select-user';
 import { Button } from '@/components/ui/button';
 
-interface Survey {
-  title: string;
-  description?: string;
-  teamId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface Member {
   _id: string;
   name: string;
@@ -22,28 +14,30 @@ interface Member {
   imageUrl: string;
 }
 
-export default function SelectUsersClient() {
+interface SelectUsersClientProps {
+  surveyId: string;
+  respondeeId: string;
+}
+
+export default function SelectUsersClient({ surveyId, respondeeId }: SelectUsersClientProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId') ?? '';
+  const teamId = searchParams.get('teamId') ?? '';
   const email = searchParams.get('email') ?? '';
-  const { data, isLoading, error } = useQuery<{
-    survey: Survey;
-    members: Member[];
-  }>({
-    queryKey: ['survey', surveyId],
-    enabled: !!surveyId, // só executa se existir surveyId
-    queryFn: async () => {
-      const surveyRes = await fetch(`/api/surveys/${surveyId}`);
-      if (!surveyRes.ok) throw new Error('Erro ao buscar survey');
-      const { survey } = (await surveyRes.json()) as { survey: Survey };
 
-      const membersRes = await fetch(`/api/teams/${survey.teamId}`);
+  const {
+    data: members,
+    isLoading,
+    error,
+  } = useQuery<Member[]>({
+    queryKey: ['team-members', teamId],
+    enabled: !!teamId, // só executa se existir teamId
+    queryFn: async () => {
+      const membersRes = await fetch(`/api/teams/${teamId}`);
       if (!membersRes.ok) throw new Error('Erro ao buscar membros');
       const { members } = (await membersRes.json()) as { members: Member[] };
-
-      return { survey, members };
+      return members;
     },
   });
 
@@ -58,7 +52,7 @@ export default function SelectUsersClient() {
       ...selectedUsers.map((u) => `users=${encodeURIComponent(u)}`),
     ].join('&');
 
-    router.push(`/questionnaire/peerCommunication?${qs}`);
+    router.push(`/questionnaire/${surveyId}/${respondeeId}/peerCommunication?${qs}`);
   };
 
   if (isLoading) {
@@ -72,7 +66,7 @@ export default function SelectUsersClient() {
     );
   }
 
-  if (error || !data) {
+  if (error || !members) {
     return (
       <main className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 bg-background px-4 pb-12">
         <h1 className="p-6 text-4xl font-bold">
@@ -95,7 +89,7 @@ export default function SelectUsersClient() {
 
       <div className="flex w-full items-center justify-center">
         <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {data.members.map((user) => (
+          {members.map((user) => (
             <SelectUser
               key={user._id}
               name={user.name}

@@ -41,9 +41,13 @@ function safeJsonParse<T>(raw: string | null, fallback: T): T {
   }
 }
 
-export default function WellBeingClient() {
+interface WellBeingClientProps {
+  surveyId: string;
+  respondeeId: string;
+}
+
+export default function WellBeingClient({ surveyId, respondeeId }: WellBeingClientProps) {
   const searchParams = useSearchParams();
-  const surveyId = searchParams.get('surveyId') ?? '';
   const email = searchParams.get('email') ?? '';
   if (!surveyId || !email) throw new Error('Parâmetros surveyId/email não definidos');
 
@@ -58,7 +62,7 @@ export default function WellBeingClient() {
 
       const { questionnaires } = (await res.json()) as { questionnaires: QuestionnaireRaw[] };
       const wbRaw = questionnaires.find((q) => q.section === 'wellBeing');
-      if (!wbRaw) throw new Error('Questionário “wellBeing” não encontrado');
+      if (!wbRaw) throw new Error('Questionário "wellBeing" não encontrado');
 
       const escala = wbRaw.questions[0]!.options.reduce<Record<string, string>>(
         (acc, o) => ({ ...acc, [o.value]: o.label }),
@@ -93,7 +97,7 @@ export default function WellBeingClient() {
     },
     onSuccess: () =>
       router.push(
-        `/questionnaire/jobMeaning?surveyId=${encodeURIComponent(
+        `/questionnaire/${surveyId}/${respondeeId}/jobMeaning?surveyId=${encodeURIComponent(
           surveyId
         )}&email=${encodeURIComponent(email)}`
       ),
