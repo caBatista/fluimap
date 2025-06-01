@@ -41,6 +41,9 @@ export default function SelectUsersClient({ surveyId, respondeeId }: SelectUsers
     },
   });
 
+  // Filter out the respondent (person with matching email) from the members list
+  const filteredMembers = members?.filter((member) => member.email !== email) ?? [];
+
   const handleSelect = (name: string, selected: boolean) => {
     setSelectedUsers((prev) => (selected ? [...prev, name] : prev.filter((n) => n !== name)));
   };
@@ -89,7 +92,7 @@ export default function SelectUsersClient({ surveyId, respondeeId }: SelectUsers
 
       <div className="flex w-full items-center justify-center">
         <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {members.map((user) => (
+          {filteredMembers.map((user) => (
             <SelectUser
               key={user._id}
               name={user.name}

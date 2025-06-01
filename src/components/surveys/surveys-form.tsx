@@ -154,7 +154,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mb-[27px] ml-[27px] mt-[25px] h-screen w-[1161px] space-y-6"
+        className="mx-auto w-full max-w-4xl space-y-6 p-6"
       >
         <Card className="border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <CardHeader>
@@ -187,18 +187,22 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-[hsl(var(--muted-foreground))]">Descrição</FormLabel>
-                  <FormControl className="h-[71px] w-[1110px]">
-                    <Textarea placeholder="Breve descrição do objetivo do formulário" {...field} />
+                  <FormControl>
+                    <Textarea
+                      placeholder="Breve descrição do objetivo do formulário"
+                      className="min-h-[71px] resize-y"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <div className="flex items-end gap-4">
+            <div className="flex flex-col items-end gap-4 sm:flex-row">
               <FormField
                 control={form.control}
                 name="teamId"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="w-full flex-1">
                     <FormLabel className="text-[hsl(var(--muted-foreground))]">Time</FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -221,7 +225,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                 control={form.control}
                 name="dateClosing"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex w-full flex-col sm:w-auto">
                     <FormLabel className="text-[hsl(var(--muted-foreground))]">
                       Término em
                     </FormLabel>
@@ -230,7 +234,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                         <Button
                           variant="outline"
                           className={cn(
-                            'w-[240px] justify-start text-left font-normal',
+                            'w-full justify-start text-left font-normal sm:w-[240px]',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -260,18 +264,18 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               />
             </div>
           </CardContent>
-          <CardFooter className="justify-between space-x-2">
+          <CardFooter className="flex flex-col justify-between gap-4 px-6 py-4 sm:flex-row">
             <Button
               variant="outline"
               type="button"
-              className="h-[40px] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))]"
+              className="h-[40px] w-full border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] sm:w-auto"
               onClick={() => router.push('/fluimap/surveys')}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="h-[40px] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+              className="h-[40px] w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90 sm:w-auto"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Criando...' : 'Criar Pesquisa'}
