@@ -1,7 +1,7 @@
-import { env } from "@/env";
-import mongoose from "mongoose";
+import { env } from '@/env';
+import mongoose from 'mongoose';
 
-const MONGODB_URI = env.DATABASE_URL || "mongodb://localhost:27017/db";
+const MONGODB_URI = env.DATABASE_URL || 'mongodb://localhost:27017/db';
 
 // Define the cache interface
 type MongooseCache = {
@@ -40,8 +40,8 @@ async function dbConnect() {
     const mongooseInstance = await cached.promise;
     cached.conn = mongooseInstance.connection;
 
-    console.log("Connected to MongoDB");
-    console.log("MONGODB_URI ", MONGODB_URI);
+    console.log('Connected to MongoDB');
+    console.log('MONGODB_URI ', MONGODB_URI);
     return cached.conn;
   } catch (e) {
     cached.promise = null;

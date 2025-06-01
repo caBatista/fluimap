@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 export const AnalyticsSchemaZod = z.object({
   formId: z.string(),
@@ -16,7 +16,7 @@ const AnalyticsMongooseSchema: Schema = new Schema(
     totalReplies: { type: Number, required: true },
     statistics: { type: Object, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 interface IAnalytics extends AnalyticsType, Document {}
@@ -25,7 +25,7 @@ function createAnalyticsModel(): Model<IAnalytics> {
   if (mongoose.models.Analytics) {
     return mongoose.models.Analytics as Model<IAnalytics>;
   }
-  return mongoose.model<IAnalytics>("Analytics", AnalyticsMongooseSchema);
+  return mongoose.model<IAnalytics>('Analytics', AnalyticsMongooseSchema);
 }
 
 const Analytics = createAnalyticsModel();

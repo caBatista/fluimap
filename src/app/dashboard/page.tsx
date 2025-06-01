@@ -53,14 +53,14 @@ export default function CreateDashboardPage() {
   const totalActiveSurveys = activeSurveys.length;
 
   const recentSurveys = [...activeSurveys]
-  .filter((survey) => survey.dateClosing)
-  .sort((a, b) => new Date(b.dateClosing!).getTime() - new Date(a.dateClosing!).getTime())
-  .slice(0, 3);
+    .filter((survey) => survey.dateClosing)
+    .sort((a, b) => new Date(b.dateClosing!).getTime() - new Date(a.dateClosing!).getTime())
+    .slice(0, 3);
 
   // const recentSurvey = recentSurveys[0].responsesCount ?? 0;
 
   const recentSurvey = 0;
-  
+
   function isTeam(item: unknown): item is EditTeamType {
     return (
       typeof item === 'object' &&
@@ -69,16 +69,16 @@ export default function CreateDashboardPage() {
       typeof (item as Record<string, unknown>).name === 'string'
     );
   }
-  
+
   function isApiTeamResponse(data: unknown): data is { teams: unknown[] } {
     return (
-      typeof data === 'object' && data !== null && Array.isArray((data as { teams?: unknown }).teams)
+      typeof data === 'object' &&
+      data !== null &&
+      Array.isArray((data as { teams?: unknown }).teams)
     );
   }
 
-  const {
-    data: teams = [],
-  } = useQuery<EditTeamType[]>({
+  const { data: teams = [] } = useQuery<EditTeamType[]>({
     queryKey: ['teams'],
     queryFn: async () => {
       const res = await fetch('/api/teams');
@@ -97,18 +97,16 @@ export default function CreateDashboardPage() {
     <div className="flex min-h-screen flex-col px-8 py-4">
       <DashboardHeader />
 
-      <DashboardCards 
+      <DashboardCards
         activeTab={totalActiveSurveys}
         totalTeams={totalTeams}
         recentSurvey={recentSurvey}
       />
-      
+
       <DashboardNetworkGraph />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-5">
-        <DashboardRecentForms 
-          surveys={recentSurveys}
-        />
+      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <DashboardRecentForms surveys={recentSurveys} />
         <DashboardEngagement />
       </div>
     </div>

@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 export const UserSchemaZod = z.object({
   clerkId: z.string(),
@@ -22,7 +22,7 @@ const UserMongooseSchema: Schema = new Schema(
     },
     // type: { type: String, required: true, enum: ["lead", "rh"] },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 interface IUser extends UserType, Document {}
@@ -31,7 +31,7 @@ function createUserModel(): Model<IUser> {
   if (mongoose.models.User) {
     return mongoose.models.User as Model<IUser>;
   }
-  return mongoose.model<IUser>("User", UserMongooseSchema);
+  return mongoose.model<IUser>('User', UserMongooseSchema);
 }
 
 const User = createUserModel();
