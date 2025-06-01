@@ -9,6 +9,8 @@ const PlaceBetSchema = z.object({
   betAmount: z.number().positive().min(1),
 });
 
+const SYMBOLS = ['🐅', '💎', '🍀', '🎰'];
+
 const PAYOUT_MULTIPLIERS: Record<string, number> = {
   '🐅': 10, // Tiger - 10x (highest)
   '💎': 5, // Diamond - 5x (high)
