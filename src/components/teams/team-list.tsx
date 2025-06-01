@@ -118,6 +118,9 @@ export function TeamList() {
       toast.success(
         `Survey started with ID: ${data.surveyId}. ${data.respondeeCount} emails will be sent.`
       );
+
+      // Invalidate credit balance cache since credits were deducted
+      void queryClient.invalidateQueries({ queryKey: ['credit-balance'] });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
@@ -47,6 +47,7 @@ interface SurveyFormProps {
 export function SurveyForm({ onSuccess }: SurveyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: teams = [] } = useQuery<{ _id: string; name: string }[]>({
     queryKey: ['teams'],
@@ -126,6 +127,9 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               ? (runErr as { error: string }).error
               : JSON.stringify(runErr) || 'Erro ao iniciar o envio dos questionários';
           alert('Erro ao iniciar o envio dos questionários: ' + runErrorMsg);
+        } else {
+          // Invalidate credit balance cache since credits were deducted
+          void queryClient.invalidateQueries({ queryKey: ['credit-balance'] });
         }
       } catch (runError) {
         console.error(runError);

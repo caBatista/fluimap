@@ -8,6 +8,7 @@ import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ModeToggle } from '@/components/mode-toggle';
+import CreditBalance from '@/components/credit-balance';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -79,8 +80,13 @@ export default function Sidebar() {
         />
       </nav>
 
+      {/* Credit Balance */}
+      <div className="mb-4 mt-auto">
+        <CreditBalance />
+      </div>
+
       {/* Footer – Perfil e Logout */}
-      <footer className="mt-auto flex h-[71px] w-full items-center justify-between border-t border-[hsl(var(--sidebar-border))] p-4">
+      <footer className="flex h-[71px] w-full items-center justify-between border-t border-[hsl(var(--sidebar-border))] p-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
             {user?.imageUrl ? (
