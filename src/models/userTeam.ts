@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 // 1. Zod Schema Definition
 export const UserTeamSchemaZod = z.object({
@@ -15,7 +15,7 @@ const UserTeamMongooseSchema: Schema = new Schema(
     userId: { type: String, required: true },
     teamId: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 // 3. Mongoose Model Definition
@@ -25,7 +25,7 @@ function createUserTeamModel(): Model<IUserTeam> {
   if (mongoose.models.UserTeam) {
     return mongoose.models.UserTeam as Model<IUserTeam>;
   }
-  return mongoose.model<IUserTeam>("UserTeam", UserTeamMongooseSchema);
+  return mongoose.model<IUserTeam>('UserTeam', UserTeamMongooseSchema);
 }
 
 const UserTeam = createUserTeamModel();

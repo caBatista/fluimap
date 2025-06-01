@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 // 1. Zod Schema Definition
 export const RespondeeSchemaZod = z.object({
@@ -22,7 +22,7 @@ const RespondeeSchema: Schema = new Schema(
     role: { type: String, required: true },
     teamId: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 // 3. Mongoose Model Definition
@@ -34,7 +34,7 @@ function createRespondeeModel(): Model<IRespondee> {
   if (mongoose.models.Respondee) {
     return mongoose.models.Respondee as Model<IRespondee>;
   }
-  return mongoose.model<IRespondee>("Respondee", RespondeeSchema);
+  return mongoose.model<IRespondee>('Respondee', RespondeeSchema);
 }
 
 const Respondee = createRespondeeModel();

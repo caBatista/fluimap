@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { CheckCircle } from "lucide-react";
+import { CheckCircle } from 'lucide-react';
 
 export default function SuccessPage() {
   return (
