@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 export default function AgreeButtons({
@@ -17,8 +18,7 @@ export default function AgreeButtons({
 
   return (
     <div className="flex gap-4">
-      <button
-        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+      <Button
         onClick={() =>
           router.push(
             `/questionnaire/${surveyId}/${respondeeId}/selectUsers?teamId=${teamId}&email=${encodeURIComponent(email ?? '')}`
@@ -26,13 +26,10 @@ export default function AgreeButtons({
         }
       >
         Sim, quero participar
-      </button>
-      <button
-        className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-        onClick={() => router.push(`/questionnaire/declined`)}
-      >
+      </Button>
+      <Button variant="destructive" onClick={() => router.push(`/questionnaire/declined`)}>
         Não quero participar
-      </button>
+      </Button>
     </div>
   );
 }
