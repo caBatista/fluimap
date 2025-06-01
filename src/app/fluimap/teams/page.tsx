@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PlusIcon } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { type EditTeamType } from '@/models/Team';
+import { Input } from '@/components/ui/input';
 
 function isTeam(item: unknown): item is EditTeamType {
   return (
@@ -179,34 +180,39 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
-      <div className="flex flex-col items-center justify-between px-8 pb-4 sm:flex-row">
+    <div className="flex min-h-screen flex-col px-8 py-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="pt-4 text-2xl font-bold sm:text-3xl">Times</h1>
-          <h2 className="text-sm sm:text-base">Gerencie suas equipes e membros de equipe</h2>
+          <h1 className="h-[32px] w-[141px] text-2xl font-bold">Times</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+            Gerencie suas equipes e membros de equipe
+          </p>
         </div>
 
-        <Button
-          size="lg"
-          className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 pt-2 text-white sm:mt-0"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <span className="flex items-center justify-center rounded-full border-2 border-white bg-blue-500 p-1 text-white">
-            <PlusIcon className="h-5 w-5" />
-          </span>
-          Criar Novo Time
-        </Button>
+        <div className="mb-[32px] mt-[40px]">
+          <Button
+            size="lg"
+            className="flex h-[40px] w-[180px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <PlusCircle className="h-5 w-5" />
+            Criar Novo Time
+          </Button>
+        </div>
       </div>
 
       {/* Campo de busca */}
-      <div className="w-full px-8 pb-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nome ou descrição"
-          className="w-full rounded-md border border-gray-300 px-4 py-2"
-        />
+      <div className="mt-[24px] flex flex-wrap items-center gap-4 rounded-[8px] border-[hsl(var(--input))] bg-[hsl(var(--card))]">
+        {/* Barra de pesquisa */}
+        <div className="relative mb-5 h-[40px] min-w-[200px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
+          <Input
+            placeholder="Pesquisar time..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] pl-9 text-sm"
+          />
+        </div>
       </div>
 
       <TeamModal
@@ -227,17 +233,21 @@ export default function TeamPage() {
           <DialogHeader>
             <DialogTitle>Excluir Time</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             Tem certeza que deseja apagar este time? Os dados relacionados ao time serão excluídos
             após a confirmação.
           </p>
           <DialogFooter className="flex justify-between sm:justify-between">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              className="flex h-[40px] w-[75px] items-center justify-center gap-1 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/90"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
               Cancelar
             </Button>
             <Button
               variant="destructive"
-              className="bg-blue-500 text-white hover:bg-blue-600"
+              className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               onClick={handleDeleteTeam}
             >
               Excluir Time
