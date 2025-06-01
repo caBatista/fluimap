@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 
 interface QuestionnaireRaw {
   _id: string;

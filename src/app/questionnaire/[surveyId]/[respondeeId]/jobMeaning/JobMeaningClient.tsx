@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface Questionnaire {
