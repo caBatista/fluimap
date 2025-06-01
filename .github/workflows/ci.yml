@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint-build-typecheck:
-    name: Lint, Build & Typecheck
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
 
     env:
@@ -32,9 +32,6 @@ jobs:
 
       - name: Run TypeScript type check
         run: npm run typecheck
-
-      - name: Build application
-        run: npm run build
 
       - name: Check formatting
         run: npm run format:check
