@@ -9,7 +9,7 @@ import SurveyEmail from '@/components/email/email-template';
 import { env } from '@/env';
 import { Resend } from 'resend';
 
-const resend = new Resend(env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY ?? '');
 
 function generateSurveyId(): string {
   return crypto.randomBytes(5).toString('hex');
