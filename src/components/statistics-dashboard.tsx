@@ -26,7 +26,7 @@ import {
   Pie,
   Cell,
   Legend,
-} from '@/components/mocks/recharts';
+} from 'recharts';
 import { Users, ClipboardList, CheckCircle, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -250,14 +250,14 @@ export default function StatisticsDashboard() {
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            _data={stats?.surveyTypes ?? []}
-                            _cx="50%"
-                            _cy="50%"
-                            _labelLine={false}
-                            _outerRadius={80}
-                            _fill="#8884d8"
-                            _dataKey="value"
-                            _label={({ name, percent }: { name: string; percent: number }) =>
+                            data={stats?.surveyTypes ?? []}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ name, percent }: { name: string; percent: number }) =>
                               `${name} ${(percent * 100).toFixed(0)}%`
                             }
                           >
@@ -286,21 +286,21 @@ export default function StatisticsDashboard() {
                     <div className="h-80 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                          _data={stats?.monthlyActivity ?? []}
-                          _margin={{
+                          data={stats?.monthlyActivity ?? []}
+                          margin={{
                             top: 5,
                             right: 30,
                             left: 20,
                             bottom: 5,
                           }}
                         >
-                          <CartesianGrid _strokeDasharray="3 3" />
-                          <XAxis _dataKey="month" />
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar _dataKey="surveys" _fill="#0088FE" _name="Pesquisas Criadas" />
-                          <Bar _dataKey="responses" _fill="#00C49F" _name="Respostas Recebidas" />
+                          <Bar dataKey="surveys" fill="#0088FE" name="Pesquisas Criadas" />
+                          <Bar dataKey="responses" fill="#00C49F" name="Respostas Recebidas" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
