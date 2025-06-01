@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 // 1. Zod Schema Definition
 export const PostSchemaZod = z.object({
@@ -20,7 +20,7 @@ const PostSchema: Schema = new Schema(
     author: { type: String, required: true },
     authorId: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 // 3. Mongoose Model Definition
@@ -33,7 +33,7 @@ function createPostModel(): Model<IPost> {
     return mongoose.models.Post as Model<IPost>;
   }
 
-  return mongoose.model<IPost>("Post", PostSchema);
+  return mongoose.model<IPost>('Post', PostSchema);
 }
 
 const Post = createPostModel();

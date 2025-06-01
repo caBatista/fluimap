@@ -136,7 +136,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
         onSuccess();
       }
 
-      router.push(`/fluimap/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
+      router.push(`/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
@@ -269,7 +269,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               variant="outline"
               type="button"
               className="h-[40px] w-full border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] sm:w-auto"
-              onClick={() => router.push('/fluimap/surveys')}
+              onClick={() => router.push('/surveys')}
             >
               Cancelar
             </Button>

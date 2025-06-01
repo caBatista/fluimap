@@ -3,9 +3,6 @@ import dbConnect from '@/server/database/db';
 import Questionnaire from '@/models/Questionnaire';
 import { z } from 'zod';
 
-// Garante conexão com o Mongo
-await dbConnect();
-
 const questionnaireResponseSchema = z.object({
   questionId: z.string(),
   answer: z.union([z.string(), z.number(), z.boolean(), z.null()]),
@@ -16,6 +13,7 @@ type QuestionnaireResponse = z.infer<typeof questionnaireResponseSchema>;
 // GET: lista todos os questionários
 export async function GET() {
   try {
+    await dbConnect();
     const all = await Questionnaire.find().lean();
     return NextResponse.json({ questionnaires: all }, { status: 200 });
   } catch (err: unknown) {
@@ -28,6 +26,7 @@ export async function GET() {
 // POST: recebe e processa as respostas enviadas
 export async function POST(request: Request) {
   try {
+    await dbConnect();
     const raw: unknown = await request.json();
     const payload: QuestionnaireResponse[] = questionnaireResponseSchema.array().parse(raw);
     // TODO: persistir payload no banco ou outro processamento

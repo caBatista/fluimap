@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 // 1. Zod Schema Definition
 export const TeamSchemaZod = z.object({
@@ -13,12 +13,9 @@ export const TeamSchemaZod = z.object({
 // Define the TypeScript type based on the Zod schema
 export type TeamType = z.infer<typeof TeamSchemaZod>;
 
-export type CreateTeamType = Omit<
-  TeamType,
-  "ownerId" | "createdAt" | "updatedAt"
->;
+export type CreateTeamType = Omit<TeamType, 'ownerId' | 'createdAt' | 'updatedAt'>;
 
-export type EditTeamType = Omit<TeamType, "createdAt" | "updatedAt"> & {
+export type EditTeamType = Omit<TeamType, 'createdAt' | 'updatedAt'> & {
   _id: string;
 };
 
@@ -29,7 +26,7 @@ const TeamSchema: Schema = new Schema(
     description: { type: String },
     ownerId: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 // 3. Mongoose Model Definition
@@ -41,7 +38,7 @@ function createTeamModel(): Model<ITeam> {
   if (mongoose.models.Team) {
     return mongoose.models.Team as Model<ITeam>;
   }
-  return mongoose.model<ITeam>("Team", TeamSchema);
+  return mongoose.model<ITeam>('Team', TeamSchema);
 }
 
 const Team = createTeamModel();
