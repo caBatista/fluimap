@@ -22,6 +22,7 @@ interface ResponseApplied {
 interface InputNode {
   Pessoa: string;
   Papel: string;
+  Equipe: string;
   Frequencia: string | number;
   Direcao?: string;
   Clareza?: number;
@@ -90,8 +91,9 @@ function convertResponseToApplied(response: ResponseDBEntry): ResponseApplied {
   const typedAnswers = answers as Partial<AnswerValues>;
 
   const node: InputNode = {
-    Pessoa: name,
-    Papel: 'Membro', // TO-DO: precisamos incluir a role do usuario no model
+    Pessoa: name, // TO DO: atualmente esta passando o email
+    Papel: 'Membro', // TO DO: incluir role no response model
+    Equipe: 'Time A', // TO DO: incluir time no response model
     Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
     Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
     Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 3,
