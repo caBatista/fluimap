@@ -181,13 +181,3 @@ export default function WellBeingClient({ surveyId, respondeeId }: WellBeingClie
     </div>
   );
 }
-
-export default function WellBeingPage() {
-  return (
-    <Suspense
-      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
-    >
-      <WellBeingContent />
-    </Suspense>
-  );
-}

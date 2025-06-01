@@ -181,13 +181,3 @@ export default function JobMeaningClient({ surveyId, respondeeId }: JobMeaningCl
     </div>
   );
 }
-
-export default function JobMeaningPage() {
-  return (
-    <Suspense
-      fallback={<div className="flex min-h-screen items-center justify-center">Carregando...</div>}
-    >
-      <JobMeaningContent />
-    </Suspense>
-  );
-}
