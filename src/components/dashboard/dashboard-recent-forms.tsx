@@ -42,7 +42,7 @@ function capitalize(text: string): string {
 export function DashboardRecentForms({ surveys }: SurveyListProps) {
   return (
     <div className="rounded-xl border p-4 shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">Formulários Recentes</h2>
+      <h2 className="mb-4 text-lg font-semibold">Formulários Recentes</h2>
 
       <div className="space-y-4">
         {surveys.map((survey) => {
@@ -122,7 +122,10 @@ export function DashboardRecentForms({ surveys }: SurveyListProps) {
         })}
       </div>
 
-      <Link href="/fluimap/surveys" className="block mt-4 text-sm text-blue-600 hover:underline dark:text-blue-400">
+      <Link
+        href="/surveys"
+        className="mt-4 block text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
         Ver todos os formulários →
       </Link>
     </div>

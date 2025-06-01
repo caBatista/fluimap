@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       )
     );
 
-    revalidatePath(`/fluimap/surveys`);
+    revalidatePath(`/surveys`);
 
     const response: SurveyRunResponse = {
       success: true,
