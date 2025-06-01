@@ -14,7 +14,7 @@ function generateSurveyId(): string {
 }
 
 async function sendEmail({ name, email, link }: { name: string; email: string; link: string }) {
-  const resend = new Resend(env.RESEND_API_KEY ?? '');
+  const resend = new Resend(env.RESEND_API_KEY);
   console.log(`Sending email to ${email}:`);
   console.log(`Survey link: ${link}`);
 
