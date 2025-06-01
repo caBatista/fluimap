@@ -9,13 +9,12 @@ import SurveyEmail from '@/components/email/email-template';
 import { env } from '@/env';
 import { Resend } from 'resend';
 
-const resend = new Resend(env.RESEND_API_KEY ?? '');
-
 function generateSurveyId(): string {
   return crypto.randomBytes(5).toString('hex');
 }
 
 async function sendEmail({ name, email, link }: { name: string; email: string; link: string }) {
+  const resend = new Resend(env.RESEND_API_KEY ?? '');
   console.log(`Sending email to ${email}:`);
   console.log(`Survey link: ${link}`);
 
