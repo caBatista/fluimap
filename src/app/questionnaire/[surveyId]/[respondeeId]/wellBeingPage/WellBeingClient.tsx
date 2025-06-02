@@ -127,7 +127,7 @@ export default function WellBeingClient({ surveyId, respondeeId }: WellBeingClie
     );
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-6">
+    <div className="mb-12 flex min-h-screen flex-col items-center p-6">
       <h1 className="mb-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
@@ -158,25 +158,24 @@ export default function WellBeingClient({ surveyId, respondeeId }: WellBeingClie
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mb-[80] mt-10 flex w-full justify-between">
-        <Button
-          variant="outline"
-          className="h-auto px-8 py-4 text-base"
-          onClick={() => router.back()}
-          disabled={mutation.isPending}
-        >
-          Voltar
-        </Button>
-        <Button
-          variant="default"
-          className="h-auto px-8 py-4 text-base"
-          onClick={handleContinue}
-          disabled={mutation.isPending}
-        >
-          {mutation.isPending ? 'Enviando…' : 'Continuar'}
-        </Button>
+        <div className="mb-[80] mt-10 flex w-full justify-between">
+          <Button
+            variant="outline"
+            className="h-auto px-8 py-4 text-base"
+            onClick={() => router.back()}
+            disabled={mutation.isPending}
+          >
+            Voltar
+          </Button>
+          <Button
+            variant="default"
+            className="h-auto px-8 py-4 text-base"
+            onClick={handleContinue}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? 'Enviando…' : 'Continuar'}
+          </Button>
+        </div>
       </div>
     </div>
   );

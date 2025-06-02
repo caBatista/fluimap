@@ -42,18 +42,52 @@ export function PeerCommunicationContent({ surveyId, respondeeId }: PeerCommunic
 
   // Mutation for submitting answers
   const mutation = useMutation({
-    mutationFn: async (payload: { answers: Record<string, string>; users: string[] }) => {
-      const res = await fetch('/api/peer-communication-answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+    mutationFn: async () => {
+      if (!data) throw new Error('Questionário não carregado');
+
+      const groupedAnswers = users.map((user, userIndex) => {
+        const answersByQuestion: Record<string, string> = {};
+        data.questoes.forEach((_, qIndex) => {
+          const key = `user-${userIndex}-q${qIndex}`;
+          if (answers[key]) {
+            answersByQuestion[`q${qIndex}`] = answers[key];
+          }
+        });
+
+        return {
+          name: user,
+          answers: answersByQuestion,
+        };
       });
-      if (!res.ok) throw new Error('Erro ao enviar respostas');
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return res.json();
+
+      const currentAnswers = {
+        section: 'peerCommunication',
+        answersByUser: groupedAnswers,
+      };
+
+      const previousRaw = sessionStorage.getItem('partialResponses');
+      const previous = (() => {
+        try {
+          return previousRaw
+            ? (JSON.parse(previousRaw) as {
+                section: string;
+                answersByUser: {
+                  name: string;
+                  answers: Record<string, string>;
+                }[];
+              }[])
+            : [];
+        } catch (e) {
+          console.error('Erro ao parsear partialResponses:', e);
+          return [];
+        }
+      })();
+
+      const updated = [...previous, currentAnswers];
+      sessionStorage.setItem('partialResponses', JSON.stringify(updated));
     },
     onSuccess: () => {
-      void router.push(
+      router.push(
         `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?email=${encodeURIComponent(email)}`
       );
     },
@@ -65,9 +99,20 @@ export function PeerCommunicationContent({ surveyId, respondeeId }: PeerCommunic
   };
 
   const handleContinue = () => {
-    router.push(
-      `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?email=${encodeURIComponent(email)}`
+    if (!data) return;
+    const allAnswered = users.every((_, userIndex) =>
+      data.questoes.every((_, qIndex) => {
+        const key = `user-${userIndex}-q${qIndex}`;
+        return answers[key];
+      })
     );
+
+    if (!allAnswered) {
+      alert('Por favor, responda todas as perguntas antes de continuar.');
+      return;
+    }
+
+    mutation.mutate();
   };
 
   if (isLoading) {
@@ -123,7 +168,7 @@ export function PeerCommunicationContent({ surveyId, respondeeId }: PeerCommunic
           })}
 
           {userIndex === users.length - 1 && (
-            <div className="mt-10 flex w-full justify-between">
+            <div className="mb-5 mt-10 flex w-full justify-between">
               <Button
                 className="h-auto px-8 py-4 text-base"
                 variant="outline"
