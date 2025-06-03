@@ -8,6 +8,7 @@ export const SurveySchemaZod = z.object({
   status: z.enum(['ativo', 'fechado']),
   questionnaireIds: z.array(z.string()).length(3),
   ownerId: z.string(),
+  formId: z.string().optional(),
   dateClosing: z.preprocess(
     (v) => (typeof v === 'string' || v instanceof Date ? new Date(v) : v),
     z.date()
@@ -28,6 +29,7 @@ const SurveySchema = new Schema<ISurvey>(
     questionnaireIds: [{ type: String, required: true, ref: 'Questionnaire' }],
     dateClosing: Date,
     ownerId: { type: String, required: true },
+    formId: { type: String },
   },
   { collection: 'surveys', timestamps: true }
 );

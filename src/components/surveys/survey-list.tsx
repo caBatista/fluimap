@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
@@ -18,6 +17,8 @@ export type SurveyResponse = {
   expiresInDays?: number;
   dateClosing?: string;
   email?: string;
+  formId?: string;
+  teamId?: string;
 };
 
 export interface SurveyListProps {
@@ -56,9 +57,50 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
     setLocalSurveys(surveys);
   }, [surveys]);
 
-  const finalSurveys = Array.isArray(localSurveys) ? localSurveys : [];
+  useEffect(() => {
+    async function fetchProgress() {
+      const updatedSurveys = await Promise.all(
+        surveys.map(async (survey) => {
+          console.log('Survey recebido:', survey);
+          const formId = survey.formId ?? survey._id;
+          if (!formId || !survey.teamId) return survey;
 
-  const filtered = finalSurveys.filter((survey) => {
+          console.log('Chamando /api/progress com:', {
+            formId,
+            teamId: survey.teamId,
+          });
+          try {
+            const res = await fetch('/api/progress', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ formId, teamId: survey.teamId }),
+            });
+
+            if (!res.ok) throw new Error('Erro na API progress');
+
+            const data = await res.json();
+            console.log('Resposta da API progress:', data);
+            const { totalPeople, totalReplies } = data;
+            const progress = totalPeople ? Math.round((totalReplies / totalPeople) * 100) : 0;
+
+            console.log(
+              `Formulário ${survey.title} - Total pessoas: ${totalPeople}, Respostas: ${totalReplies}, Progresso: ${progress}%`
+            );
+
+            return { ...survey, progress };
+          } catch (err) {
+            console.error(`Erro ao buscar progresso do formulário ${survey.title}:`, err);
+            return survey;
+          }
+        })
+      );
+      setLocalSurveys(updatedSurveys);
+    }
+
+    fetchProgress();
+  }, [surveys]);
+
+  const filtered = localSurveys.filter((survey) => {
     const matchesSearch = survey.title.toLowerCase().includes(search.toLowerCase());
     if (statusFilter === 'todos') return matchesSearch;
     return (
