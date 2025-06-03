@@ -1,0 +1,82 @@
+name: Deploy Next.js e Mongo no EC2
+
+# Dispara em push ou merge na main
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Faz checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Instala Node.js (ajuste a versão conforme seu projeto)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3. Instala dependências e faz build do Next.js
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      # 4. Compacta a pasta de build (opcional: facilita transferência)
+      - name: Archive built files
+        run: |
+          tar czf next-build.tar.gz .next package.json package-lock.json public
+
+      # 5. Copia os arquivos para o EC2 via SSH
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}         # Ex.: ec2-XX-XX-XX-XX.compute-1.amazonaws.com
+          username: ${{ secrets.EC2_USER }}     # Ex.: ubuntu ou ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}       # Chave privada SSH como secret
+          port: 22
+          source: |
+            next-build.tar.gz
+            package.json
+            package-lock.json
+            public/
+            docker-compose.yml                   # Se seu docker-compose estiver versionado
+          target: /home/${{ secrets.EC2_USER }}/app
+
+      # 6. Conecta via SSH e sobe containers (Mongo + Next.js)
+      - name: SSH and deploy on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            # Navega até a pasta do app
+            cd /home/${{ secrets.EC2_USER }}/app
+
+            # Se existir build anterior em execução, pare e limpe
+            if [ -f docker-compose.override.yml ]; then
+              docker-compose down
+            else
+              docker-compose down || true
+            fi
+
+            # Extrai arquivo compactado
+            tar xzf next-build.tar.gz
+
+            # Atualiza imagem/node_modules (caso use Dockerfile para Next.js,
+            # ajuste para docker-compose build)
+            npm ci --production
+
+            # Sobe em background via Docker Compose
+            docker-compose up -d --build
+
+            # Opcional: Limpa arquivos antigos
+            rm -f next-build.tar.gz

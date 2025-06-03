@@ -6,7 +6,6 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
-
-volumes:
-  mongodb_data:
+      # tudo que o Mongo gravar em /data/db no container vai para /mnt/mongo_data no volume raiz.
+      # Isso permite persistência de dados mesmo se o container for removido.
+      - /mnt/mongo_data:/data/db
