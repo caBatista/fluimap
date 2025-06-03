@@ -240,14 +240,14 @@ export default function TeamPage() {
           <DialogFooter className="flex justify-between sm:justify-between">
             <Button
               variant="outline"
-              className="flex h-[40px] w-[75px] items-center justify-center gap-1 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/90"
+              className="hover:[hsl(var(--foreground))]/90 flex h-[40px] w-[75px] items-center justify-center gap-1 text-[hsl(var(--muted-foreground))]"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Cancelar
             </Button>
             <Button
               variant="destructive"
-              className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+              className="hover:[hsl(var(--muted-foreground))]/90 flex h-[40px] w-[105px] items-center justify-center gap-1 text-[hsl(var(--primary-foreground))]"
               onClick={handleDeleteTeam}
             >
               Excluir Time
