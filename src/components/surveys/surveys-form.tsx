@@ -152,10 +152,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto w-full max-w-4xl space-y-6 p-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full space-y-6 p-6">
         <Card className="border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-[hsl(var(--foreground))]">
