@@ -66,12 +66,6 @@ export default function Sidebar() {
           currentPath={pathname}
         />
         <SidebarItem
-          href="/reports"
-          icon={<BarChart4 size={20} />}
-          label="Relatórios"
-          currentPath={pathname}
-        />
-        <SidebarItem
           href="/settings"
           icon={<Settings size={20} />}
           label="Configuração"
