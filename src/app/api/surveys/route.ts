@@ -11,43 +11,48 @@ const InputSurveySchema = SurveySchemaZod.omit({ questionnaireIds: true }).exten
 });
 
 export async function GET() {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const surveys = await Survey.find({ ownerId: userId }).sort({ createdAt: -1 }).lean();
+    const now = new Date();
+
+    const detailed = await Promise.all(
+      surveys.map(async (s) => {
+        if (s.dateClosing && s.dateClosing < now && s.status !== 'fechado') {
+          await Survey.updateOne({ _id: s._id }, { status: 'fechado' });
+          s.status = 'fechado';
+        }
+
+        const responsesCount = await ResponseModel.countDocuments({ surveyId: s._id });
+
+        const qs = await Questionnaire.find(
+          {
+            _id: { $in: s.questionnaireIds },
+          },
+          'questions'
+        ).lean();
+        const totalQuestions = qs.reduce((sum, q) => sum + q.questions.length, 0);
+        const progress = totalQuestions ? Math.round((responsesCount / totalQuestions) * 100) : 0;
+
+        return {
+          ...s,
+          responsesCount,
+          progress,
+        };
+      })
+    );
+
+    return NextResponse.json({ surveys: detailed }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching surveys:', error);
+    return NextResponse.json({ error: 'Failed to fetch surveys' }, { status: 500 });
   }
-
-  const surveys = await Survey.find({ ownerId: userId }).sort({ createdAt: -1 }).lean();
-  const now = new Date();
-
-  const detailed = await Promise.all(
-    surveys.map(async (s) => {
-      if (s.dateClosing && s.dateClosing < now && s.status !== 'fechado') {
-        await Survey.updateOne({ _id: s._id }, { status: 'fechado' });
-        s.status = 'fechado';
-      }
-
-      const responsesCount = await ResponseModel.countDocuments({ surveyId: s._id });
-
-      const qs = await Questionnaire.find(
-        {
-          _id: { $in: s.questionnaireIds },
-        },
-        'questions'
-      ).lean();
-      const totalQuestions = qs.reduce((sum, q) => sum + q.questions.length, 0);
-      const progress = totalQuestions ? Math.round((responsesCount / totalQuestions) * 100) : 0;
-
-      return {
-        ...s,
-        responsesCount,
-        progress,
-      };
-    })
-  );
-
-  return NextResponse.json({ surveys: detailed }, { status: 200 });
 }
 
 export async function POST(request: NextRequest) {

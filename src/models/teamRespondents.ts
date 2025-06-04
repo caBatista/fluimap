@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 export const TeamRespondentSchemaZod = z.object({
   teamId: z.string(),
@@ -19,7 +19,7 @@ const TeamRespondentMongooseSchema: Schema = new Schema(
     },
     role: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 interface ITeamRespondent extends TeamRespondentType, Document {}
@@ -28,10 +28,7 @@ function createTeamRespondentModel(): Model<ITeamRespondent> {
   if (mongoose.models.TeamRespondent) {
     return mongoose.models.TeamRespondent as Model<ITeamRespondent>;
   }
-  return mongoose.model<ITeamRespondent>(
-    "TeamRespondent",
-    TeamRespondentMongooseSchema,
-  );
+  return mongoose.model<ITeamRespondent>('TeamRespondent', TeamRespondentMongooseSchema);
 }
 
 const TeamRespondent = createTeamRespondentModel();
