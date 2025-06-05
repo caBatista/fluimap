@@ -85,7 +85,8 @@ export function BulkImportForm({ teamId, onSuccess }: BulkImportFormProps) {
         <div className="space-y-4">
           <div>
             <p className="mb-2 text-sm text-muted-foreground">
-              Insira os dados em CSV no formato: <span className="font-mono">nome, e-mail, cargo</span>
+              Insira os dados em CSV no formato:{' '}
+              <span className="font-mono">nome, e-mail, cargo</span>
               <br />
               Uma entrada por linha.
             </p>

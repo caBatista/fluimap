@@ -81,7 +81,7 @@ export function RespondeeList({ teamId }: RespondeeListProps) {
       }
 
       toast.success('Membro removido com sucesso');
-      
+
       void queryClient.invalidateQueries({ queryKey: ['respondees', teamId] });
     } catch (error) {
       if (error instanceof Error) {

@@ -36,9 +36,9 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
     const formattedName = memberName
       .split(' ')
       .filter(Boolean)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
-      
+
     onSubmit(formattedName, memberEmail, memberPosition);
   }
 
@@ -74,7 +74,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 ? row.name
                     .split(' ')
                     .filter(Boolean)
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                     .join(' ')
                 : '';
               return {
