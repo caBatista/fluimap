@@ -61,6 +61,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (userId !== id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await req.json();
+
   await connectDB();
 
   const updated = await User.findOneAndUpdate({ clerkId: id }, body, {
@@ -69,6 +70,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     runValidators: true,
   });
 
+  const [first, ...rest] = body.name.trim().split(' ');
+  await (
+    await ck()
+  ).users.updateUser(id, {
+    publicMetadata: { displayName: body.name.trim() },
+  });
   return NextResponse.json(updated);
 }
 

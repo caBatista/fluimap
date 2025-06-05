@@ -35,12 +35,20 @@ export function AccountCard({ initialData }: { initialData: AccountData }) {
       setError('name', { message: 'Nome muito curto' });
       return;
     }
+
     const res = await fetch(`/api/users/${user?.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
-    res.ok ? toast.success('Conta atualizada!') : toast.error('Erro ao salvar');
+
+    if (!res.ok) {
+      toast.error('Erro ao salvar');
+      return;
+    }
+
+    await user?.reload();
+    toast.success('Conta atualizada!');
   }
 
   return (
