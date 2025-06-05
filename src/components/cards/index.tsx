@@ -9,7 +9,6 @@ import { GenericModal } from '@/components/modal/genericModal';
 import { RespondeeList } from '@/components/respondees/respondee-list';
 import { type EditTeamType } from '@/models/Team';
 
-// New modal for viewing members, following EditTeamModal structure
 interface ViewMembersModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,8 +20,8 @@ function ViewMembersModal({ isOpen, onClose, team }: ViewMembersModalProps) {
     <GenericModal
       isOpen={isOpen}
       onClose={onClose}
-      title={team ? `Membros do time: ${team.name}` : 'Membros do time'}
-      description="Veja e gerencie os membros deste time."
+      title={team ? `${team.name}` : 'Equipe'}
+      description="Veja e gerencie os membros da equipe."
     >
       {team && <RespondeeList teamId={team._id} />}
     </GenericModal>
@@ -36,7 +35,7 @@ interface CardsProps {
   onDelete?: () => void;
   onEdit?: () => void;
   teamId: string;
-  team?: EditTeamType; // Add the full team object for modal
+  team?: EditTeamType;
 }
 
 export function Cards({ name, description, onOpenModal, onDelete, onEdit, team }: CardsProps) {
