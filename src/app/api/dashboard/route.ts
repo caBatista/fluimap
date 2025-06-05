@@ -1,6 +1,8 @@
 import dbConnect from '@/server/database/db';
 import { NextResponse } from 'next/server';
 import ResponseModel from '@/models/response';
+import Respondee from '@/models/Respondee';
+import Team from '@/models/Team';
 
 type AnswerMap = Record<string, string>;
 
@@ -39,39 +41,41 @@ interface AnswerValues {
   q4: string; // efetividade
 }
 
-// mappings
+// mappings -> traduz os parametros da resposta para o modelo
 const clarityMap: Record<string, number> = {
   'Nada clara': 1,
   'Pouco clara': 2,
-  'Razoavelmente clara': 3,
-  Clara: 4,
+  'Poderia ser mais clara': 3,
+  'É clara o bastante': 4,
   'Muito clara': 5,
 };
 
 const objectivityMap: Record<string, number> = {
   'Nada direta': 1,
   'Pouco direta': 2,
-  'Razoavelmente direta': 3,
-  Direta: 4,
+  'Poderia ser mais direta': 3,
+  'É direta o bastante': 4,
   'Muito direta': 5,
 };
 
 const effectivenessMap: Record<string, number> = {
   'Nada resolutiva': 1,
   'Pouco resolutiva': 2,
-  'Razoavelmente resolutiva': 3,
-  Resolutiva: 4,
+  'Poderia ser mais resolutiva': 3,
+  'É resolutiva o bastante': 4,
   'Muito resolutiva': 5,
 };
 
 const frequencyMap: Record<string, string> = {
+  'Todos os dias': '1x dia',
+  '3/4x na semana': '4x sem',
   '1x por mês': '1x mês',
   '2x por mês': '2x mês',
+  '3x por mês': '3x mês',
   '1x por semana': '1x sem',
   '2x por semana': '2x sem',
   '3x por semana': '3x sem',
   '4x por semana': '4x sem',
-  'Todos os dias': '1x dia',
   '2x por dia': '2x dia',
   '3x por dia': '3x dia',
 };
@@ -82,40 +86,57 @@ const directionMap: Record<string, string> = {
   'Nós trocamos informações': 'Horizontal',
 };
 
-function convertResponseToApplied(response: ResponseDBEntry): ResponseApplied {
+async function convertResponseToApplied(response: ResponseDBEntry): Promise<ResponseApplied> {
   const firstAnswer = response.answersByUser[0];
   if (!firstAnswer) return { nodes: [] };
 
   const { name, answers } = firstAnswer;
-
   const typedAnswers = answers as Partial<AnswerValues>;
 
+  const respondee = await Respondee.findOne({ name: name });
+  if (!respondee) {
+    // console.warn(`Respondee não encontrado para: ${name}`); // DEBUG
+    return { nodes: [] };
+  }
+
+  const team = await Team.findById(respondee.teamId);
+  if (!team) {
+    // console.warn(`Time não encontrado para respondee ${respondee.name} (teamId: ${respondee.teamId})`); // DEBUG
+    return { nodes: [] };
+  }
+
   const node: InputNode = {
-    Pessoa: name, // TO DO: atualmente esta passando o email
-    Papel: 'Membro', // TO DO: incluir role no response model
-    Equipe: 'Time A', // TO DO: incluir time no response model
+    Pessoa: respondee.name,
+    Papel: respondee.role,
+    Equipe: team.name,
     Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
     Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
-    Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 3,
-    Objetividade: objectivityMap[typedAnswers.q3 ?? ''] ?? 3,
-    Efetividade: effectivenessMap[typedAnswers.q4 ?? ''] ?? 3,
-    Comunicacao: 'Assíncrona',
+    Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 1,
+    Objetividade: objectivityMap[typedAnswers.q3 ?? ''] ?? 1,
+    Efetividade: effectivenessMap[typedAnswers.q4 ?? ''] ?? 1,
+    Comunicacao: 'Assíncrona', // nao sei o que fazer com esse campo
   };
 
   return { nodes: [node] };
 }
 
+// itera sob todas as responses do banco para gerar o processamento do modelo
+// modelo so processa multiplas respostas entao eh inviavel salvar os grafos no banco individualmente
 export async function GET() {
   try {
     await dbConnect();
 
     const responses: ResponseDBEntry[] = await ResponseModel.find().lean();
-    const adaptedResponses = responses.map(convertResponseToApplied);
+    const adaptedResponses = await Promise.all(responses.map(convertResponseToApplied));
     const allNodes = adaptedResponses.flatMap((r) => r.nodes);
 
-    const inputForR = { nodes: allNodes };
+    if (allNodes.length === 0) {
+      console.warn('Nenhum node válido encontrado. Verifique os dados.');
+      return NextResponse.json({ warning: 'Nenhum node válido encontrado.' }, { status: 204 });
+    }
 
-    console.log('Enviando para API R (input):', JSON.stringify(inputForR, null, 2));
+    const inputForR = { nodes: allNodes };
+    // console.log('Enviando para API R (input):', JSON.stringify(inputForR, null, 2)); // DEBUG
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gerar-grafo`, {
       method: 'POST',
@@ -129,7 +150,7 @@ export async function GET() {
     }
 
     const modelResults = (await response.json()) as unknown;
-    console.log('Resposta da API R (output):', JSON.stringify(modelResults, null, 2));
+    // console.log('Resposta da API R (output):', JSON.stringify(modelResults, null, 2)); // DEBUG
 
     return NextResponse.json({ nodes: allNodes, modelResults }, { status: 200 });
   } catch (err) {
