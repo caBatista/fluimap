@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import Team from '@/models/Team';
 import Respondee from '@/models/Respondee';
+import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
@@ -65,6 +66,19 @@ export async function POST(request: NextRequest) {
 
     const { teamId } = body;
 
+    const user = await User.findOne({ clerkId: userId });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (user.credits < 5) {
+      return NextResponse.json(
+        { error: 'Insufficient credits. You need at least 5 credits to run a survey.' },
+        { status: 400 }
+      );
+    }
+
     const team = await Team.findById(teamId);
 
     if (!team) {
@@ -96,11 +110,19 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    await Promise.allSettled(
+    const emailResults = await Promise.allSettled(
       respondeeLinks.map((respondee) =>
         sendEmail({ name: respondee.name, email: respondee.email, link: respondee.link })
       )
     );
+
+    // Check if at least one email was sent successfully
+    const successfulEmails = emailResults.filter((result) => result.status === 'fulfilled');
+
+    if (successfulEmails.length > 0) {
+      await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: -5 } }, { new: true });
+      console.log(`Deducted 5 credits from user ${userId}. Remaining credits: ${user.credits - 5}`);
+    }
 
     revalidatePath(`/surveys`);
 
