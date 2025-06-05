@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,12 +28,6 @@ interface BetResult {
 }
 
 const SYMBOLS = ['🐅', '💎', '🍀', '🎰'];
-const WINNING_COMBINATIONS = [
-  ['🐅', '🐅', '🐅'], // Tiger - highest payout
-  ['💎', '💎', '💎'], // Diamond - high payout
-  ['🍀', '🍀', '🍀'], // Lucky - medium payout
-  ['🎰', '🎰', '🎰'], // Slot - low payout
-];
 
 const PAYOUT_MULTIPLIERS: Record<string, number> = {
   '🐅': 10, // Tiger - 10x (highest)

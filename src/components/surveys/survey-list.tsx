@@ -1,12 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
 
 export type SurveyResponse = {
   _id: string;
@@ -46,11 +44,6 @@ function capitalize(text: string): string {
 
 export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyListProps) {
   const [localSurveys, setLocalSurveys] = useState<SurveyResponse[]>(surveys);
-  const { user } = useUser();
-
-  const email = user?.primaryEmailAddress?.emailAddress ?? '';
-  const localPart = email.split('@')[0] ?? '';
-  const displayName = user?.fullName?.trim() ? user.fullName : localPart;
 
   useEffect(() => {
     setLocalSurveys(surveys);
