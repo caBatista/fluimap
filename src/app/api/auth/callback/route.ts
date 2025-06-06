@@ -18,7 +18,7 @@ export async function GET() {
   let user = await User.findOne({ clerkId: userId });
   user ??= await User.create({
     clerkId: clerkUser.id,
-    name: clerkUser.fullName,
+    name: clerkUser.fullName ?? clerkUser.primaryEmailAddress?.emailAddress.split('@')[0],
     email: clerkUser.primaryEmailAddress?.emailAddress,
   });
 
