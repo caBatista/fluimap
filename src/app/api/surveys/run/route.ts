@@ -135,6 +135,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
+    if (error instanceof Error) {
+      const msg = error.message;
+    }
     console.error('Error running survey:', error);
     return NextResponse.json({ error: 'Failed to run survey' }, { status: 500 });
   }
