@@ -6,7 +6,7 @@ import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import dbConnect from '@/server/database/db';
-import SurveyEmail from '@/components/modal/email/email-template';
+import SurveyEmail from '@/components/email/email-template';
 import { env } from '@/env';
 import { Resend } from 'resend';
 
