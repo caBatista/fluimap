@@ -6,7 +6,7 @@ import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import dbConnect from '@/server/database/db';
-import SurveyEmail from '@/components/email/email-template';
+import SurveyEmail from '@/components/modal/email/email-template';
 import { env } from '@/env';
 import { Resend } from 'resend';
 
@@ -135,6 +135,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
+    if (error instanceof Error) {
+      const msg = error.message;
+    }
     console.error('Error running survey:', error);
     return NextResponse.json({ error: 'Failed to run survey' }, { status: 500 });
   }
