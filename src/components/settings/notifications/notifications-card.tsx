@@ -4,7 +4,6 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 
 export interface NotificationsData {
@@ -25,8 +24,6 @@ export function NotificationsCard({ initial }: { initial: NotificationsData }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
-
-    res.ok ? toast.success('Preferências salvas!') : toast.error('Erro ao salvar');
   }
 
   return (
