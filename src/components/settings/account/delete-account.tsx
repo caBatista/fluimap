@@ -23,12 +23,15 @@ export function DeleteAccount() {
     setLoading(true);
     try {
       const res = await fetch(`/api/users/${user?.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Falha ao excluir');
+      if (!res.ok) {
+        throw new Error('Falha ao excluir conta');
+      }
       toast.success('Conta excluída. Até logo!');
       await signOut();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message ?? 'Erro desconhecido');
+      const message = err instanceof Error ? err.message : 'Falha ao excluir conta';
+      toast.error(message);
     } finally {
       setLoading(false);
       setOpen(false);
