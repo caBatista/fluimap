@@ -23,8 +23,8 @@ export default function SettingsPage() {
       if (!res.ok) return;
       const json = await res.json();
       setAccountData({
-        name: json.name || user.fullName || '',
-        email: json.email || user.primaryEmailAddress?.emailAddress || '',
+        name: json.name ?? user.fullName ?? '',
+        email: json.email ?? user.primaryEmailAddress?.emailAddress ?? '',
       });
     })();
   }, [user?.id, user?.fullName, user?.primaryEmailAddress]);

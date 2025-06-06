@@ -23,7 +23,7 @@ export default function Sidebar() {
     typeof user?.publicMetadata?.displayName === 'string' &&
     user.publicMetadata.displayName.trim().length > 0
       ? truncate(user.publicMetadata.displayName, 12)
-      : truncate(user?.fullName?.trim() || localPart, 12);
+      : truncate(user?.fullName?.trim() ?? localPart, 12);
   const cargo =
     typeof user?.publicMetadata?.cargo === 'string' ? user.publicMetadata.cargo : 'gestor';
 

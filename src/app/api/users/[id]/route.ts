@@ -29,8 +29,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const isGoogle = me.externalAccounts?.some((a) => a.provider === 'oauth_google');
 
   const defaultName =
-    me.fullName?.trim() ||
-    me.username ||
+    me.fullName?.trim() ??
+    me.username ??
     fallbackFromEmail(me.primaryEmailAddress?.emailAddress ?? '');
 
   if (!isGoogle) {
@@ -40,8 +40,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         email: me.primaryEmailAddress?.emailAddress ?? '',
         clerkId: id,
       }).save();
-    } catch (err: any) {
-      if (err?.code === 11000) {
+    } catch (err: unknown) {
+      if (err instanceof Error && (err as any).code === 11000) {
         doc = await User.findOne({ clerkId: id });
       } else throw err;
     }
