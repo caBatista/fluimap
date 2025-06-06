@@ -19,7 +19,9 @@ type WelcomeEmailProps = {
   link?: string;
 };
 
-const baseUrl = process.env.URL ? `https://${process.env.URL}` : 'http://localhost:3000';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL
+  ? `https://${process.env.NEXT_PUBLIC_API_URL}`
+  : 'http://localhost:3000';
 
 const SurveyEmail = ({ username = 'Steve', link }: WelcomeEmailProps) => {
   const previewText = `Anwser you survey, ${username}!`;
