@@ -1,9 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-
 export function SettingsHeader() {
   return (
     <div className="flex items-center justify-between">
