@@ -16,6 +16,7 @@ export type SurveyResponse = {
   expiresInDays?: number;
   dateClosing?: string;
   email?: string;
+  respondents?: number;
 };
 
 export interface SurveyListProps {

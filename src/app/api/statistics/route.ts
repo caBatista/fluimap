@@ -3,7 +3,7 @@ import dbConnect from '@/server/database/db';
 import Survey from '@/models/Survey';
 import Team from '@/models/Team';
 import Response from '@/models/response';
-import TeamRespondent from '@/models/teamRespondents';
+import Respondee from '@/models/Respondee';
 import { format } from 'date-fns';
 import { auth } from '@clerk/nextjs/server';
 import type { Document, Types } from 'mongoose';
@@ -20,7 +20,7 @@ interface ITeam extends Document {
 interface ISurvey extends Document {
   _id: Types.ObjectId;
   title: string;
-  teamId: Types.ObjectId;
+  teamId: string;
   status: string;
   createdAt: Date;
 }
@@ -34,19 +34,27 @@ type LeanSurvey = {
   __v: number;
 };
 
+type ResponseCount = { count: number };
+
 export async function GET() {
   try {
     await dbConnect();
     const { userId } = await auth();
 
+    console.log('[STATISTICS] userId:', userId);
+
     if (!userId) {
+      console.log('[STATISTICS] Unauthorized access');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userTeams = (await Team.find({ ownerId: userId })) as unknown as ITeam[];
+    console.log('[STATISTICS] userTeams:', userTeams);
     const userTeamIds = userTeams.map((team) => team._id.toString());
+    console.log('[STATISTICS] userTeamIds:', userTeamIds);
 
     if (userTeamIds.length === 0) {
+      console.log('[STATISTICS] No teams found for user');
       return NextResponse.json({
         totalSurveys: 0,
         completedSurveys: 0,
@@ -64,21 +72,32 @@ export async function GET() {
       teamId: { $in: userTeamIds },
       status: 'fechado',
     });
+    console.log('[STATISTICS] totalSurveys:', totalSurveys, 'completedSurveys:', completedSurveys);
 
     const allSurveys = (await Survey.find({
       teamId: { $in: userTeamIds },
     })) as unknown as ISurvey[];
+    console.log('[STATISTICS] allSurveys:', allSurveys);
     const surveyIds = allSurveys.map((survey) => survey._id.toString());
+    console.log('[STATISTICS] surveyIds:', surveyIds);
 
-    const responses = await Response.find({ formId: { $in: surveyIds } });
-    const totalRespondents = responses.length;
+    const totalRespondents = await Respondee.countDocuments({ teamId: { $in: userTeamIds } });
 
     let responseRate = 0;
-    if (totalSurveys > 0 && responses.length > 0) {
-      const teamRespondents = await TeamRespondent.find({ teamId: { $in: userTeamIds } });
+    if (totalSurveys > 0 && totalRespondents > 0) {
+      const teamRespondents = await Respondee.find({ teamId: { $in: userTeamIds } });
+      console.log('[STATISTICS] teamRespondents:', teamRespondents);
       const avgRespondentsPerTeam = teamRespondents.length / userTeamIds.length;
       const totalPossibleResponses = totalSurveys * avgRespondentsPerTeam;
-      responseRate = Math.round((responses.length / (totalPossibleResponses ?? 1)) * 100);
+      responseRate = Math.round((totalRespondents / (totalPossibleResponses ?? 1)) * 100);
+      console.log(
+        '[STATISTICS] avgRespondentsPerTeam:',
+        avgRespondentsPerTeam,
+        'totalPossibleResponses:',
+        totalPossibleResponses,
+        'responseRate:',
+        responseRate
+      );
     }
 
     const surveyCategories: CategoryCount = {};
@@ -97,11 +116,13 @@ export async function GET() {
         surveyCategories.Outros = (surveyCategories.Outros ?? 0) + 1;
       }
     });
+    console.log('[STATISTICS] surveyCategories:', surveyCategories);
 
     const surveyTypes = Object.entries(surveyCategories).map(([name, value]) => ({
       name,
       value,
     }));
+    console.log('[STATISTICS] surveyTypes:', surveyTypes);
 
     const currentDate = new Date();
     const sixMonthsAgo = new Date();
@@ -133,34 +154,56 @@ export async function GET() {
         responses: responsesInMonth,
       });
     }
+    console.log('[STATISTICS] monthlyActivity:', monthlyActivity);
 
     const recentSurveys = (await Survey.find({ teamId: { $in: userTeamIds } })
       .sort({ createdAt: -1 })
       .limit(5)
       .lean()) as unknown as LeanSurvey[];
+    console.log('[STATISTICS] recentSurveys:', recentSurveys);
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
-        const surveyId = survey._id;
-        const responsesForSurvey = await Response.countDocuments({ formId: surveyId });
-        const respondentsInTeam = await TeamRespondent.countDocuments({ teamId: survey.teamId });
+        // Busca a contagem de respostas via API interna
+        const baseUrl =
+          process.env.NEXT_PUBLIC_BASE_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000';
+        const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+        let count = 0;
+        try {
+          const res = await fetch(`${url}/api/responses?surveyId=${survey._id}`);
+          if (res.ok) {
+            const data = (await res.json()) as ResponseCount;
+            count = typeof data.count === 'number' ? data.count : 0;
+          }
+        } catch (err) {}
+
+        // Conta respondentes únicos do time desse formulário
+        const respondentsInTeam = await Respondee.countDocuments({ teamId: survey.teamId });
         const total = Math.max(respondentsInTeam, 1);
 
         return {
-          id: surveyId,
+          id: survey._id,
           title: survey.title,
           date: survey.createdAt ?? new Date(),
-          responses: responsesForSurvey,
+          responses: count,
+          respondents: respondentsInTeam,
           total,
         };
       })
     );
+    console.log('[STATISTICS] recentSurveysWithStats:', recentSurveysWithStats);
 
     const teamStats = await Promise.all(
       userTeams.map(async (team) => {
         const teamId = team._id.toString();
-        const members = await TeamRespondent.countDocuments({ teamId });
+        const members = await Respondee.countDocuments({ teamId });
         const teamSurveys = await Survey.countDocuments({ teamId });
+        console.log(
+          `[STATISTICS] Team ${team.name} (${teamId}) members:`,
+          members,
+          'teamSurveys:',
+          teamSurveys
+        );
 
         const lastSurvey = (await Survey.findOne({ teamId }).sort({
           createdAt: -1,
@@ -194,8 +237,9 @@ export async function GET() {
         };
       })
     );
+    console.log('[STATISTICS] teamStats:', teamStats);
 
-    return NextResponse.json({
+    const result = {
       totalSurveys,
       completedSurveys,
       totalRespondents,
@@ -204,7 +248,9 @@ export async function GET() {
       monthlyActivity,
       recentSurveys: recentSurveysWithStats,
       teamStats,
-    });
+    };
+    console.log('[STATISTICS] FINAL RESULT:', result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching statistics:', error);
     return NextResponse.json({ error: 'Failed to fetch statistics' }, { status: 500 });
