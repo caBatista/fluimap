@@ -48,7 +48,28 @@ export default function CreateSurveyPage() {
         throw new Error('Invalid response structure');
       }
 
-      return parsed.data.surveys;
+      const surveysWithRespondents: Survey[] = await Promise.all(
+        parsed.data.surveys.map(async (surveyBase) => {
+          const survey = surveyBase as Survey & { responsesCount?: number };
+          let respondents = 0;
+          try {
+            const res = await fetch(`/api/respondees?teamId=${survey.teamId}`);
+            if (res.ok) {
+              const data = (await res.json()) as { respondees: unknown[] };
+              respondents = Array.isArray(data.respondees) ? data.respondees.length : 0;
+            }
+          } catch (e) {
+            respondents = 0;
+          }
+
+          const responsesCount = survey.responsesCount ?? 0;
+          const progress = respondents > 0 ? Math.round((responsesCount / respondents) * 100) : 0;
+
+          return { ...survey, respondents, responsesCount, progress } as Survey;
+        })
+      );
+
+      return surveysWithRespondents;
     },
   });
 
