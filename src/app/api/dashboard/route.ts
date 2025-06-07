@@ -1,8 +1,9 @@
 import dbConnect from '@/server/database/db';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import ResponseModel from '@/models/response';
 import Respondee from '@/models/Respondee';
 import Team from '@/models/Team';
+import { type GrafoType } from '@/models/Grafo';
 
 type AnswerMap = Record<string, string>;
 
@@ -19,6 +20,10 @@ interface ResponseDBEntry {
 // cast para o formato esperado pelo modelo
 interface ResponseApplied {
   nodes: InputNode[];
+}
+
+interface SurveyRequestBody {
+  surveyId: string;
 }
 
 interface InputNode {
@@ -101,38 +106,49 @@ async function convertResponseToApplied(response: ResponseDBEntry): Promise<Resp
 
   const team = await Team.findById(respondee.teamId);
   if (!team) {
-    // console.warn(`Time não encontrado para respondee ${respondee.name} (teamId: ${respondee.teamId})`); // DEBUG
+    // console.warn(
+    //   `Time não encontrado para respondee ${respondee.name} (teamId: ${respondee.teamId})`
+    // ); // DEBUG
     return { nodes: [] };
   }
 
   const node: InputNode = {
     Pessoa: respondee.name,
-    Papel: respondee.role,
+    Papel: ['Líder', 'Membro', 'Coordenador'].includes(respondee.role) ? respondee.role : 'Membro',
     Equipe: team.name,
     Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
     Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
     Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 1,
     Objetividade: objectivityMap[typedAnswers.q3 ?? ''] ?? 1,
     Efetividade: effectivenessMap[typedAnswers.q4 ?? ''] ?? 1,
-    Comunicacao: 'Assíncrona', // nao sei o que fazer com esse campo
+    Comunicacao: 'Assíncrona', // nao sei oq faço com esse campo
   };
 
   return { nodes: [node] };
 }
 
-// itera sob todas as responses do banco para gerar o processamento do modelo
+// itera sob todas as responses do mesmo formulario para gerar o processamento do modelo
 // modelo so processa multiplas respostas entao eh inviavel salvar os grafos no banco individualmente
-export async function GET() {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const responses: ResponseDBEntry[] = await ResponseModel.find().lean();
+    const body = (await req.json()) as SurveyRequestBody;
+    const surveyId = body?.surveyId;
+
+    if (!surveyId || typeof surveyId !== 'string') {
+      return NextResponse.json(
+        { error: 'O campo surveyId é obrigatório no corpo da requisição.' },
+        { status: 400 }
+      );
+    }
+
+    const responses: ResponseDBEntry[] = await ResponseModel.find({ surveyId }).lean();
     const adaptedResponses = await Promise.all(responses.map(convertResponseToApplied));
     const allNodes = adaptedResponses.flatMap((r) => r.nodes);
 
     if (allNodes.length === 0) {
-      console.warn('Nenhum node válido encontrado. Verifique os dados.');
-      return NextResponse.json({ warning: 'Nenhum node válido encontrado.' }, { status: 204 });
+      return new NextResponse(null, { status: 204 });
     }
 
     const inputForR = { nodes: allNodes };
@@ -149,7 +165,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Erro na requisição para o modelo R' }, { status: 500 });
     }
 
-    const modelResults = (await response.json()) as unknown;
+    const modelResults = (await response.json()) as GrafoType;
     // console.log('Resposta da API R (output):', JSON.stringify(modelResults, null, 2)); // DEBUG
 
     return NextResponse.json({ nodes: allNodes, modelResults }, { status: 200 });
