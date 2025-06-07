@@ -21,6 +21,22 @@ interface InputFormat {
   }>;
 }
 
+export async function GET() {
+  try {
+    // Get the latest graph from the database
+    const latestGrafo = await Grafo.findOne().sort({ createdAt: -1 });
+
+    if (!latestGrafo) {
+      return NextResponse.json({ error: 'No graph data available' }, { status: 404 });
+    }
+
+    return NextResponse.json(latestGrafo);
+  } catch (error) {
+    console.error('Error fetching graph data:', error);
+    return NextResponse.json({ error: 'Failed to fetch graph data' }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   const input = (await request.json()) as InputFormat;
 
