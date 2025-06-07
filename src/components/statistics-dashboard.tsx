@@ -346,11 +346,14 @@ export default function StatisticsDashboard() {
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <Progress
-                                    value={(survey.responses / survey.total) * 100}
+                                    value={((survey.respondents ?? 0) / (survey.total ?? 1)) * 100}
                                     className="align-right h-2 w-full"
                                   />
                                   <span className="text-xs">
-                                    {Math.round((survey.responses / survey.total) * 100)}%
+                                    {Math.round(
+                                      ((survey.respondents ?? 0) / (survey.total ?? 1)) * 100
+                                    )}
+                                    %
                                   </span>
                                 </div>
                               </TableCell>

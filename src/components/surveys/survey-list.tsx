@@ -77,7 +77,10 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
           : survey.status === 'fechado'
             ? 'ativo'
             : (survey.status ?? 'ativo');
-        const progressValue = survey.progress ?? 0;
+        const progressValue =
+          survey.respondents && survey.respondents > 0
+            ? Math.round(((survey.responsesCount ?? 0) / survey.respondents) * 100)
+            : 0;
 
         return (
           <div key={survey._id} className="block h-full w-full">
@@ -101,7 +104,7 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
               </div>
 
               <p className="mt-[5px] text-xs text-[hsl(var(--muted-foreground))]">
-                {survey.responsesCount ?? 0} respostas
+                {survey.respondents ?? 0} respostas
               </p>
 
               <div className="mb-[16px] mt-2 flex items-center gap-2">

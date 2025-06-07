@@ -41,17 +41,14 @@ export async function GET() {
     await dbConnect();
     const { userId } = await auth();
 
-    console.log('[STATISTICS] userId:', userId);
-
     if (!userId) {
       console.log('[STATISTICS] Unauthorized access');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userTeams = (await Team.find({ ownerId: userId })) as unknown as ITeam[];
-    console.log('[STATISTICS] userTeams:', userTeams);
+
     const userTeamIds = userTeams.map((team) => team._id.toString());
-    console.log('[STATISTICS] userTeamIds:', userTeamIds);
 
     if (userTeamIds.length === 0) {
       console.log('[STATISTICS] No teams found for user');
@@ -72,14 +69,12 @@ export async function GET() {
       teamId: { $in: userTeamIds },
       status: 'fechado',
     });
-    console.log('[STATISTICS] totalSurveys:', totalSurveys, 'completedSurveys:', completedSurveys);
 
     const allSurveys = (await Survey.find({
       teamId: { $in: userTeamIds },
     })) as unknown as ISurvey[];
-    console.log('[STATISTICS] allSurveys:', allSurveys);
+
     const surveyIds = allSurveys.map((survey) => survey._id.toString());
-    console.log('[STATISTICS] surveyIds:', surveyIds);
 
     const totalRespondents = await Respondee.countDocuments({ teamId: { $in: userTeamIds } });
 
@@ -116,13 +111,11 @@ export async function GET() {
         surveyCategories.Outros = (surveyCategories.Outros ?? 0) + 1;
       }
     });
-    console.log('[STATISTICS] surveyCategories:', surveyCategories);
 
     const surveyTypes = Object.entries(surveyCategories).map(([name, value]) => ({
       name,
       value,
     }));
-    console.log('[STATISTICS] surveyTypes:', surveyTypes);
 
     const currentDate = new Date();
     const sixMonthsAgo = new Date();
@@ -154,13 +147,11 @@ export async function GET() {
         responses: responsesInMonth,
       });
     }
-    console.log('[STATISTICS] monthlyActivity:', monthlyActivity);
 
     const recentSurveys = (await Survey.find({ teamId: { $in: userTeamIds } })
       .sort({ createdAt: -1 })
       .limit(5)
       .lean()) as unknown as LeanSurvey[];
-    console.log('[STATISTICS] recentSurveys:', recentSurveys);
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
@@ -177,7 +168,6 @@ export async function GET() {
           }
         } catch (err) {}
 
-        // Conta respondentes únicos do time desse formulário
         const respondentsInTeam = await Respondee.countDocuments({ teamId: survey.teamId });
         const total = Math.max(respondentsInTeam, 1);
 
@@ -191,7 +181,6 @@ export async function GET() {
         };
       })
     );
-    console.log('[STATISTICS] recentSurveysWithStats:', recentSurveysWithStats);
 
     const teamStats = await Promise.all(
       userTeams.map(async (team) => {
@@ -237,7 +226,6 @@ export async function GET() {
         };
       })
     );
-    console.log('[STATISTICS] teamStats:', teamStats);
 
     const result = {
       totalSurveys,
