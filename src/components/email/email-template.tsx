@@ -21,7 +21,7 @@ type WelcomeEmailProps = {
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL
   ? `https://${process.env.NEXT_PUBLIC_API_URL}`
-  : null;
+  : 'localhost:3000';
 
 const fallbackImageUrl =
   'https://raw.githubusercontent.com/caBatista/fluimap/main/public/LogoFluiMap.png';
