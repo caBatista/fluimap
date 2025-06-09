@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ClipboardList, Users, BarChart4, Settings, LogOut, PieChart } from 'lucide-react';
+import { Home, ClipboardList, Users, Settings, LogOut, PieChart } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ModeToggle } from '@/components/mode-toggle';
 import CreditBalance from '@/components/credit-balance';
+
+const truncate = (s: string, n = 12) => (s.length > n ? `${s.slice(0, n)}…` : s);
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -17,7 +19,11 @@ export default function Sidebar() {
 
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
   const localPart = email.split('@')[0] ?? '';
-  const displayName = user?.fullName?.trim() ? user.fullName : localPart;
+  const displayName =
+    typeof user?.publicMetadata?.displayName === 'string' &&
+    user.publicMetadata.displayName.trim().length > 0
+      ? truncate(user.publicMetadata.displayName, 12)
+      : truncate(user?.fullName?.trim() ?? localPart, 12);
   const cargo =
     typeof user?.publicMetadata?.cargo === 'string' ? user.publicMetadata.cargo : 'gestor';
 
@@ -64,12 +70,6 @@ export default function Sidebar() {
           href="/statistics"
           icon={<PieChart size={20} />}
           label="Estatísticas"
-          currentPath={pathname}
-        />
-        <SidebarItem
-          href="/reports"
-          icon={<BarChart4 size={20} />}
-          label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
