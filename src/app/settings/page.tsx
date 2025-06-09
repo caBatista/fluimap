@@ -1,18 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { z } from 'zod';
 import { SettingsHeader } from '@/components/settings/settings-header';
 import { SettingsTablist } from '@/components/settings/settings-tablist';
 import { AccountCard, type AccountData } from '@/components/settings/account/account-card';
 import { DeleteAccount } from '@/components/settings/account/delete-account';
 import { useUser } from '@clerk/nextjs';
-
-const UserSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-});
-type ApiUser = z.infer<typeof UserSchema>;
 
 type Tab = 'conta' | 'notificações';
 

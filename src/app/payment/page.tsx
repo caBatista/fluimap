@@ -189,7 +189,8 @@ export default function PaymentPage() {
         amount: selectedPkg.price,
         credits: selectedPkg.credits,
       });
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       toast.error('Falha no pagamento. Tente novamente.');
       setIsProcessing(false);
     }
