@@ -58,7 +58,8 @@ export default function CreateSurveyPage() {
               const data = (await res.json()) as { respondees: unknown[] };
               respondents = Array.isArray(data.respondees) ? data.respondees.length : 0;
             }
-          } catch (e) {
+          } catch (err) {
+            console.error('Error fetching respondees:', err);
             respondents = 0;
           }
 

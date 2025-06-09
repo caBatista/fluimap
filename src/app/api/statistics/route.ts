@@ -42,16 +42,13 @@ export async function GET() {
     const { userId } = await auth();
 
     if (!userId) {
-      console.log('[STATISTICS] Unauthorized access');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userTeams = (await Team.find({ ownerId: userId })) as unknown as ITeam[];
-
     const userTeamIds = userTeams.map((team) => team._id.toString());
 
     if (userTeamIds.length === 0) {
-      console.log('[STATISTICS] No teams found for user');
       return NextResponse.json({
         totalSurveys: 0,
         completedSurveys: 0,
@@ -155,18 +152,17 @@ export async function GET() {
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
-        // Busca a contagem de respostas via API interna
-        const baseUrl =
-          process.env.NEXT_PUBLIC_BASE_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000';
-        const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
         let count = 0;
         try {
-          const res = await fetch(`${url}/api/responses?surveyId=${survey._id}`);
+          const res = await fetch(`${baseUrl}/api/responses?surveyId=${survey._id}`);
           if (res.ok) {
             const data = (await res.json()) as ResponseCount;
             count = typeof data.count === 'number' ? data.count : 0;
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error('Error fetching response count for survey', survey._id, err);
+        }
 
         const respondentsInTeam = await Respondee.countDocuments({ teamId: survey.teamId });
         const total = Math.max(respondentsInTeam, 1);
@@ -187,12 +183,6 @@ export async function GET() {
         const teamId = team._id.toString();
         const members = await Respondee.countDocuments({ teamId });
         const teamSurveys = await Survey.countDocuments({ teamId });
-        console.log(
-          `[STATISTICS] Team ${team.name} (${teamId}) members:`,
-          members,
-          'teamSurveys:',
-          teamSurveys
-        );
 
         const lastSurvey = (await Survey.findOne({ teamId }).sort({
           createdAt: -1,
@@ -237,7 +227,6 @@ export async function GET() {
       recentSurveys: recentSurveysWithStats,
       teamStats,
     };
-    console.log('[STATISTICS] FINAL RESULT:', result);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching statistics:', error);
