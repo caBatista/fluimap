@@ -115,7 +115,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
         const runResponse = await fetch('/api/surveys/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teamId: data.teamId }),
+          body: JSON.stringify({ teamId: data.teamId, surveyId: newSurveyId }),
         });
         if (!runResponse.ok) {
           const runErr: unknown = await runResponse.json();

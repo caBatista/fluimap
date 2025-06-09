@@ -27,6 +27,8 @@ const surveysSchema = z.object({
       status: z.enum(['ativo', 'fechado']),
       teamId: z.string(),
       dateClosing: z.string().optional(),
+      responsesCount: z.number().optional(),
+      progress: z.number().optional(),
     })
   ),
 });

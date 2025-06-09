@@ -104,7 +104,7 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
               </div>
 
               <p className="mt-[5px] text-xs text-[hsl(var(--muted-foreground))]">
-                {survey.respondents ?? 0} respostas
+                {survey.responsesCount ?? 0} respostas
               </p>
 
               <div className="mb-[16px] mt-2 flex items-center gap-2">

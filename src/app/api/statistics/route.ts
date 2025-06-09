@@ -34,8 +34,6 @@ type LeanSurvey = {
   __v: number;
 };
 
-type ResponseCount = { count: number };
-
 export async function GET() {
   try {
     await dbConnect();
@@ -152,14 +150,9 @@ export async function GET() {
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
         let count = 0;
         try {
-          const res = await fetch(`${baseUrl}/api/responses?surveyId=${survey._id}`);
-          if (res.ok) {
-            const data = (await res.json()) as ResponseCount;
-            count = typeof data.count === 'number' ? data.count : 0;
-          }
+          count = await Response.countDocuments({ surveyId: survey._id });
         } catch (err) {
           console.error('Error fetching response count for survey', survey._id, err);
         }
@@ -172,6 +165,7 @@ export async function GET() {
           title: survey.title,
           date: survey.createdAt ?? new Date(),
           responses: count,
+          responsesCount: count,
           respondents: respondentsInTeam,
           total,
         };

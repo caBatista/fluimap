@@ -44,6 +44,7 @@ interface RecentSurvey {
   date: string | Date;
   responses: number;
   total: number;
+  responsesCount: number;
 }
 
 interface TeamStat {
@@ -336,29 +337,35 @@ export default function StatisticsDashboard() {
                     <TableBody>
                       {stats?.recentSurveys?.length ? (
                         stats.recentSurveys.map(
-                          (survey: RecentSurvey & { respondents?: number }) => (
-                            <TableRow key={survey.id}>
-                              <TableCell className="font-medium">{survey.title}</TableCell>
-                              <TableCell>{format(new Date(survey.date), 'dd/MM/yyyy')}</TableCell>
-                              <TableCell>
-                                {survey.respondents ?? '0'} / {survey.total ?? '0'}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <Progress
-                                    value={((survey.respondents ?? 0) / (survey.total ?? 1)) * 100}
-                                    className="align-right h-2 w-full"
-                                  />
-                                  <span className="text-xs">
-                                    {Math.round(
-                                      ((survey.respondents ?? 0) / (survey.total ?? 1)) * 100
-                                    )}
-                                    %
-                                  </span>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          )
+                          (survey: RecentSurvey & { respondents?: number }) => {
+                            return (
+                              <TableRow key={survey.id}>
+                                <TableCell className="font-medium">{survey.title}</TableCell>
+                                <TableCell>{format(new Date(survey.date), 'dd/MM/yyyy')}</TableCell>
+                                <TableCell>
+                                  {survey.responsesCount ?? '0'} / {survey.respondents ?? '0'}
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Progress
+                                      value={
+                                        ((survey.responsesCount ?? 0) / (survey.respondents ?? 0)) *
+                                        100
+                                      }
+                                      className="align-right h-2 w-full"
+                                    />
+                                    <span className="text-xs">
+                                      {Math.round(
+                                        ((survey.responsesCount ?? 0) / (survey.respondents ?? 0)) *
+                                          100
+                                      )}
+                                      %
+                                    </span>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          }
                         )
                       ) : (
                         <TableRow>
