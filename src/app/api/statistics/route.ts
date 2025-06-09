@@ -166,7 +166,7 @@ export async function GET() {
             const data = (await res.json()) as ResponseCount;
             count = typeof data.count === 'number' ? data.count : 0;
           }
-        } catch (err) {}
+        } catch {}
 
         const respondentsInTeam = await Respondee.countDocuments({ teamId: survey.teamId });
         const total = Math.max(respondentsInTeam, 1);

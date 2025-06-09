@@ -60,7 +60,7 @@ export default function CreateSurveyPage() {
               const data = (await res.json()) as { respondees: unknown[] };
               respondents = Array.isArray(data.respondees) ? data.respondees.length : 0;
             }
-          } catch (e) {
+          } catch {
             respondents = 0;
           }
 
