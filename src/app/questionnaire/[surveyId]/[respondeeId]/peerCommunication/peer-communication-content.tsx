@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams, useRouter, useParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -10,75 +10,43 @@ interface QuestionItem {
   options: string[];
 }
 
-interface QuestionnaireRaw {
-  _id: string;
-  name: string;
-  instructions: string;
-  section: string;
-  questions: Array<{ text: string; options: { value: string; label: string }[] }>;
-}
 interface QuestionnaireData {
-  questionnaireId: string;
   titulo: string;
   instrucoes: string;
   pergunta: string;
   questoes: QuestionItem[];
 }
 
-export function PeerCommunicationContent() {
+interface PeerCommunicationContentProps {
+  surveyId: string;
+  respondeeId: string;
+}
+
+export function PeerCommunicationContent({ surveyId, respondeeId }: PeerCommunicationContentProps) {
   const searchParams = useSearchParams();
-  const params = useParams();
-  const rawSurveyId = params.surveyId as string;
-  const respondeeId = params.respondeeId as string;
-  const users = searchParams.getAll('users').filter((u) => !!u && u !== 'null');
-  const rawEmail = searchParams.get('email');
-
-  if (
-    !rawSurveyId ||
-    rawSurveyId === 'null' ||
-    !rawEmail ||
-    rawEmail === 'null' ||
-    users.length === 0
-  ) {
-    throw new Error('Parâmetros surveyId/email/users não definidos');
-  }
-
-  const surveyId = rawSurveyId;
-  const email = rawEmail;
-
+  const users = searchParams.getAll('users');
+  const email = searchParams.get('email') ?? '';
   const router = useRouter();
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
+  // Fetch questionnaire data with React Query
   const { data, isLoading, error } = useQuery<QuestionnaireData>({
-    queryKey: ['peer-communication', surveyId],
+    queryKey: ['peer-communication'],
     queryFn: async () => {
-      const res = await fetch('/api/questionnaires');
-      if (!res.ok) throw new Error('Erro ao carregar questionários');
-
-      const body = (await res.json()) as { questionnaires: QuestionnaireRaw[] };
-      const qp = body.questionnaires.find((q) => q.section === 'communicationPeers');
-      if (!qp) throw new Error('Questionário de comunicação não encontrado');
-
-      return {
-        questionnaireId: qp._id,
-        titulo: qp.name,
-        instrucoes: qp.instructions,
-        pergunta: '',
-        questoes: qp.questions.map((q) => ({
-          question: q.text,
-          options: q.options.map((o) => o.label),
-        })),
-      };
+      const res = await fetch('/peer-communication.json');
+      if (!res.ok) throw new Error('Erro ao carregar o questionário');
+      return res.json() as Promise<QuestionnaireData>;
     },
   });
 
+  // Mutation for submitting answers
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!data) throw new Error('Dados do questionário ausentes');
+      if (!data) throw new Error('Questionário não carregado');
+
       const groupedAnswers = users.map((user, userIndex) => {
         const answersByQuestion: Record<string, string> = {};
-
         data.questoes.forEach((_, qIndex) => {
           const key = `user-${userIndex}-q${qIndex}`;
           if (answers[key]) {
@@ -98,28 +66,29 @@ export function PeerCommunicationContent() {
       };
 
       const previousRaw = sessionStorage.getItem('partialResponses');
-      let previous: { section: string; answersByUser: Record<string, string>[] }[] = [];
-      try {
-        previous = previousRaw
-          ? (JSON.parse(previousRaw) as {
-              section: string;
-              answersByUser: Record<string, string>[];
-            }[])
-          : [];
-      } catch (e) {
-        console.error('Erro ao parsear partialResponses do sessionStorage:', e);
-        previous = [];
-      }
+      const previous = (() => {
+        try {
+          return previousRaw
+            ? (JSON.parse(previousRaw) as {
+                section: string;
+                answersByUser: {
+                  name: string;
+                  answers: Record<string, string>;
+                }[];
+              }[])
+            : [];
+        } catch (e) {
+          console.error('Erro ao parsear partialResponses:', e);
+          return [];
+        }
+      })();
 
-      const allSections = Array.isArray(previous)
-        ? [...previous, currentAnswers]
-        : [previous, currentAnswers];
-
-      sessionStorage.setItem('partialResponses', JSON.stringify(allSections));
+      const updated = [...previous, currentAnswers];
+      sessionStorage.setItem('partialResponses', JSON.stringify(updated));
     },
     onSuccess: () => {
       router.push(
-        `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?surveyId=${encodeURIComponent(surveyId)}&email=${encodeURIComponent(email)}`
+        `/questionnaire/${surveyId}/${respondeeId}/wellBeingPage?email=${encodeURIComponent(email)}`
       );
     },
   });
@@ -131,7 +100,6 @@ export function PeerCommunicationContent() {
 
   const handleContinue = () => {
     if (!data) return;
-
     const allAnswered = users.every((_, userIndex) =>
       data.questoes.every((_, qIndex) => {
         const key = `user-${userIndex}-q${qIndex}`;
@@ -149,14 +117,16 @@ export function PeerCommunicationContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">Loading questionnaire...</div>
+      <div className="flex min-h-screen items-center justify-center">
+        Carregando questionário...
+      </div>
     );
   }
 
   if (error || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center text-red-500">
-        Failed to load questionnaire
+        Erro ao carregar o questionário
       </div>
     );
   }
@@ -166,7 +136,7 @@ export function PeerCommunicationContent() {
       <h1 className="mb-6 text-4xl font-bold">
         <span className="text-[hsl(var(--primary))]">FluiMap</span>
       </h1>
-      <h2 className="mb-4 text-center text-2xl font-semibold">{data.titulo}</h2>
+      <h2 className="mb-4 text-center text-2xl font-semibold">{data?.titulo}</h2>
       <p className="mb-8 max-w-2xl text-center text-sm">{data.instrucoes}</p>
 
       {users.map((user, userIndex) => (
@@ -198,14 +168,14 @@ export function PeerCommunicationContent() {
           })}
 
           {userIndex === users.length - 1 && (
-            <div className="mb-8 mt-10 flex w-full justify-between">
+            <div className="mb-5 mt-10 flex w-full justify-between">
               <Button
                 className="h-auto px-8 py-4 text-base"
                 variant="outline"
                 onClick={() => router.back()}
                 disabled={mutation.status === 'pending'}
               >
-                Voltar
+                Cancelar
               </Button>
               <Button
                 variant="default"

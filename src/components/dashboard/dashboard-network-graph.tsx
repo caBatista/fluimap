@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Network } from "vis-network/standalone/esm/vis-network";
+import React, { useEffect, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Network } from 'vis-network/standalone/esm/vis-network';
 
 export function DashboardNetworkGraph() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -12,64 +12,64 @@ export function DashboardNetworkGraph() {
 
     const rawNodes = [
       {
-        Pessoa: "JD",
-        Papel: "Líder",
+        Pessoa: 'JD',
+        Papel: 'Líder',
         Frequencia: 5,
-        Direcao: "bidirecional",
+        Direcao: 'bidirecional',
         Clareza: 4,
         Objetividade: 5,
         Efetividade: 4,
-        Comunicacao: "Assertiva",
+        Comunicacao: 'Assertiva',
       },
       {
-        Pessoa: "MT",
-        Papel: "Dev",
+        Pessoa: 'MT',
+        Papel: 'Dev',
         Frequencia: 3,
-        Direcao: "unidirecional",
+        Direcao: 'unidirecional',
         Clareza: 3,
         Objetividade: 3,
         Efetividade: 3,
-        Comunicacao: "Informal",
+        Comunicacao: 'Informal',
       },
       {
-        Pessoa: "SM",
-        Papel: "Dev",
+        Pessoa: 'SM',
+        Papel: 'Dev',
         Frequencia: 4,
-        Direcao: "bidirecional",
+        Direcao: 'bidirecional',
         Clareza: 4,
         Objetividade: 4,
         Efetividade: 4,
-        Comunicacao: "Clara",
+        Comunicacao: 'Clara',
       },
       {
-        Pessoa: "ER",
-        Papel: "QA",
+        Pessoa: 'ER',
+        Papel: 'QA',
         Frequencia: 2,
-        Direcao: "unidirecional",
+        Direcao: 'unidirecional',
         Clareza: 2,
         Objetividade: 3,
         Efetividade: 2,
-        Comunicacao: "Burocrática",
+        Comunicacao: 'Burocrática',
       },
       {
-        Pessoa: "JK",
-        Papel: "PM",
+        Pessoa: 'JK',
+        Papel: 'PM',
         Frequencia: 5,
-        Direcao: "bidirecional",
+        Direcao: 'bidirecional',
         Clareza: 5,
         Objetividade: 5,
         Efetividade: 5,
-        Comunicacao: "Formal",
+        Comunicacao: 'Formal',
       },
     ];
 
     const rawEdges = [
-      { Pessoa: "JD", Pessoa2: "SM", Equipe: "A", weight: 3 },
-      { Pessoa: "JD", Pessoa2: "MT", Equipe: "A", weight: 4 },
-      { Pessoa: "MT", Pessoa2: "SM", Equipe: "A", weight: 2 },
-      { Pessoa: "SM", Pessoa2: "JK", Equipe: "A", weight: 3 },
-      { Pessoa: "SM", Pessoa2: "ER", Equipe: "A", weight: 1 },
-      { Pessoa: "ER", Pessoa2: "JK", Equipe: "A", weight: 2 },
+      { Pessoa: 'JD', Pessoa2: 'SM', Equipe: 'A', weight: 3 },
+      { Pessoa: 'JD', Pessoa2: 'MT', Equipe: 'A', weight: 4 },
+      { Pessoa: 'MT', Pessoa2: 'SM', Equipe: 'A', weight: 2 },
+      { Pessoa: 'SM', Pessoa2: 'JK', Equipe: 'A', weight: 3 },
+      { Pessoa: 'SM', Pessoa2: 'ER', Equipe: 'A', weight: 1 },
+      { Pessoa: 'ER', Pessoa2: 'JK', Equipe: 'A', weight: 2 },
     ];
 
     const nodes = rawNodes.map((n, index) => ({
@@ -92,18 +92,18 @@ export function DashboardNetworkGraph() {
 
     const options = {
       nodes: {
-        shape: "dot",
+        shape: 'dot',
         size: 20,
-        font: { color: "#fff" },
+        font: { color: '#fff' },
       },
       groups: {
-        "Líder": { color: { background: "#1E90FF" } },
-        "Dev": { color: { background: "#32CD32" } },
-        "QA": { color: { background: "#FF8C00" } },
-        "PM": { color: { background: "#800080" } },
+        Líder: { color: { background: '#1E90FF' } },
+        Dev: { color: { background: '#32CD32' } },
+        QA: { color: { background: '#FF8C00' } },
+        PM: { color: { background: '#800080' } },
       },
       edges: {
-        color: "rgba(150, 150, 150, 0.5)",
+        color: 'rgba(150, 150, 150, 0.5)',
         width: 2,
         scaling: {
           min: 1,
@@ -121,9 +121,9 @@ export function DashboardNetworkGraph() {
   }, []);
 
   return (
-    <Card className="mt-6 shadow-md rounded-2xl">
+    <Card className="mt-6 rounded-2xl shadow-md">
       <CardContent className="p-4">
-        <p className="text-lg font-semibold mb-4">Conexões da Equipe</p>
+        <p className="mb-4 text-lg font-semibold">Conexões da Equipe</p>
         <div ref={containerRef} className="h-[400px] w-full" />
       </CardContent>
     </Card>

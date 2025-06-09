@@ -7,10 +7,13 @@ import AgreeButtons from '@/components/AgreeButtons';
 
 export default async function QuestionnairePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ surveyId: string; respondeeId: string }>;
+  searchParams: Promise<{ teamId?: string; email?: string }>;
 }) {
   const { surveyId, respondeeId } = await params;
+  const { teamId, email } = await searchParams;
   await dbConnect();
 
   // Fetch respondee
@@ -38,7 +41,7 @@ export default async function QuestionnairePage({
       </p>
       <p className="mb-6">Deseja participar?</p>
       <Suspense fallback={<div>Carregando...</div>}>
-        <AgreeButtons surveyId={surveyId} respondeeId={respondeeId} />
+        <AgreeButtons surveyId={surveyId} respondeeId={respondeeId} teamId={teamId} email={email} />
       </Suspense>
     </div>
   );

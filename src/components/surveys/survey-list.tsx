@@ -1,12 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
 
 export type SurveyResponse = {
   _id: string;
@@ -46,11 +44,6 @@ function capitalize(text: string): string {
 
 export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyListProps) {
   const [localSurveys, setLocalSurveys] = useState<SurveyResponse[]>(surveys);
-  const { user } = useUser();
-
-  const email = user?.primaryEmailAddress?.emailAddress ?? '';
-  const localPart = email.split('@')[0] ?? '';
-  const displayName = user?.fullName?.trim() ? user.fullName : localPart;
 
   useEffect(() => {
     setLocalSurveys(surveys);
@@ -86,11 +79,7 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
         const progressValue = survey.progress ?? 0;
 
         return (
-          <Link
-            key={survey._id}
-            href={`/questionnaire/selectUsers?surveyId=${survey._id}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(displayName)}`}
-            className="block h-full w-full"
-          >
+          <div key={survey._id} className="block h-full w-full">
             <Card className="relative h-[138px] w-full rounded-[6px] border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-4 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
@@ -145,7 +134,7 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                 </span>
               </div>
             </Card>
-          </Link>
+          </div>
         );
       })}
     </div>

@@ -1,5 +1,5 @@
-import { UserButton } from "@clerk/nextjs";
-import { ModeToggle } from "./mode-toggle";
+import { UserButton } from '@clerk/nextjs';
+import { ModeToggle } from './mode-toggle';
 
 export function Header() {
   return (

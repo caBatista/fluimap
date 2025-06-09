@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from 'react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -15,14 +15,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Team name must be at least 2 characters.",
+    message: 'Team name must be at least 2 characters.',
   }),
   description: z.string().optional(),
 });
@@ -40,8 +40,8 @@ export function TeamForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     },
   });
 
@@ -49,28 +49,28 @@ export function TeamForm() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/teams", {
-        method: "POST",
+      const response = await fetch('/api/teams', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
 
       if (!response.ok) {
-        const errorData = await response.json() as ApiError;
-        throw new Error(errorData.error || "Failed to create team");
+        const errorData = (await response.json()) as ApiError;
+        throw new Error(errorData.error || 'Failed to create team');
       }
 
-      toast.success("Team created successfully");
+      toast.success('Team created successfully');
       form.reset();
       // Update teams data after successful creation
-      void queryClient.invalidateQueries({ queryKey: ["teams"] });
+      void queryClient.invalidateQueries({ queryKey: ['teams'] });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error("An unknown error occurred");
+        toast.error('An unknown error occurred');
       }
     } finally {
       setIsLoading(false);
@@ -116,7 +116,7 @@ export function TeamForm() {
               )}
             />
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Team"}
+              {isLoading ? 'Creating...' : 'Create Team'}
             </Button>
           </form>
         </Form>

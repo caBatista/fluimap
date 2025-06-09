@@ -3,11 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ClipboardList, Users, BarChart4, Settings, LogOut } from 'lucide-react';
+import { Home, ClipboardList, Users, BarChart4, Settings, LogOut, PieChart } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ModeToggle } from '@/components/mode-toggle';
+import CreditBalance from '@/components/credit-balance';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -23,14 +24,16 @@ export default function Sidebar() {
   return (
     <div className="z-50 flex h-screen w-[256px] flex-col bg-background shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
-      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
-        <Image
-          src="/LogoFluiMap.png"
-          alt="Logo do FluiMap"
-          width={100}
-          height={100}
-          className="mb-2 mt-3 dark:invert"
-        />
+      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))] py-14">
+        <Link href="/dashboard">
+          <Image
+            src="/LogoFluiMap.png"
+            alt="Logo do FluiMap"
+            width={100}
+            height={100}
+            className="mb-2 mt-3 cursor-pointer dark:invert"
+          />
+        </Link>
 
         <h1 className="text-xl font-bold">
           {/* <span className="text-[hsl(var(--primary))]">FluiMap</span> */}
@@ -40,39 +43,50 @@ export default function Sidebar() {
       {/* Navegação */}
       <nav className="mt-4 flex flex-col items-start gap-[4px] px-2">
         <SidebarItem
-          href="/fluimap/dashboard"
+          href="/dashboard"
           icon={<Home size={20} />}
           label="Dashboard"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/fluimap/surveys"
+          href="/surveys"
           icon={<ClipboardList size={20} />}
           label="Formulário"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/fluimap/teams"
+          href="/teams"
           icon={<Users size={20} />}
           label="Times"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/fluimap/reports"
+          href="/statistics"
+          icon={<PieChart size={20} />}
+          label="Estatísticas"
+          currentPath={pathname}
+        />
+        <SidebarItem
+          href="/reports"
           icon={<BarChart4 size={20} />}
           label="Relatórios"
           currentPath={pathname}
         />
         <SidebarItem
-          href="/fluimap/settings"
+          href="/settings"
           icon={<Settings size={20} />}
           label="Configuração"
           currentPath={pathname}
         />
       </nav>
 
+      {/* Credit Balance */}
+      <div className="mb-4 mt-auto">
+        <CreditBalance />
+      </div>
+
       {/* Footer – Perfil e Logout */}
-      <footer className="mt-auto flex h-[71px] w-full items-center justify-between border-t border-[hsl(var(--sidebar-border))] p-4">
+      <footer className="flex h-[71px] w-full items-center justify-between border-t border-[hsl(var(--sidebar-border))] p-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
             {user?.imageUrl ? (

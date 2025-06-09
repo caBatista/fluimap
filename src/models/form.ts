@@ -1,5 +1,5 @@
-import mongoose, { Schema, type Document, type Model } from "mongoose";
-import { z } from "zod";
+import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { z } from 'zod';
 
 export const FormSchemaZod = z.object({
   teamId: z.string(),
@@ -20,7 +20,7 @@ const FormMongooseSchema: Schema = new Schema(
     dateClosing: { type: Date, required: true },
     questions: { type: [String], required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 interface IForm extends FormType, Document {}
@@ -29,7 +29,7 @@ function createFormModel(): Model<IForm> {
   if (mongoose.models.Form) {
     return mongoose.models.Form as Model<IForm>;
   }
-  return mongoose.model<IForm>("Form", FormMongooseSchema);
+  return mongoose.model<IForm>('Form', FormMongooseSchema);
 }
 
 const Form = createFormModel();

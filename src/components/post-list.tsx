@@ -1,6 +1,6 @@
-import { Posts } from "./posts";
-import { ScrollArea } from "./ui/scroll-area";
-import Post from "@/models/Posts";
+import { Posts } from './posts';
+import { ScrollArea } from './ui/scroll-area';
+import Post from '@/models/Posts';
 
 async function getPosts() {
   const data = await Post.find();
