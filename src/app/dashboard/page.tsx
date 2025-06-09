@@ -101,6 +101,7 @@ export default function CreateDashboardPage() {
   });
 
   const totalActiveSurveys = allSurveys.filter((s) => s.status === 'ativo').length;
+  const totalClosedSurveys = allSurveys.filter((s) => s.status === 'fechado').length;
   const totalTeams = teams.length;
 
   return (
@@ -132,16 +133,20 @@ export default function CreateDashboardPage() {
       )}
 
       <DashboardCards
-        activeTab={totalActiveSurveys}
-        totalTeams={totalTeams}
-        recentSurvey={recentSurvey}
+        activeSurveys={totalActiveSurveys}
+        closedSurveys={totalClosedSurveys}
+        surveyId={surveyId}
       />
 
       <DashboardNetworkGraph surveyId={surveyId} />
 
       <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DashboardRecentForms surveys={recentSurveys} />
-        <DashboardEngagement />
+
+        <DashboardEngagement 
+          activeSurveys={totalActiveSurveys}
+          closedSurveys={totalClosedSurveys}
+        />
       </div>
     </div>
   );
