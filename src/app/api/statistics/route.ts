@@ -34,8 +34,6 @@ type LeanSurvey = {
   __v: number;
 };
 
-type ResponseCount = { count: number };
-
 export async function GET() {
   try {
     await dbConnect();
@@ -155,18 +153,12 @@ export async function GET() {
 
     const recentSurveysWithStats = await Promise.all(
       recentSurveys.map(async (survey) => {
-        // Busca a contagem de respostas via API interna
-        const baseUrl =
-          process.env.NEXT_PUBLIC_BASE_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000';
-        const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
         let count = 0;
         try {
-          const res = await fetch(`${url}/api/responses?surveyId=${survey._id}`);
-          if (res.ok) {
-            const data = (await res.json()) as ResponseCount;
-            count = typeof data.count === 'number' ? data.count : 0;
-          }
-        } catch {}
+          count = await Response.countDocuments({ surveyId: survey._id });
+        } catch (e) {
+          console.error('Erro ao contar respostas do survey', survey._id, e);
+        }
 
         const respondentsInTeam = await Respondee.countDocuments({ teamId: survey.teamId });
         const total = Math.max(respondentsInTeam, 1);
@@ -176,6 +168,7 @@ export async function GET() {
           title: survey.title,
           date: survey.createdAt ?? new Date(),
           responses: count,
+          responsesCount: count,
           respondents: respondentsInTeam,
           total,
         };
