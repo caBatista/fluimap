@@ -30,7 +30,7 @@ export default function Sidebar() {
   return (
     <div className="z-50 flex h-screen w-[256px] flex-col bg-background shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
       {/* Header */}
-      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))]">
+      <header className="flex h-[64px] w-[256px] items-center justify-center border-b border-[hsl(var(--sidebar-border))] py-14">
         <Link href="/dashboard">
           <Image
             src="/LogoFluiMap.png"

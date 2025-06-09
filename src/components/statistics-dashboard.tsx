@@ -44,6 +44,7 @@ interface RecentSurvey {
   date: string | Date;
   responses: number;
   total: number;
+  responsesCount: number;
 }
 
 interface TeamStat {
@@ -335,29 +336,40 @@ export default function StatisticsDashboard() {
                     </TableHeader>
                     <TableBody>
                       {stats?.recentSurveys?.length ? (
-                        stats.recentSurveys.map((survey: RecentSurvey) => (
-                          <TableRow key={survey.id}>
-                            <TableCell className="font-medium">{survey.title}</TableCell>
-                            <TableCell>{format(new Date(survey.date), 'dd/MM/yyyy')}</TableCell>
-                            <TableCell>
-                              {survey.responses} / {survey.total}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Progress
-                                  value={(survey.responses / survey.total) * 100}
-                                  className="h-2 w-full"
-                                />
-                                <span className="text-xs">
-                                  {Math.round((survey.responses / survey.total) * 100)}%
-                                </span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
+                        stats.recentSurveys.map(
+                          (survey: RecentSurvey & { respondents?: number }) => {
+                            return (
+                              <TableRow key={survey.id}>
+                                <TableCell className="font-medium">{survey.title}</TableCell>
+                                <TableCell>{format(new Date(survey.date), 'dd/MM/yyyy')}</TableCell>
+                                <TableCell>
+                                  {survey.responsesCount ?? '0'} / {survey.respondents ?? '0'}
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Progress
+                                      value={
+                                        ((survey.responsesCount ?? 0) / (survey.respondents ?? 0)) *
+                                        100
+                                      }
+                                      className="align-right h-2 w-full"
+                                    />
+                                    <span className="text-xs">
+                                      {Math.round(
+                                        ((survey.responsesCount ?? 0) / (survey.respondents ?? 0)) *
+                                          100
+                                      )}
+                                      %
+                                    </span>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          }
+                        )
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={4} className="py-4 text-center text-muted-foreground">
+                          <TableCell colSpan={5} className="py-4 text-center text-muted-foreground">
                             Nenhuma pesquisa encontrada.
                           </TableCell>
                         </TableRow>
