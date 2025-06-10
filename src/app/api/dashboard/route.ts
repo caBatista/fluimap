@@ -152,9 +152,10 @@ export async function POST(req: NextRequest) {
     }
 
     const inputForR = { nodes: allNodes };
-    // console.log('Enviando para API R (input):', JSON.stringify(inputForR, null, 2)); // DEBUG
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gerar-grafo`, {
+    const baseUrl = process.env.R_API_URL ?? 'http://localhost:8000';
+
+    const response = await fetch(`${baseUrl}/gerar-grafo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(inputForR.nodes),
@@ -166,7 +167,6 @@ export async function POST(req: NextRequest) {
     }
 
     const modelResults = (await response.json()) as GrafoType;
-    // console.log('Resposta da API R (output):', JSON.stringify(modelResults, null, 2)); // DEBUG
 
     return NextResponse.json({ nodes: allNodes, modelResults }, { status: 200 });
   } catch (err) {
