@@ -3,12 +3,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardCards } from '@/components/dashboard/dashboard-cards';
 import { DashboardNetworkGraph } from '@/components/dashboard/dashboard-network-graph';
 import { DashboardRecentForms } from '@/components/dashboard/dashboard-recent-forms';
 import { DashboardEngagement } from '@/components/dashboard/dashboard-engagement';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type Survey = {
   _id: string;
@@ -35,6 +43,7 @@ const surveysSchema = z.object({
 export default function CreateDashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectedSurveyId, setSelectedSurveyId] = useState<string | undefined>(undefined);
 
   const { data: allSurveys = [] } = useQuery<Survey[]>({
     queryKey: ['surveys'],
@@ -52,12 +61,16 @@ export default function CreateDashboardPage() {
     },
   });
 
-  const surveyId = searchParams.get('surveyId') ?? allSurveys[0]?._id;
+  useEffect(() => {
+    if (!selectedSurveyId && allSurveys.length > 0) {
+      setSelectedSurveyId(searchParams.get('surveyId') ?? (allSurveys[0]?._id ?? ''));
+    }
+  }, [allSurveys, searchParams, selectedSurveyId]);
 
-  const handleSurveyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = event.target.value;
+  const handleSurveyChange = (value: string) => {
+    setSelectedSurveyId(value);
     const params = new URLSearchParams(searchParams.toString());
-    params.set('surveyId', selectedId);
+    params.set('surveyId', value);
     router.push(`?${params.toString()}`);
   };
 
@@ -73,7 +86,6 @@ export default function CreateDashboardPage() {
     <div className="flex min-h-screen flex-col px-8 py-4">
       <DashboardHeader />
 
-      {}
       {allSurveys.length > 0 && (
         <div className="mb-0.2 max-w-xs">
           <label
@@ -82,28 +94,28 @@ export default function CreateDashboardPage() {
           >
             <h2 className="mb-2.5 text-lg font-semibold">Selecionar Formulário</h2>
           </label>
-          <select
-            id="survey-select"
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-            value={surveyId}
-            onChange={handleSurveyChange}
-          >
-            {allSurveys.map((survey) => (
-              <option key={survey._id} value={survey._id}>
-                {survey.title} {survey.status === 'fechado' ? '(Fechado)' : ''}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedSurveyId} onValueChange={handleSurveyChange}>
+            <SelectTrigger className="w-full rounded-md border border-muted-background bg-background px-3 py-2 text-sm shadow-sm text-foreground">
+              <SelectValue placeholder="Selecione um formulário" />
+            </SelectTrigger>
+            <SelectContent className="w-full text-sm">
+              {allSurveys.map((survey) => (
+                <SelectItem key={survey._id} value={survey._id} className="pl-2">
+                  {survey.title} {survey.status === 'fechado' ? '(Fechado)' : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       <DashboardCards
         activeSurveys={totalActiveSurveys}
         closedSurveys={totalClosedSurveys}
-        surveyId={surveyId}
+        surveyId={selectedSurveyId}
       />
 
-      <DashboardNetworkGraph surveyId={surveyId} />
+      <DashboardNetworkGraph surveyId={selectedSurveyId} />
 
       <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DashboardRecentForms surveys={recentSurveys} />
