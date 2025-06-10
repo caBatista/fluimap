@@ -116,14 +116,12 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
           networkRef.current.destroy();
         }
 
-        const isDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
-
         const options = {
           nodes: {
             shape: 'dot',
             size: 20,
             font: {
-              color: isDark ? '#FFFFFF' : '#000000',
+              color: 'text-foreground',
               size: 14,
             },
           },
@@ -134,7 +132,7 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
             PM: { color: { background: '#800080' } },
           },
           edges: {
-            color: isDark ? '#AAAAAA' : '#333333',
+            color: 'text-foreground',
             width: 2,
             scaling: {
               min: 1,
