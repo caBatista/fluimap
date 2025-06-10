@@ -10,8 +10,6 @@ import { DashboardNetworkGraph } from '@/components/dashboard/dashboard-network-
 import { DashboardRecentForms } from '@/components/dashboard/dashboard-recent-forms';
 import { DashboardEngagement } from '@/components/dashboard/dashboard-engagement';
 
-import { type EditTeamType } from '@/models/Team';
-
 type Survey = {
   _id: string;
   title: string;
@@ -68,41 +66,8 @@ export default function CreateDashboardPage() {
     .sort((a, b) => new Date(b.dateClosing!).getTime() - new Date(a.dateClosing!).getTime())
     .slice(0, 3);
 
-  const recentSurvey = 0;
-
-  function isTeam(item: unknown): item is EditTeamType {
-    return (
-      typeof item === 'object' &&
-      item !== null &&
-      'name' in item &&
-      typeof (item as Record<string, unknown>).name === 'string'
-    );
-  }
-
-  function isApiTeamResponse(data: unknown): data is { teams: unknown[] } {
-    return (
-      typeof data === 'object' &&
-      data !== null &&
-      Array.isArray((data as { teams?: unknown }).teams)
-    );
-  }
-
-  const { data: teams = [] } = useQuery<EditTeamType[]>({
-    queryKey: ['teams'],
-    queryFn: async () => {
-      const res = await fetch('/api/teams');
-      if (!res.ok) throw new Error('Erro ao buscar times');
-      const json: unknown = await res.json();
-      if (!isApiTeamResponse(json)) {
-        throw new Error('Formato inválido da resposta da API');
-      }
-      return json.teams.filter(isTeam);
-    },
-  });
-
   const totalActiveSurveys = allSurveys.filter((s) => s.status === 'ativo').length;
   const totalClosedSurveys = allSurveys.filter((s) => s.status === 'fechado').length;
-  const totalTeams = teams.length;
 
   return (
     <div className="flex min-h-screen flex-col px-8 py-4">
@@ -143,7 +108,7 @@ export default function CreateDashboardPage() {
       <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DashboardRecentForms surveys={recentSurveys} />
 
-        <DashboardEngagement 
+        <DashboardEngagement
           activeSurveys={totalActiveSurveys}
           closedSurveys={totalClosedSurveys}
         />

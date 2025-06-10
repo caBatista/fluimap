@@ -1,7 +1,6 @@
 'use client';
 
-import { Download, AlertTriangle, Zap, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Zap, CheckCircle } from 'lucide-react';
 
 interface DashboardEngagementProps {
   activeSurveys: number;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList, Users, BarChart2, Star } from 'lucide-react';
+import { ClipboardList, Users, BarChart2 } from 'lucide-react';
 
 interface DashboardCardsProps {
   activeSurveys: number;
@@ -19,9 +19,9 @@ export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: Dashb
 
       try {
         const responsesResponse = await fetch(`/api/responses?surveyId=${surveyId}`);
-        const responsesData = await responsesResponse.json();
+        const responsesData = (await responsesResponse.json()) as { count?: number };
 
-        if (responsesData.count !== undefined) {
+        if (typeof responsesData.count === 'number') {
           setResponseCount(responsesData.count);
         }
       } catch (error) {
@@ -29,7 +29,7 @@ export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: Dashb
       }
     }
 
-    fetchResponseCount();
+    void fetchResponseCount();
   }, [surveyId]);
 
   const cards = [
@@ -37,26 +37,17 @@ export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: Dashb
       title: 'Formulários Ativos',
       value: activeSurveys,
       icon: <ClipboardList className="text-blue-500" />,
-      // trend: '+12%',
-      // trendDescription: 'do mês passado',
-      // trendColor: 'text-green-500',
     },
     {
       title: 'Formulários Fechados',
       value: closedSurveys,
       icon: <Users className="text-green-500" />,
-      // trend: '+3%',
-      // trendDescription: 'novos times',
-      // trendColor: 'text-green-500',
     },
     {
       title: 'Número de Respostas',
       value: responseCount,
       icon: <BarChart2 className="text-indigo-400" />,
-      // trend: '+7%',
-      // trendDescription: 'da pesquisa anterior',
-      // trendColor: 'text-green-500',
-    }
+    },
   ];
 
   return (
@@ -73,9 +64,6 @@ export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: Dashb
                 {card.icon}
               </div>
             </div>
-            {/* <p className={`mt-2 text-sm ${card.trendColor}`}>
-              {card.trend} <span className="text-muted-foreground">{card.trendDescription}</span>
-            </p> */}
           </CardContent>
         </Card>
       ))}
