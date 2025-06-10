@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No respondees found for this team' }, { status: 400 });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
     const respondeeLinks = respondees.map((respondee) => {
       const uniqueLink = `${baseUrl}/questionnaire/${surveyId}/${String(respondee._id)}?teamId=${teamId}&email=${encodeURIComponent(respondee.email)}`;
