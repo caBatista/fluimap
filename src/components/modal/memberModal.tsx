@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GenericModal } from './genericModal';
-import { DownloadIcon } from 'lucide-react';
+import { DownloadIcon, UploadIcon } from 'lucide-react';
 import { DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { type EditTeamType } from '@/models/Team';
@@ -32,9 +32,14 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
     }
   }, [isOpen]);
 
-  // Função para lidar com o envio do formulário
   function handleSubmit() {
-    onSubmit(memberName, memberEmail, memberPosition); // Passa os dados de membro
+    const formattedName = memberName
+      .split(' ')
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    onSubmit(formattedName, memberEmail, memberPosition);
   }
 
   function handleTitle(selectedTeam: EditTeamType | null | undefined): string {
@@ -64,11 +69,20 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
         try {
           // Expect columns: name, email, role
           const respondees = results.data
-            .map((row) => ({
-              name: row.name?.trim() || '',
-              email: row.email?.trim() || '',
-              role: row.role?.trim() || '',
-            }))
+            .map((row) => {
+              const formattedName = row.name
+                ? row.name
+                    .split(' ')
+                    .filter(Boolean)
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')
+                : '';
+              return {
+                name: formattedName,
+                email: row.email?.trim() || '',
+                role: row.role?.trim() || '',
+              };
+            })
             .filter((r) => r.name && r.email && r.role);
           if (respondees.length === 0) {
             toast.error('O arquivo CSV não contém dados válidos.');
@@ -193,7 +207,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 htmlFor="csv-upload"
                 className="flex h-[40px] w-[110px] items-center justify-center gap-1 rounded-[6px] border bg-[hsl(var(--card))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
               >
-                <DownloadIcon className="h-5 w-5" />
+                <UploadIcon className="h-5 w-5" />
                 Arq. CSV
                 <Input
                   id="csv-upload"
@@ -221,7 +235,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 variant="outline"
                 size="lg"
                 type="button"
-                className="flex h-[40px] w-[78px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
+                className="flex h-[40px] w-[80px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
                 onClick={onClose}
               >
                 Cancelar
@@ -230,7 +244,7 @@ export function MemberModal({ isOpen, onClose, onSubmit, selectedTeam }: MemberM
                 variant="outline"
                 size="lg"
                 type="submit"
-                className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+                className="flex h-[40px] w-[80px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               >
                 Salvar
               </Button>

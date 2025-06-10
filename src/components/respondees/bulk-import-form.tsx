@@ -26,7 +26,6 @@ export function BulkImportForm({ teamId, onSuccess }: BulkImportFormProps) {
     try {
       setIsLoading(true);
 
-      // Simple CSV parsing (name, email, role)
       const rows = csvData
         .split('\n')
         .map((row) => row.trim())
@@ -37,13 +36,12 @@ export function BulkImportForm({ teamId, onSuccess }: BulkImportFormProps) {
         return { name, email, role };
       });
 
-      // Validate the data
       const invalidRows = respondees.filter(
         (row) => !row.name || !row.email || !row.email.includes('@') || !row.role
       );
 
       if (invalidRows.length > 0) {
-        throw new Error(`Invalid data in CSV. Each row must contain name, email, and role.`);
+        throw new Error(`Dados inválidos no CSV. Cada linha deve conter nome, e-mail e cargo.`);
       }
 
       const response = await fetch('/api/respondees', {
@@ -59,19 +57,19 @@ export function BulkImportForm({ teamId, onSuccess }: BulkImportFormProps) {
 
       if (!response.ok) {
         const errorData = (await response.json()) as ApiError;
-        throw new Error(errorData.error || 'Failed to import team members');
+        throw new Error(errorData.error || 'Falha ao importar membros da equipe');
       }
 
-      toast.success(`Successfully imported ${respondees.length} team members`);
+      toast.success(`Importação de ${respondees.length} membros realizada com sucesso`);
       setCsvData('');
-      // Update respondees data after successful import
+
       void queryClient.invalidateQueries({ queryKey: ['respondees', teamId] });
       onSuccess?.();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error('An unknown error occurred');
+        toast.error('Ocorreu um erro desconhecido');
       }
     } finally {
       setIsLoading(false);
@@ -81,25 +79,26 @@ export function BulkImportForm({ teamId, onSuccess }: BulkImportFormProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Bulk Import Team Members</CardTitle>
+        <CardTitle>Importação em Massa de Membros</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
             <p className="mb-2 text-sm text-muted-foreground">
-              Enter CSV data with format: <span className="font-mono">name, email, role</span>
+              Insira os dados em CSV no formato:{' '}
+              <span className="font-mono">nome, e-mail, cargo</span>
               <br />
-              One entry per line.
+              Uma entrada por linha.
             </p>
             <Textarea
               value={csvData}
               onChange={(e) => setCsvData(e.target.value)}
-              placeholder="John Doe, john@example.com, Developer\nJane Smith, jane@example.com, Manager"
+              placeholder="João Silva, joao@email.com, Desenvolvedor\nMaria Souza, maria@email.com, Gestora"
               className="h-[150px] font-mono"
             />
           </div>
           <Button onClick={() => void handleImport()} disabled={isLoading || !csvData.trim()}>
-            {isLoading ? 'Importing...' : 'Import Members'}
+            {isLoading ? 'Importando...' : 'Importar Membros'}
           </Button>
         </div>
       </CardContent>

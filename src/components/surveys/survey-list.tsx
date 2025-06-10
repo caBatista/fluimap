@@ -16,6 +16,7 @@ export type SurveyResponse = {
   expiresInDays?: number;
   dateClosing?: string;
   email?: string;
+  respondents?: number;
 };
 
 export interface SurveyListProps {
@@ -76,7 +77,10 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
           : survey.status === 'fechado'
             ? 'ativo'
             : (survey.status ?? 'ativo');
-        const progressValue = survey.progress ?? 0;
+        const progressValue =
+          survey.respondents && survey.respondents > 0
+            ? Math.round(((survey.responsesCount ?? 0) / survey.respondents) * 100)
+            : 0;
 
         return (
           <div key={survey._id} className="block h-full w-full">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
@@ -47,6 +47,7 @@ interface SurveyFormProps {
 export function SurveyForm({ onSuccess }: SurveyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: teams = [] } = useQuery<{ _id: string; name: string }[]>({
     queryKey: ['teams'],
@@ -114,7 +115,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
         const runResponse = await fetch('/api/surveys/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teamId: data.teamId }),
+          body: JSON.stringify({ teamId: data.teamId, surveyId: newSurveyId }),
         });
         if (!runResponse.ok) {
           const runErr: unknown = await runResponse.json();
@@ -126,6 +127,9 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
               ? (runErr as { error: string }).error
               : JSON.stringify(runErr) || 'Erro ao iniciar o envio dos questionários';
           alert('Erro ao iniciar o envio dos questionários: ' + runErrorMsg);
+        } else {
+          // Invalidate credit balance cache since credits were deducted
+          void queryClient.invalidateQueries({ queryKey: ['credit-balance'] });
         }
       } catch (runError) {
         console.error(runError);
@@ -152,10 +156,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto w-full max-w-4xl space-y-6 p-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full space-y-6 p-6">
         <Card className="border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-[hsl(var(--foreground))]">

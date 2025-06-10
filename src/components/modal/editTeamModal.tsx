@@ -85,7 +85,7 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
             variant="outline"
             size="lg"
             type="button"
-            className="flex h-[40px] w-[78px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
+            className="flex h-[40px] w-[80px] items-center justify-center gap-1 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={onClose}
           >
             Cancelar
@@ -94,7 +94,7 @@ export function EditTeamModal({ isOpen, onClose, onSubmit, team }: TeamModalProp
             variant="outline"
             size="lg"
             type="submit"
-            className="flex h-[40px] w-[105px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+            className="flex h-[40px] w-[80px] items-center justify-center gap-1 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
             onClick={handleEdit}
           >
             Salvar
