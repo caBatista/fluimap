@@ -28,7 +28,10 @@ type EdgeData = {
 
 type DashboardResponse = {
   nodes: NodeData[];
-  edges: EdgeData[];
+  modelResults: {
+    nodes: NodeData[];
+    edges: EdgeData[];
+  }
 };
 
 export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) {
@@ -68,8 +71,8 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
 
         const result = JSON.parse(text) as DashboardResponse;
 
-        const rawNodes = Array.isArray(result.nodes) ? result.nodes : [];
-        const rawEdges = Array.isArray(result.edges) ? result.edges : [];
+        const rawNodes = Array.isArray(result.modelResults.nodes) ? result.modelResults.nodes : [];
+        const rawEdges = Array.isArray(result.modelResults.edges) ? result.modelResults.edges : [];
 
         const uniqueNodesMap = new Map<string, NodeData>();
         rawNodes.forEach((n) => {
@@ -125,14 +128,8 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
               size: 14,
             },
           },
-          groups: {
-            Líder: { color: { background: '#1E90FF' } },
-            Dev: { color: { background: '#32CD32' } },
-            QA: { color: { background: '#FF8C00' } },
-            PM: { color: { background: '#800080' } },
-          },
           edges: {
-            color: 'text-foreground',
+            color: 'rgba(150, 150, 150, 0.5)',
             width: 2,
             scaling: {
               min: 1,
