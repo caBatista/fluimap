@@ -46,7 +46,7 @@ export function DashboardRecentForms({ surveys }: SurveyListProps) {
 
       <div className="space-y-4">
         {surveys.map((survey) => {
-            const isExpired = survey.status === 'fechado';
+          const isExpired = survey.status === 'fechado';
           const statusText: 'ativo' | 'rascunho' | 'fechado' = isExpired
             ? 'fechado'
             : survey.status === 'fechado'
