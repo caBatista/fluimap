@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+const responsesCountSchema = z.object({ count: z.number().optional() });
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -61,6 +62,21 @@ export default function CreateDashboardPage() {
     },
   });
 
+  const { data: responsesCount = 0 } = useQuery<number>({
+    queryKey: ['responsesCount'],
+    queryFn: async () => {
+      const response = await fetch('/api/responses/count');
+      if (!response.ok) throw new Error('Failed to fetch responses count');
+      const json = (await response.json()) as unknown;
+      const parsed = responsesCountSchema.safeParse(json);
+      if (!parsed.success) {
+        console.error(parsed.error);
+        return 0;
+      }
+      return typeof parsed.data.count === 'number' ? parsed.data.count : 0;
+    },
+  });
+
   useEffect(() => {
     if (!selectedSurveyId && allSurveys.length > 0) {
       setSelectedSurveyId(searchParams.get('surveyId') ?? (allSurveys[0]?._id ?? ''));
@@ -112,6 +128,7 @@ export default function CreateDashboardPage() {
       <DashboardCards
         activeSurveys={totalActiveSurveys}
         closedSurveys={totalClosedSurveys}
+        responsesCount={responsesCount}
         surveyId={selectedSurveyId}
       />
 

@@ -1,37 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ClipboardList, Users, BarChart2 } from 'lucide-react';
 
 interface DashboardCardsProps {
   activeSurveys: number;
   closedSurveys: number;
+  responsesCount: number;
   surveyId?: string;
 }
 
-export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: DashboardCardsProps) {
-  const [responseCount, setResponseCount] = useState<number>(0);
-
-  useEffect(() => {
-    async function fetchResponseCount() {
-      if (!surveyId) return;
-
-      try {
-        const responsesResponse = await fetch(`/api/responses?surveyId=${surveyId}`);
-        const responsesData = (await responsesResponse.json()) as { count?: number };
-
-        if (typeof responsesData.count === 'number') {
-          setResponseCount(responsesData.count);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar taxa de resposta:', error);
-      }
-    }
-
-    void fetchResponseCount();
-  }, [surveyId]);
-
+export function DashboardCards({ activeSurveys, closedSurveys, responsesCount }: DashboardCardsProps) {
   const cards = [
     {
       title: 'Formulários Ativos',
@@ -45,7 +24,7 @@ export function DashboardCards({ activeSurveys, closedSurveys, surveyId }: Dashb
     },
     {
       title: 'Número de Respostas',
-      value: responseCount,
+      value: responsesCount,
       icon: <BarChart2 className="text-indigo-400" />,
     },
   ];
