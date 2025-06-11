@@ -81,6 +81,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: -5 } }, { new: true });
+    let creditsRefunded = false;
+
     const team = await Team.findById(teamId);
 
     if (!team) {
@@ -122,15 +125,16 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         emailResults.push({ status: 'rejected', reason: error });
       }
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     // Check if at least one email was sent successfully
     const successfulEmails = emailResults.filter((result) => result.status === 'fulfilled');
 
-    if (successfulEmails.length > 0) {
-      await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: -5 } }, { new: true });
-      console.log(`Deducted 5 credits from user ${userId}. Remaining credits: ${user.credits - 5}`);
+    if (successfulEmails.length === 0 && !creditsRefunded) {
+      await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: 5 } }, { new: true });
+      creditsRefunded = true;
+      console.log(`Refunded 5 credits to user ${userId} due to email failure.`);
     }
 
     revalidatePath(`/surveys`);
