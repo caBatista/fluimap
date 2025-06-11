@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
-    "dev": "concurrently \"next dev\" \"Rscript r-model/plumber.R\"",
+    "dev": "concurrently \"next dev --turbopack\" \"Rscript r-model/plumber.R\"",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
