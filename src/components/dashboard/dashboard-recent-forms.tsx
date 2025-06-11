@@ -60,9 +60,7 @@ export function DashboardRecentForms({ surveys }: SurveyListProps) {
                 const diffDays = Math.ceil(
                   (new Date(survey.dateClosing).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
                 );
-                return diffDays < 0
-                  ? `Expirado há ${Math.abs(diffDays)} dias`
-                  : `Expira em ${diffDays} dias`;
+                return isExpired ? `` : `Expira em ${diffDays} dias`;
               })()
             : 'Sem data de expiração';
 

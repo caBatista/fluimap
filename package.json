@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
-    "dev": "next dev --turbo",
+    "dev": "concurrently \"next dev\" \"Rscript r-model/plumber.R\"",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
@@ -71,6 +71,7 @@
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
+    "concurrently": "^9.1.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.1",
     "postcss": "^8.4.39",

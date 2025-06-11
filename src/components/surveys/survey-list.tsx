@@ -118,21 +118,14 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
               </div>
 
               <div className="mt-2 flex items-center justify-between">
-                <span
-                  className={cn(
-                    'text-xs',
-                    isExpired ? 'text-red-500' : 'text-[hsl(var(--muted-foreground))]'
-                  )}
-                >
+                <span className={cn('text-xs', 'text-[hsl(var(--muted-foreground))]')}>
                   {survey.dateClosing
                     ? (() => {
                         const diffDays = Math.ceil(
                           (new Date(survey.dateClosing).getTime() - Date.now()) /
                             (1000 * 60 * 60 * 24)
                         );
-                        return diffDays < 0
-                          ? `Expirado há ${Math.abs(diffDays)} dias`
-                          : `Expira em ${diffDays} dias`;
+                        return isExpired ? `` : `Expira em ${diffDays} dias`;
                       })()
                     : 'Sem data de expiração'}
                 </span>

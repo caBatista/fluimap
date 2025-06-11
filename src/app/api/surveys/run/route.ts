@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No respondees found for this team' }, { status: 400 });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
     const respondeeLinks = respondees.map((respondee) => {
       const uniqueLink = `${baseUrl}/questionnaire/${surveyId}/${String(respondee._id)}?teamId=${teamId}&email=${encodeURIComponent(respondee.email)}`;
@@ -110,11 +110,20 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    const emailResults = await Promise.allSettled(
-      respondeeLinks.map((respondee) =>
-        sendEmail({ name: respondee.name, email: respondee.email, link: respondee.link })
-      )
-    );
+    const emailResults = [];
+    for (const respondee of respondeeLinks) {
+      try {
+        const result = await sendEmail({
+          name: respondee.name,
+          email: respondee.email,
+          link: respondee.link,
+        });
+        emailResults.push({ status: 'fulfilled', value: result });
+      } catch (error) {
+        emailResults.push({ status: 'rejected', reason: error });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
 
     // Check if at least one email was sent successfully
     const successfulEmails = emailResults.filter((result) => result.status === 'fulfilled');
