@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
       const respondees = await Respondee.find({ teamId: survey.teamId }).lean();
       // Busca todos os emails que já responderam para esse survey
       const responses = await ResponseModel.find({ surveyId }).lean();
-      const answeredEmails = new Set(responses.map(r => r.email));
-      const allAnswered = respondees.every(r => answeredEmails.has(r.email));
+      const answeredEmails = new Set(responses.map((r) => r.email));
+      const allAnswered = respondees.every((r) => answeredEmails.has(r.email));
       if (allAnswered && survey.status === 'ativo') {
         // Fecha o survey
         await Survey.findByIdAndUpdate(surveyId, { status: 'fechado', dateClosing: new Date() });

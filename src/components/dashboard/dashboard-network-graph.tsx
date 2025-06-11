@@ -31,7 +31,7 @@ type DashboardResponse = {
   modelResults: {
     nodes: NodeData[];
     edges: EdgeData[];
-  }
+  };
 };
 
 export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) {

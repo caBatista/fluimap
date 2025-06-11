@@ -46,7 +46,8 @@ export default async function QuestionnairePage({
         <div className="flex flex-col items-center gap-6">
           <h2 className="text-5xl font-bold">Pesquisa encerrada</h2>
           <p className="text-2xl leading-relaxed">
-            Esta pesquisa foi encerrada.<br />
+            Esta pesquisa foi encerrada.
+            <br />
             Obrigado pelo seu interesse!
           </p>
           <CheckCircle size={72} strokeWidth={1.5} />
@@ -71,7 +72,8 @@ export default async function QuestionnairePage({
         <div className="flex flex-col items-center gap-6">
           <h2 className="text-5xl font-bold">Pesquisa já respondida</h2>
           <p className="text-2xl leading-relaxed">
-            Você já respondeu a esta pesquisa.<br />
+            Você já respondeu a esta pesquisa.
+            <br />
             Obrigado pela sua participação!
           </p>
           <CheckCircle size={72} strokeWidth={1.5} />

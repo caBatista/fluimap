@@ -10,7 +10,11 @@ interface DashboardCardsProps {
   surveyId?: string;
 }
 
-export function DashboardCards({ activeSurveys, closedSurveys, responsesCount }: DashboardCardsProps) {
+export function DashboardCards({
+  activeSurveys,
+  closedSurveys,
+  responsesCount,
+}: DashboardCardsProps) {
   const cards = [
     {
       title: 'Formulários Ativos',

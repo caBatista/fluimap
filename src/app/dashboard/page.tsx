@@ -79,7 +79,7 @@ export default function CreateDashboardPage() {
 
   useEffect(() => {
     if (!selectedSurveyId && allSurveys.length > 0) {
-      setSelectedSurveyId(searchParams.get('surveyId') ?? (allSurveys[0]?._id ?? ''));
+      setSelectedSurveyId(searchParams.get('surveyId') ?? allSurveys[0]?._id ?? '');
     }
   }, [allSurveys, searchParams, selectedSurveyId]);
 
@@ -111,7 +111,7 @@ export default function CreateDashboardPage() {
             <h2 className="mb-2.5 text-lg font-semibold">Selecionar Formulário</h2>
           </label>
           <Select value={selectedSurveyId} onValueChange={handleSurveyChange}>
-            <SelectTrigger className="w-full rounded-md border border-muted-background bg-background px-3 py-2 text-sm shadow-sm text-foreground">
+            <SelectTrigger className="border-muted-background w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground shadow-sm">
               <SelectValue placeholder="Selecione um formulário" />
             </SelectTrigger>
             <SelectContent className="w-full text-sm">
