@@ -101,7 +101,7 @@ export default function CreateDashboardPage() {
             <SelectContent className="w-full text-sm">
               {allSurveys.map((survey) => (
                 <SelectItem key={survey._id} value={survey._id} className="pl-2">
-                  {survey.title} {survey.status === 'fechado' ? '(Fechado)' : ''}
+                  {survey.title} {survey.status === 'ativo' ? '(Ativo)' : ''}
                 </SelectItem>
               ))}
             </SelectContent>
