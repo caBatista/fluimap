@@ -92,39 +92,39 @@ const directionMap: Record<string, string> = {
 };
 
 async function convertResponseToApplied(response: ResponseDBEntry): Promise<ResponseApplied> {
-  const firstAnswer = response.answersByUser[0];
-  if (!firstAnswer) return { nodes: [] };
+  if (!response.answersByUser || response.answersByUser.length === 0) return { nodes: [] };
 
-  const { name, answers } = firstAnswer;
-  const typedAnswers = answers as Partial<AnswerValues>;
+  const nodes: InputNode[] = [];
 
-  const respondee = await Respondee.findOne({ name: name });
-  if (!respondee) {
-    // console.warn(`Respondee não encontrado para: ${name}`); // DEBUG
-    return { nodes: [] };
+  for (const answerByUser of response.answersByUser) {
+    const { name, answers } = answerByUser;
+    const typedAnswers = answers as Partial<AnswerValues>;
+
+    const respondee = await Respondee.findOne({ name: name });
+    if (!respondee) {
+      continue;
+    }
+
+    const team = await Team.findById(respondee.teamId);
+    if (!team) {
+      continue;
+    }
+
+    const node: InputNode = {
+      Pessoa: respondee.name,
+      Papel: ['Líder', 'Membro', 'Coordenador'].includes(respondee.role) ? respondee.role : 'Membro',
+      Equipe: team.name,
+      Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
+      Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
+      Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 1,
+      Objetividade: objectivityMap[typedAnswers.q3 ?? ''] ?? 1,
+      Efetividade: effectivenessMap[typedAnswers.q4 ?? ''] ?? 1,
+      Comunicacao: 'Assíncrona', // nao sei oq faço com esse campo
+    };
+    nodes.push(node);
   }
 
-  const team = await Team.findById(respondee.teamId);
-  if (!team) {
-    // console.warn(
-    //   `Time não encontrado para respondee ${respondee.name} (teamId: ${respondee.teamId})`
-    // ); // DEBUG
-    return { nodes: [] };
-  }
-
-  const node: InputNode = {
-    Pessoa: respondee.name,
-    Papel: ['Líder', 'Membro', 'Coordenador'].includes(respondee.role) ? respondee.role : 'Membro',
-    Equipe: team.name,
-    Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
-    Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
-    Clareza: clarityMap[typedAnswers.q2 ?? ''] ?? 1,
-    Objetividade: objectivityMap[typedAnswers.q3 ?? ''] ?? 1,
-    Efetividade: effectivenessMap[typedAnswers.q4 ?? ''] ?? 1,
-    Comunicacao: 'Assíncrona', // nao sei oq faço com esse campo
-  };
-
-  return { nodes: [node] };
+  return { nodes };
 }
 
 // itera sob todas as responses do mesmo formulario para gerar o processamento do modelo
