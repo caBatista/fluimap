@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GenericModal } from "@/components/modal/genericModal";
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { GenericModal } from '@/components/modal/genericModal';
 
 interface Survey {
   surveyId: string;
@@ -30,23 +30,23 @@ export function DashboardAdminSections() {
   const deleteUserMutation = useMutation({
     mutationFn: async (id: string): Promise<{ message: string }> => {
       const res = await fetch(`/api/userManagement/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
-      if (!res.ok) throw new Error("Erro ao excluir usuário");
+      if (!res.ok) throw new Error('Erro ao excluir usuário');
       return res.json() as Promise<{ message: string }>;
     },
     onSuccess: () => {
       setIsModalOpen(false);
-      void queryClient.invalidateQueries({ queryKey: ["users"] });
+      void queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
   const { data: users = [] } = useQuery<UserManagement[]>({
-    queryKey: ["users"],
+    queryKey: ['users'],
     queryFn: async (): Promise<UserManagement[]> => {
-      const res = await fetch("/api/userManagement");
-      if (!res.ok) throw new Error("Erro ao buscar usuários");
+      const res = await fetch('/api/userManagement');
+      if (!res.ok) throw new Error('Erro ao buscar usuários');
       return res.json() as Promise<UserManagement[]>;
     },
   });
@@ -56,10 +56,10 @@ export function DashboardAdminSections() {
     isLoading,
     error,
   } = useQuery<Survey[]>({
-    queryKey: ["surveys-all"],
+    queryKey: ['surveys-all'],
     queryFn: async (): Promise<Survey[]> => {
-      const res = await fetch("/api/administration");
-      if (!res.ok) throw new Error("Erro ao buscar formulários");
+      const res = await fetch('/api/administration');
+      if (!res.ok) throw new Error('Erro ao buscar formulários');
       return res.json() as Promise<Survey[]>;
     },
   });
@@ -69,17 +69,17 @@ export function DashboardAdminSections() {
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-md rounded-2xl">
+      <Card className="rounded-2xl shadow-md">
         <CardContent className="p-4">
-          <h2 className="text-xl font-semibold mb-4">Gestão de Usuários</h2>
+          <h2 className="mb-4 text-xl font-semibold">Gestão de Usuários</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full w-full table-fixed text-sm text-left">
+            <table className="w-full min-w-full table-fixed text-left text-sm">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 w-[85%]">Nome</th>
-                  <th className="px-4 py-2 w-[85%]">Créditos</th>
-                  <th className="px-4 py-2 w-[85%]">Data de Expiração</th>
-                  <th className="px-4 py-2 w-[15%]">Ação</th>
+                  <th className="w-[85%] px-4 py-2">Nome</th>
+                  <th className="w-[85%] px-4 py-2">Créditos</th>
+                  <th className="w-[85%] px-4 py-2">Data de Expiração</th>
+                  <th className="w-[15%] px-4 py-2">Ação</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,14 +114,11 @@ export function DashboardAdminSections() {
         description={`Tem certeza que deseja desativar o usuário ${selectedUserName}?`}
       >
         <div className="flex justify-end gap-4">
-          <button
-            className="px-4 py-2 rounded-md"
-            onClick={() => setIsModalOpen(false)}
-          >
+          <button className="rounded-md px-4 py-2" onClick={() => setIsModalOpen(false)}>
             Cancelar
           </button>
           <button
-            className="px-4 py-2 bg-red-600 text-white rounded-md"
+            className="rounded-md bg-red-600 px-4 py-2 text-white"
             onClick={() => {
               if (selectedUserId) {
                 deleteUserMutation.mutate(selectedUserId);
@@ -132,11 +129,11 @@ export function DashboardAdminSections() {
           </button>
         </div>
       </GenericModal>
-      <Card className="shadow-md rounded-2xl">
+      <Card className="rounded-2xl shadow-md">
         <CardContent className="p-4">
-          <h2 className="text-xl font-semibold mb-4">Administração</h2>
+          <h2 className="mb-4 text-xl font-semibold">Administração</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-left">
+            <table className="min-w-full text-left text-sm">
               <thead>
                 <tr>
                   <th className="px-4 py-2">Formulário</th>

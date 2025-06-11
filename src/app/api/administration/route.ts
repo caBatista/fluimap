@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/server/database/db";
-import Survey from "@/models/Survey";
-import Team from "@/models/Team";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/server/database/db';
+import Survey from '@/models/Survey';
+import Team from '@/models/Team';
 
 function normalizeId(id: unknown): string {
-  return typeof id === "string" ? id : id?.toString?.() ?? "";
+  return typeof id === 'string' ? id : (id?.toString?.() ?? '');
 }
 
 export async function GET() {
@@ -23,7 +23,7 @@ export async function GET() {
         return {
           surveyId: survey._id,
           surveyTitle: survey.title,
-          teamName: team?.name ?? "Time não encontrado",
+          teamName: team?.name ?? 'Time não encontrado',
           status: survey.status,
           dateClosing: survey.dateClosing,
         };
@@ -32,7 +32,7 @@ export async function GET() {
 
     return NextResponse.json(dashboardData);
   } catch (error) {
-    console.error("Erro ao montar dashboard:", error);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    console.error('Erro ao montar dashboard:', error);
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
 }
