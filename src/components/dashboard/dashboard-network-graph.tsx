@@ -35,6 +35,7 @@ type DashboardResponse = {
 };
 
 export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) {
+  const [themeVersion, setThemeVersion] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -42,6 +43,14 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
 
   useEffect(() => {
     if (!surveyId) return;
+
+    function getForegroundColor() {
+      if (typeof window === 'undefined') return '#222';
+      const root = window.getComputedStyle(document.documentElement);
+      const foreground = root.getPropertyValue('--foreground').trim();
+      if (!foreground) return '#222';
+      return `hsl(${foreground})`;
+    }
 
     setLoading(true);
     setHasError(false);
@@ -84,6 +93,15 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
         const uniqueNodes = Array.from(uniqueNodesMap.values());
 
         const idMap = new Map<string, number>();
+        function getRandomColor() {
+          const letters = '0123456789ABCDEF';
+          let color = '#';
+          for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+
         const nodes = uniqueNodes.map((n, index) => {
           const id = index + 1;
           idMap.set(n.Pessoa, id);
@@ -91,6 +109,8 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
             id,
             label: n.Pessoa,
             group: n.Papel,
+            color: getRandomColor(),
+            font: { color: getForegroundColor() },
             title: `Frequência: ${n.Frequencia ?? 'N/A'}\nClareza: ${n.Clareza}\nObjetividade: ${n.Objetividade}\nEfetividade: ${n.Efetividade}\nComunicação: ${n.Comunicacao}`,
           };
         });
@@ -124,7 +144,7 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
             shape: 'dot',
             size: 20,
             font: {
-              color: 'text-foreground',
+              color: getForegroundColor(),
               size: 14,
             },
           },
@@ -141,12 +161,21 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
             enabled: true,
             solver: 'forceAtlas2Based',
             stabilization: {
+              enabled: true,
               iterations: 150,
+              updateInterval: 25,
+              onlyDynamicEdges: false,
+              fit: true,
             },
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 200,
           },
         };
 
         networkRef.current = new Network(containerRef.current, data, options);
+        networkRef.current.stabilize();
       } catch (error) {
         console.error('Erro ao carregar os dados do dashboard:', error);
         setHasError(true);
@@ -157,13 +186,20 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
 
     void fetchDataAndRenderGraph();
 
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setThemeVersion((v) => v + 1);
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+
     return () => {
+      observer.disconnect();
       if (networkRef.current) {
         networkRef.current.destroy();
         networkRef.current = null;
       }
     };
-  }, [surveyId]);
+  }, [surveyId, themeVersion]);
 
   return (
     <Card className="mt-6 rounded-2xl shadow-md">
