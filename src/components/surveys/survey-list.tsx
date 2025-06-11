@@ -121,7 +121,7 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                 <span
                   className={cn(
                     'text-xs',
-                    isExpired ? 'text-red-500' : 'text-[hsl(var(--muted-foreground))]'
+                    'text-[hsl(var(--muted-foreground))]'
                   )}
                 >
                   {survey.dateClosing
@@ -130,8 +130,8 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
                           (new Date(survey.dateClosing).getTime() - Date.now()) /
                             (1000 * 60 * 60 * 24)
                         );
-                        return diffDays < 0
-                          ? `Expirado há ${Math.abs(diffDays)} dias`
+                        return isExpired
+                          ? ``
                           : `Expira em ${diffDays} dias`;
                       })()
                     : 'Sem data de expiração'}
