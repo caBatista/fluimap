@@ -112,7 +112,9 @@ async function convertResponseToApplied(response: ResponseDBEntry): Promise<Resp
 
     const node: InputNode = {
       Pessoa: respondee.name,
-      Papel: ['Líder', 'Membro', 'Coordenador'].includes(respondee.role) ? respondee.role : 'Membro',
+      Papel: ['Líder', 'Membro', 'Coordenador'].includes(respondee.role)
+        ? respondee.role
+        : 'Membro',
       Equipe: team.name,
       Frequencia: frequencyMap[typedAnswers.q0 ?? ''] ?? '1x dia',
       Direcao: directionMap[typedAnswers.q1 ?? ''] ?? 'Vertical',
