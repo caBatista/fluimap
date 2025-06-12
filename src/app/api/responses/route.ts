@@ -45,13 +45,12 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   await dbConnect();
 
-  // pega surveyId da query string
   const surveyId = req.nextUrl.searchParams.get('surveyId');
   if (!surveyId) {
     return NextResponse.json({ error: 'Missing surveyId' }, { status: 400 });
   }
 
-  // conta quantas respostas esse formulário já tem
-  const count = await ResponseModel.countDocuments({ formId: surveyId });
-  return NextResponse.json({ count }, { status: 200 });
+  const responses = await ResponseModel.find({ surveyId: surveyId }).lean();
+
+  return NextResponse.json({ responses }, { status: 200 });
 }
