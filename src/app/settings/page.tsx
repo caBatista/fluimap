@@ -6,7 +6,6 @@ import { AccountCard, type AccountData } from '@/components/settings/account/acc
 import { DeleteAccount } from '@/components/settings/account/delete-account';
 import { useUser } from '@clerk/nextjs';
 
-
 export default function SettingsPage() {
   const { user } = useUser();
   const [accountData, setAccountData] = useState<AccountData | null>(null);
