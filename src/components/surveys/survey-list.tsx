@@ -16,6 +16,7 @@ export type SurveyResponse = {
   expiresInDays?: number;
   dateClosing?: string;
   email?: string;
+  respondents?: number;
 };
 
 export interface SurveyListProps {
@@ -76,7 +77,10 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
           : survey.status === 'fechado'
             ? 'ativo'
             : (survey.status ?? 'ativo');
-        const progressValue = survey.progress ?? 0;
+        const progressValue =
+          survey.respondents && survey.respondents > 0
+            ? Math.round(((survey.responsesCount ?? 0) / survey.respondents) * 100)
+            : 0;
 
         return (
           <div key={survey._id} className="block h-full w-full">
@@ -114,21 +118,14 @@ export function SurveyList({ surveys, search, statusFilter, isLoading }: SurveyL
               </div>
 
               <div className="mt-2 flex items-center justify-between">
-                <span
-                  className={cn(
-                    'text-xs',
-                    isExpired ? 'text-red-500' : 'text-[hsl(var(--muted-foreground))]'
-                  )}
-                >
+                <span className={cn('text-xs', 'text-[hsl(var(--muted-foreground))]')}>
                   {survey.dateClosing
                     ? (() => {
                         const diffDays = Math.ceil(
                           (new Date(survey.dateClosing).getTime() - Date.now()) /
                             (1000 * 60 * 60 * 24)
                         );
-                        return diffDays < 0
-                          ? `Expirado há ${Math.abs(diffDays)} dias`
-                          : `Expira em ${diffDays} dias`;
+                        return isExpired ? `` : `Expira em ${diffDays} dias`;
                       })()
                     : 'Sem data de expiração'}
                 </span>

@@ -21,15 +21,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     console.log('id', id);
 
-    const userId: string = await getUserIdOrThrow();
-
     const team = await Team.findById(id).lean();
     if (!team) {
       return NextResponse.json({ error: 'Team not found' }, { status: 404 });
-    }
-
-    if (team.ownerId?.toString() !== userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     const members = await Respondee.find({ teamId: new Types.ObjectId(id) }).lean();

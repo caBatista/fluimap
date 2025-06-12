@@ -1,47 +1,42 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList, Users, BarChart2, Star } from 'lucide-react';
+import { ClipboardList, Users, BarChart2, Layers } from 'lucide-react';
 
 interface DashboardCardsProps {
-  activeTab: number;
+  activeSurveys: number;
+  closedSurveys: number;
+  responsesCount: number;
+  surveyId?: string;
   totalTeams: number;
-  recentSurvey: number;
 }
 
-export function DashboardCards({ activeTab, totalTeams, recentSurvey }: DashboardCardsProps) {
+export function DashboardCards({
+  activeSurveys,
+  closedSurveys,
+  responsesCount,
+  totalTeams,
+}: DashboardCardsProps) {
   const cards = [
     {
       title: 'Formulários Ativos',
-      value: activeTab,
+      value: activeSurveys,
       icon: <ClipboardList className="text-blue-500" />,
-      trend: '+12%',
-      trendDescription: 'do mês passado',
-      trendColor: 'text-green-500',
     },
     {
-      title: 'Membros da equipe',
-      value: totalTeams,
+      title: 'Formulários Fechados',
+      value: closedSurveys,
       icon: <Users className="text-green-500" />,
-      trend: '+3%',
-      trendDescription: 'Novos Membros',
-      trendColor: 'text-green-500',
     },
     {
-      title: 'Taxa de Resposta',
-      value: recentSurvey,
+      title: 'Número de Respostas',
+      value: responsesCount,
       icon: <BarChart2 className="text-indigo-400" />,
-      trend: '+7%',
-      trendDescription: 'da pesquisa anterior',
-      trendColor: 'text-green-500',
     },
     {
-      title: 'Pontuação de engajamento',
-      value: '7.8',
-      icon: <Star className="text-yellow-500" />,
-      trend: '-2%',
-      trendDescription: 'do último trimestre',
-      trendColor: 'text-red-500',
+      title: 'Times',
+      value: totalTeams,
+      icon: <Layers className="text-orange-500" />,
     },
   ];
 
@@ -59,9 +54,6 @@ export function DashboardCards({ activeTab, totalTeams, recentSurvey }: Dashboar
                 {card.icon}
               </div>
             </div>
-            <p className={`mt-2 text-sm ${card.trendColor}`}>
-              {card.trend} <span className="text-muted-foreground">{card.trendDescription}</span>
-            </p>
           </CardContent>
         </Card>
       ))}

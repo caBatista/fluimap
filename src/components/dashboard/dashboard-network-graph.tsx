@@ -1,130 +1,226 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Network } from 'vis-network/standalone/esm/vis-network';
 
-export function DashboardNetworkGraph() {
+type DashboardNetworkGraphProps = {
+  surveyId?: string;
+};
+
+type NodeData = {
+  Pessoa: string;
+  Papel: string;
+  Frequencia?: string | number;
+  Direcao: string;
+  Clareza: number;
+  Objetividade: number;
+  Efetividade: number;
+  Comunicacao: string;
+};
+
+type EdgeData = {
+  Pessoa: string;
+  Pessoa2: string;
+  Equipe: string;
+  weight: number;
+};
+
+type DashboardResponse = {
+  nodes: NodeData[];
+  modelResults: {
+    nodes: NodeData[];
+    edges: EdgeData[];
+  };
+};
+
+export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) {
+  const [themeVersion, setThemeVersion] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const networkRef = useRef<Network | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!surveyId) return;
 
-    const rawNodes = [
-      {
-        Pessoa: 'JD',
-        Papel: 'Líder',
-        Frequencia: 5,
-        Direcao: 'bidirecional',
-        Clareza: 4,
-        Objetividade: 5,
-        Efetividade: 4,
-        Comunicacao: 'Assertiva',
-      },
-      {
-        Pessoa: 'MT',
-        Papel: 'Dev',
-        Frequencia: 3,
-        Direcao: 'unidirecional',
-        Clareza: 3,
-        Objetividade: 3,
-        Efetividade: 3,
-        Comunicacao: 'Informal',
-      },
-      {
-        Pessoa: 'SM',
-        Papel: 'Dev',
-        Frequencia: 4,
-        Direcao: 'bidirecional',
-        Clareza: 4,
-        Objetividade: 4,
-        Efetividade: 4,
-        Comunicacao: 'Clara',
-      },
-      {
-        Pessoa: 'ER',
-        Papel: 'QA',
-        Frequencia: 2,
-        Direcao: 'unidirecional',
-        Clareza: 2,
-        Objetividade: 3,
-        Efetividade: 2,
-        Comunicacao: 'Burocrática',
-      },
-      {
-        Pessoa: 'JK',
-        Papel: 'PM',
-        Frequencia: 5,
-        Direcao: 'bidirecional',
-        Clareza: 5,
-        Objetividade: 5,
-        Efetividade: 5,
-        Comunicacao: 'Formal',
-      },
-    ];
+    function getForegroundColor() {
+      if (typeof window === 'undefined') return '#222';
+      const root = window.getComputedStyle(document.documentElement);
+      const foreground = root.getPropertyValue('--foreground').trim();
+      if (!foreground) return '#222';
+      return `hsl(${foreground})`;
+    }
 
-    const rawEdges = [
-      { Pessoa: 'JD', Pessoa2: 'SM', Equipe: 'A', weight: 3 },
-      { Pessoa: 'JD', Pessoa2: 'MT', Equipe: 'A', weight: 4 },
-      { Pessoa: 'MT', Pessoa2: 'SM', Equipe: 'A', weight: 2 },
-      { Pessoa: 'SM', Pessoa2: 'JK', Equipe: 'A', weight: 3 },
-      { Pessoa: 'SM', Pessoa2: 'ER', Equipe: 'A', weight: 1 },
-      { Pessoa: 'ER', Pessoa2: 'JK', Equipe: 'A', weight: 2 },
-    ];
+    setLoading(true);
+    setHasError(false);
 
-    const nodes = rawNodes.map((n, index) => ({
-      id: index + 1,
-      label: n.Pessoa,
-      group: n.Papel,
-      title: `Frequência: ${n.Frequencia}\nClareza: ${n.Clareza}\nObjetividade: ${n.Objetividade}\nEfetividade: ${n.Efetividade}\nComunicação: ${n.Comunicacao}`,
-    }));
+    const fetchDataAndRenderGraph = async () => {
+      try {
+        const response = await fetch('/api/dashboard', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ surveyId }),
+        });
 
-    const idMap = new Map(rawNodes.map((n, i) => [n.Pessoa, i + 1]));
+        // Verifica se a resposta é válida e com conteúdo antes de parsear JSON
+        if (!response.ok || response.headers.get('content-length') === '0') {
+          setHasError(true);
+          return;
+        }
 
-    const edges = rawEdges.map((e) => ({
-      from: idMap.get(e.Pessoa),
-      to: idMap.get(e.Pessoa2),
-      value: e.weight,
-      title: `Equipe: ${e.Equipe}\nPeso: ${e.weight}`,
-    }));
+        const text = await response.text();
 
-    const data = { nodes, edges };
+        if (!text) {
+          setHasError(true);
+          return;
+        }
 
-    const options = {
-      nodes: {
-        shape: 'dot',
-        size: 20,
-        font: { color: '#fff' },
-      },
-      groups: {
-        Líder: { color: { background: '#1E90FF' } },
-        Dev: { color: { background: '#32CD32' } },
-        QA: { color: { background: '#FF8C00' } },
-        PM: { color: { background: '#800080' } },
-      },
-      edges: {
-        color: 'rgba(150, 150, 150, 0.5)',
-        width: 2,
-        scaling: {
-          min: 1,
-          max: 5,
-        },
-      },
-      physics: {
-        stabilization: false,
-      },
+        const result = JSON.parse(text) as DashboardResponse;
+
+        const rawNodes = Array.isArray(result.modelResults.nodes) ? result.modelResults.nodes : [];
+        const rawEdges = Array.isArray(result.modelResults.edges) ? result.modelResults.edges : [];
+
+        const uniqueNodesMap = new Map<string, NodeData>();
+        rawNodes.forEach((n) => {
+          if (!uniqueNodesMap.has(n.Pessoa)) {
+            uniqueNodesMap.set(n.Pessoa, n);
+          }
+        });
+
+        const uniqueNodes = Array.from(uniqueNodesMap.values());
+
+        const idMap = new Map<string, number>();
+        function getRandomColor() {
+          const letters = '0123456789ABCDEF';
+          let color = '#';
+          for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+
+        const nodes = uniqueNodes.map((n, index) => {
+          const id = index + 1;
+          idMap.set(n.Pessoa, id);
+          return {
+            id,
+            label: n.Pessoa,
+            group: n.Papel,
+            color: getRandomColor(),
+            font: { color: getForegroundColor() },
+            title: `Frequência: ${n.Frequencia ?? 'N/A'}\nClareza: ${n.Clareza}\nObjetividade: ${n.Objetividade}\nEfetividade: ${n.Efetividade}\nComunicação: ${n.Comunicacao}`,
+          };
+        });
+
+        const edges = rawEdges
+          .map((e) => {
+            const from = idMap.get(e.Pessoa);
+            const to = idMap.get(e.Pessoa2);
+            if (typeof from === 'number' && typeof to === 'number') {
+              return {
+                from,
+                to,
+                value: e.weight,
+                title: `Equipe: ${e.Equipe}\nPeso: ${e.weight}`,
+              };
+            }
+            return null;
+          })
+          .filter((e): e is NonNullable<typeof e> => e !== null);
+
+        const data = { nodes, edges };
+
+        if (!containerRef.current) return;
+
+        if (networkRef.current) {
+          networkRef.current.destroy();
+        }
+
+        const options = {
+          nodes: {
+            shape: 'dot',
+            size: 20,
+            font: {
+              color: getForegroundColor(),
+              size: 14,
+            },
+          },
+          edges: {
+            color: 'rgba(150, 150, 150, 0.5)',
+            width: 2,
+            scaling: {
+              min: 1,
+              max: 5,
+            },
+            smooth: true,
+          },
+          physics: {
+            enabled: true,
+            solver: 'forceAtlas2Based',
+            stabilization: {
+              enabled: true,
+              iterations: 150,
+              updateInterval: 25,
+              onlyDynamicEdges: false,
+              fit: true,
+            },
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 200,
+          },
+        };
+
+        networkRef.current = new Network(containerRef.current, data, options);
+        networkRef.current.stabilize();
+      } catch (error) {
+        console.error('Erro ao carregar os dados do dashboard:', error);
+        setHasError(true);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const network = new Network(containerRef.current, data, options);
+    void fetchDataAndRenderGraph();
 
-    return () => network.destroy();
-  }, []);
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setThemeVersion((v) => v + 1);
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      observer.disconnect();
+      if (networkRef.current) {
+        networkRef.current.destroy();
+        networkRef.current = null;
+      }
+    };
+  }, [surveyId, themeVersion]);
 
   return (
     <Card className="mt-6 rounded-2xl shadow-md">
       <CardContent className="p-4">
         <p className="mb-4 text-lg font-semibold">Conexões da Equipe</p>
-        <div ref={containerRef} className="h-[400px] w-full" />
+
+        <div className="relative h-[400px] w-full">
+          <div ref={containerRef} className="absolute inset-0" />
+
+          {loading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center text-gray-500">
+              Carregando gráfico...
+            </div>
+          )}
+
+          {hasError && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center text-gray-500">
+              Sem respostas da pesquisa até o momento.
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

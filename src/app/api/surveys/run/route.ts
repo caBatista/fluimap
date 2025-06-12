@@ -10,10 +10,6 @@ import SurveyEmail from '@/components/email/email-template';
 import { env } from '@/env';
 import { Resend } from 'resend';
 
-function generateSurveyId(): string {
-  return crypto.randomBytes(5).toString('hex');
-}
-
 async function sendEmail({ name, email, link }: { name: string; email: string; link: string }) {
   const resend = new Resend(env.RESEND_API_KEY);
   console.log(`Sending email to ${email}:`);
@@ -62,9 +58,15 @@ export async function POST(request: NextRequest) {
 
     const body = (await request.json()) as {
       teamId: string;
+      surveyId?: string;
     };
 
-    const { teamId } = body;
+    const { teamId, surveyId: rawSurveyId } = body;
+    const surveyId =
+      rawSurveyId && rawSurveyId !== 'undefined'
+        ? String(rawSurveyId)
+        : crypto.randomBytes(5).toString('hex');
+    console.log('surveyId being used:', surveyId);
 
     const user = await User.findOne({ clerkId: userId });
 
@@ -78,6 +80,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: -5 } }, { new: true });
+    let creditsRefunded = false;
 
     const team = await Team.findById(teamId);
 
@@ -95,9 +100,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No respondees found for this team' }, { status: 400 });
     }
 
-    const surveyId = generateSurveyId();
-
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
     const respondeeLinks = respondees.map((respondee) => {
       const uniqueLink = `${baseUrl}/questionnaire/${surveyId}/${String(respondee._id)}?teamId=${teamId}&email=${encodeURIComponent(respondee.email)}`;
@@ -110,18 +113,28 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    const emailResults = await Promise.allSettled(
-      respondeeLinks.map((respondee) =>
-        sendEmail({ name: respondee.name, email: respondee.email, link: respondee.link })
-      )
-    );
+    const emailResults = [];
+    for (const respondee of respondeeLinks) {
+      try {
+        const result = await sendEmail({
+          name: respondee.name,
+          email: respondee.email,
+          link: respondee.link,
+        });
+        emailResults.push({ status: 'fulfilled', value: result });
+      } catch (error) {
+        emailResults.push({ status: 'rejected', reason: error });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
 
     // Check if at least one email was sent successfully
     const successfulEmails = emailResults.filter((result) => result.status === 'fulfilled');
 
-    if (successfulEmails.length > 0) {
-      await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: -5 } }, { new: true });
-      console.log(`Deducted 5 credits from user ${userId}. Remaining credits: ${user.credits - 5}`);
+    if (successfulEmails.length === 0 && !creditsRefunded) {
+      await User.findOneAndUpdate({ clerkId: userId }, { $inc: { credits: 5 } }, { new: true });
+      creditsRefunded = true;
+      console.log(`Refunded 5 credits to user ${userId} due to email failure.`);
     }
 
     revalidatePath(`/surveys`);

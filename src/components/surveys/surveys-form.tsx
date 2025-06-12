@@ -2,6 +2,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
@@ -110,44 +111,44 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
           ? (result as { survey: { _id: string } }).survey._id
           : null;
 
-      // Call the run API to generate and send questionnaire links
-      try {
-        const runResponse = await fetch('/api/surveys/run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teamId: data.teamId }),
-        });
-        if (!runResponse.ok) {
-          const runErr: unknown = await runResponse.json();
-          const runErrorMsg =
-            typeof runErr === 'object' &&
-            runErr !== null &&
-            'error' in runErr &&
-            typeof (runErr as { error: unknown }).error === 'string'
-              ? (runErr as { error: string }).error
-              : JSON.stringify(runErr) || 'Erro ao iniciar o envio dos questionários';
-          alert('Erro ao iniciar o envio dos questionários: ' + runErrorMsg);
-        } else {
-          // Invalidate credit balance cache since credits were deducted
-          void queryClient.invalidateQueries({ queryKey: ['credit-balance'] });
-        }
-      } catch (runError) {
-        console.error(runError);
-        alert('Erro inesperado ao iniciar o envio dos questionários');
-      }
-
+      toast('Os e-mails estão sendo enviados para os participantes...');
       if (onSuccess) {
         onSuccess();
       }
-
       router.push(`/surveys${newSurveyId ? `#${newSurveyId}` : ''}`);
+
+      fetch('/api/surveys/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamId: data.teamId, surveyId: newSurveyId }),
+      })
+        .then(async (runResponse) => {
+          if (!runResponse.ok) {
+            const runErr: unknown = await runResponse.json();
+            const runErrorMsg =
+              typeof runErr === 'object' &&
+              runErr !== null &&
+              'error' in runErr &&
+              typeof (runErr as { error: unknown }).error === 'string'
+                ? (runErr as { error: string }).error
+                : JSON.stringify(runErr) || 'Erro ao iniciar o envio dos questionários';
+            toast.error('Erro ao enviar e-mails: ' + runErrorMsg);
+          } else {
+            void queryClient.invalidateQueries({ queryKey: ['credit-balance'] });
+            toast.success('E-mails enviados com sucesso!');
+          }
+        })
+        .catch((runError) => {
+          console.error(runError);
+          toast.error('Erro inesperado ao enviar e-mails.');
+        });
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
-        alert('Falha ao criar formulário: ' + error.message);
+        toast.error('Falha ao criar formulário: ' + error.message);
       } else {
         console.error(error);
-        alert('Falha ao criar formulário. Ver console.');
+        toast.error('Falha ao criar formulário. Ver console.');
       }
     } finally {
       setIsSubmitting(false);
@@ -156,10 +157,7 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto w-full max-w-4xl space-y-6 p-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full space-y-6 p-6">
         <Card className="border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-[hsl(var(--foreground))]">
@@ -257,7 +255,11 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                               field.onChange(date.toISOString());
                             }
                           }}
-                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                          disabled={(date) => {
+                            const now = new Date();
+                            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                            return date < tomorrow;
+                          }}
                           initialFocus
                         />
                       </PopoverContent>
