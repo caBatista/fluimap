@@ -31,11 +31,6 @@ import { Users, ClipboardList, CheckCircle, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTheme } from 'next-themes';
 
-interface SurveyType {
-  name: string;
-  value: number;
-}
-
 interface RecentSurvey {
   id: string;
   title: string;

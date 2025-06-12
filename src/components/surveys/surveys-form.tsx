@@ -257,7 +257,11 @@ export function SurveyForm({ onSuccess }: SurveyFormProps) {
                           }}
                           disabled={(date) => {
                             const now = new Date();
-                            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                            const tomorrow = new Date(
+                              now.getFullYear(),
+                              now.getMonth(),
+                              now.getDate() + 1
+                            );
                             return date < tomorrow;
                           }}
                           initialFocus

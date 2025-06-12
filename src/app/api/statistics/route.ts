@@ -8,8 +8,6 @@ import { format } from 'date-fns';
 import { auth } from '@clerk/nextjs/server';
 import type { Document, Types } from 'mongoose';
 
-type CategoryCount = Record<string, number>;
-
 interface ITeam extends Document {
   _id: Types.ObjectId;
   name: string;
@@ -112,9 +110,7 @@ export async function GET() {
               ? 'NPS'
               : 'Outros';
 
-      if (!surveyCategories[category]) {
-        surveyCategories[category] = { total: 0, responded: 0 };
-      }
+      surveyCategories[category] ??= { total: 0, responded: 0 };
 
       surveyCategories[category].total += 1;
       if (responseCount > 0) {
@@ -147,7 +143,7 @@ export async function GET() {
       });
 
       const responsesInMonth = await Response.countDocuments({
-        formId: { $in: surveyIds },
+        surveyId: { $in: surveyIds },
         createdAt: { $gte: monthStart, $lte: monthEnd },
       });
 
