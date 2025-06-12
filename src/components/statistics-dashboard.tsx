@@ -29,9 +29,7 @@ import {
 } from 'recharts';
 import { Users, ClipboardList, CheckCircle, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
-
-// Define COLORS array for pie chart
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#F6B191'];
+import { useTheme } from 'next-themes';
 
 interface SurveyType {
   name: string;
@@ -66,7 +64,6 @@ interface StatisticsData {
   completedSurveys: number;
   totalRespondents: number;
   responseRate: number;
-  surveyTypes: SurveyType[];
   monthlyActivity: MonthlyActivity[];
   recentSurveys: RecentSurvey[];
   teamStats: TeamStat[];
@@ -93,6 +90,11 @@ export default function StatisticsDashboard() {
     queryKey: ['account-statistics'],
     queryFn: fetchStatistics,
   });
+
+  const { resolvedTheme } = useTheme();
+  const concluidaColor = '#0088FE';
+  const naoConcluidaColor = resolvedTheme === 'dark' ? '#222' : '#e5e7eb';
+  const naoConcluidaText = resolvedTheme === 'dark' ? '#fff' : '#000';
 
   if (error) {
     return (
@@ -169,7 +171,6 @@ export default function StatisticsDashboard() {
         </TabsList>
 
         <TabsContent value="overview">
-          {/* Summary Cards */}
           <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {isLoading ? (
               <>
@@ -240,37 +241,83 @@ export default function StatisticsDashboard() {
               </>
             ) : (
               <>
-                {/* Survey Distribution Chart */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Distribuição por Tipo</CardTitle>
-                    <CardDescription>Divisão de pesquisas por categoria</CardDescription>
+                    <CardTitle>Porcentagem de Conclusão</CardTitle>
+                    <CardDescription>Percentual de pesquisas concluídas</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-80 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            data={stats?.surveyTypes ?? []}
+                            data={
+                              stats && stats.totalSurveys > 0
+                                ? [
+                                    { name: 'Concluídas', value: stats.completedSurveys },
+                                    {
+                                      name: 'Não concluídas',
+                                      value: stats.totalSurveys - stats.completedSurveys,
+                                    },
+                                  ]
+                                : []
+                            }
                             cx="50%"
                             cy="50%"
                             labelLine={false}
                             outerRadius={80}
+                            innerRadius={60}
                             fill="#8884d8"
                             dataKey="value"
-                            label={({ name, percent }: { name: string; percent: number }) =>
-                              `${name} ${(percent * 100).toFixed(0)}%`
-                            }
                           >
-                            {(stats?.surveyTypes ?? []).map((entry: SurveyType, index: number) => (
-                              <Cell
-                                key={`cell-${entry.name}-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
+                            {stats &&
+                              stats.totalSurveys > 0 && [
+                                <Cell key="concluidas" fill={concluidaColor} />,
+                                <Cell key="nao-concluidas" fill={naoConcluidaColor} />,
+                              ]}
+                            {(!stats || stats.totalSurveys === 0) && (
+                              <Cell key="empty" fill={naoConcluidaColor} />
+                            )}
                           </Pie>
-                          <Legend />
-                          <Tooltip />
+                          <Legend
+                            payload={[
+                              {
+                                value: 'Concluídas',
+                                type: 'square',
+                                color: concluidaColor,
+                                id: 'concluidas',
+                              },
+                              {
+                                value: (
+                                  <span style={{ color: naoConcluidaText }}>Não concluídas</span>
+                                ),
+                                type: 'square',
+                                color: naoConcluidaColor,
+                                id: 'nao-concluidas',
+                              },
+                            ]}
+                          />
+                          <Tooltip
+                            formatter={(value: number, name: string) => {
+                              if (name === 'Não concluídas') {
+                                return [value, 'Não concluídas'];
+                              }
+                              return [value, name];
+                            }}
+                          />
+                          <text
+                            x="50%"
+                            y="47%"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fontSize="24"
+                            fontWeight="bold"
+                            fill={concluidaColor}
+                          >
+                            {stats && stats.totalSurveys > 0
+                              ? `${Math.round((stats.completedSurveys / stats.totalSurveys) * 100)}%`
+                              : 'Sem dados'}
+                          </text>
                         </PieChart>
                       </ResponsiveContainer>
                     </div>

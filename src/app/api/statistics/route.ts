@@ -90,26 +90,41 @@ export async function GET() {
       );
     }
 
-    const surveyCategories: CategoryCount = {};
+    const surveyCategories: Record<string, { total: number; responded: number }> = {};
 
-    allSurveys.forEach((survey) => {
+    // Get all responses count for each survey
+    const surveyResponses = await Promise.all(
+      allSurveys.map(async (survey) => {
+        const responseCount = await Response.countDocuments({ surveyId: survey._id });
+        return { survey, responseCount };
+      })
+    );
+
+    surveyResponses.forEach(({ survey, responseCount }) => {
       const title = survey.title.toLowerCase();
-      if (title.includes('avaliação')) {
-        surveyCategories.Avaliação = (surveyCategories.Avaliação ?? 0) + 1;
-      } else if (title.includes('feedback')) {
-        surveyCategories.Feedback = (surveyCategories.Feedback ?? 0) + 1;
-      } else if (title.includes('satisfação')) {
-        surveyCategories.Satisfação = (surveyCategories.Satisfação ?? 0) + 1;
-      } else if (title.includes('nps')) {
-        surveyCategories.NPS = (surveyCategories.NPS ?? 0) + 1;
-      } else {
-        surveyCategories.Outros = (surveyCategories.Outros ?? 0) + 1;
+      const category = title.includes('avaliação')
+        ? 'Avaliação'
+        : title.includes('feedback')
+          ? 'Feedback'
+          : title.includes('satisfação')
+            ? 'Satisfação'
+            : title.includes('nps')
+              ? 'NPS'
+              : 'Outros';
+
+      if (!surveyCategories[category]) {
+        surveyCategories[category] = { total: 0, responded: 0 };
+      }
+
+      surveyCategories[category].total += 1;
+      if (responseCount > 0) {
+        surveyCategories[category].responded += 1;
       }
     });
 
-    const surveyTypes = Object.entries(surveyCategories).map(([name, value]) => ({
+    const surveyTypes = Object.entries(surveyCategories).map(([name, { total, responded }]) => ({
       name,
-      value,
+      value: total > 0 ? Math.round((responded / total) * 100) : 0,
     }));
 
     const currentDate = new Date();
