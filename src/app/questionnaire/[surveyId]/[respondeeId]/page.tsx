@@ -85,7 +85,7 @@ export default async function QuestionnairePage({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="mb-4 text-2xl font-bold">Bem-vindo(a), {respondee.name}!</h1>
-      <p className="mb-2">
+      <p className="mb-2 text-center">
         Você foi convidado(a) por <span className="font-semibold">{inviterName}</span> para
         participar de uma pesquisa.
       </p>
