@@ -158,11 +158,11 @@ export default function CreateDashboardPage() {
 
       <DashboardNetworkGraph surveyId={selectedSurveyId} />
 
-      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2 ">
-        <div className="flex flex-col h-full">
+      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="flex h-full flex-col">
           <DashboardRecentForms surveys={recentSurveys} />
         </div>
-        <div className="flex flex-col h-full">
+        <div className="flex h-full flex-col">
           <DashboardEngagement surveyId={selectedSurveyId} />
         </div>
       </div>

@@ -20,41 +20,48 @@ type ResponseType = z.infer<typeof ResponseSchemaZod>;
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY ?? '');
 
 export async function POST(request: Request) {
-    try {
-        const bodyRaw: unknown = await request.json();
-        const body = typeof bodyRaw === 'object' && bodyRaw !== null ? bodyRaw as Record<string, unknown> : {};
-        const responsesRaw = Array.isArray(body.responses) ? body.responses : [];
-        if (responsesRaw.length === 0) {
-            return NextResponse.json({ error: 'Responses array is required' }, { status: 400 });
-        }
-        const responses: ResponseType[] = responsesRaw
-          .map((r: unknown) => {
-            const parsed = ResponseSchemaZod.safeParse(r);
-            return parsed.success ? parsed.data : null;
-          })
-          .filter((r): r is ResponseType => r !== null);
-        if (responses.length === 0) {
-            return NextResponse.json({ error: 'No valid responses' }, { status: 400 });
-        }
+  try {
+    const bodyRaw: unknown = await request.json();
+    const body =
+      typeof bodyRaw === 'object' && bodyRaw !== null ? (bodyRaw as Record<string, unknown>) : {};
+    const responsesRaw = Array.isArray(body.responses) ? body.responses : [];
+    if (responsesRaw.length === 0) {
+      return NextResponse.json({ error: 'Responses array is required' }, { status: 400 });
+    }
+    const responses: ResponseType[] = responsesRaw
+      .map((r: unknown) => {
+        const parsed = ResponseSchemaZod.safeParse(r);
+        return parsed.success ? parsed.data : null;
+      })
+      .filter((r): r is ResponseType => r !== null);
+    if (responses.length === 0) {
+      return NextResponse.json({ error: 'No valid responses' }, { status: 400 });
+    }
 
-        if (!process.env.GOOGLE_API_KEY) {
-            console.error('GOOGLE_API_KEY is not set');
-            return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
-        }
+    if (!process.env.GOOGLE_API_KEY) {
+      console.error('GOOGLE_API_KEY is not set');
+      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-        const answersSummary = responses.map((resp, idx) => {
-            return `Resposta #${idx + 1} (email: ${resp.email}):\n` +
-                resp.answersByUser.map(
-                    (a: { name: string; answers: Record<string, string> }) =>
-                        `- ${a.name}: ${Object.entries(a.answers).map(([q, ans]) => `${q}: ${ans}`).join('; ')}`
-                ).join('\n');
-        }).join('\n\n');
+    const answersSummary = responses
+      .map((resp, idx) => {
+        return (
+          `Resposta #${idx + 1} (email: ${resp.email}):\n` +
+          resp.answersByUser
+            .map(
+              (a: { name: string; answers: Record<string, string> }) =>
+                `- ${a.name}: ${Object.entries(a.answers)
+                  .map(([q, ans]) => `${q}: ${ans}`)
+                  .join('; ')}`
+            )
+            .join('\n')
+        );
+      })
+      .join('\n\n');
 
-        console.log('Generated answers summary:', answersSummary);
-
-        const prompt = `
+    const prompt = `
         Analise as respostas abaixo de um questionário de equipe.
         
         ${answersSummary}
@@ -71,15 +78,15 @@ export async function POST(request: Request) {
 
         ### Um paragrafo contendo sugestões de melhorias que podem ser implementadas para aumentar o engajamento e a eficácia da equipe.
         `;
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
 
-        return NextResponse.json({
-            analysis: text,
-        });
-    } catch (error) {
-        console.error('Error in Team Analysis API:', error);
-        return NextResponse.json({ error: 'Failed to process team analysis' }, { status: 500 });
-    }
+    return NextResponse.json({
+      analysis: text,
+    });
+  } catch (error) {
+    console.error('Error in Team Analysis API:', error);
+    return NextResponse.json({ error: 'Failed to process team analysis' }, { status: 500 });
+  }
 }

@@ -211,18 +211,26 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
           <div ref={containerRef} className="absolute inset-0" />
 
           {loading && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center py-12 bg-background/80">
-              <Loader2 className="w-10 h-10 mb-4 animate-spin text-blue-400" />
-              <p className="text-lg font-semibold text-muted-foreground mb-2">Carregando gráfico...</p>
-              <p className="text-sm text-muted-foreground">Aguarde enquanto processamos as respostas para gerar o gráfico de conexões da equipe.</p>
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 py-12 text-center">
+              <Loader2 className="mb-4 h-10 w-10 animate-spin text-blue-400" />
+              <p className="mb-2 text-lg font-semibold text-muted-foreground">
+                Carregando gráfico...
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Aguarde enquanto processamos as respostas para gerar o gráfico de conexões da
+                equipe.
+              </p>
             </div>
           )}
 
           {hasError && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-muted-foreground py-12 bg-background/80">
-              <Info className="w-10 h-10 mb-4 text-blue-400" />
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 py-12 text-center text-muted-foreground">
+              <Info className="mb-4 h-10 w-10 text-blue-400" />
               <p className="text-lg font-semibold">Nenhuma resposta recebida ainda</p>
-              <p className="text-sm">Assim que as respostas forem recebidas, o gráfico de conexões da equipe será exibido aqui.</p>
+              <p className="text-sm">
+                Assim que as respostas forem recebidas, o gráfico de conexões da equipe será exibido
+                aqui.
+              </p>
             </div>
           )}
         </div>

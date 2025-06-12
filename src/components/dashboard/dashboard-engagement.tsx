@@ -31,7 +31,6 @@ export function DashboardEngagement({ surveyId }: DashboardEngagementProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [responses, analysis, loading]);
 
-
   interface ResponseType {
     surveyId: string;
     questionnaireId: string;
@@ -53,7 +52,7 @@ export function DashboardEngagement({ surveyId }: DashboardEngagementProps) {
       const res = await fetch(`/api/responses?surveyId=${surveyId}`);
       if (res.ok) {
         const data = (await res.json()) as unknown;
-        
+
         if (
           typeof data === 'object' &&
           data !== null &&
@@ -101,19 +100,21 @@ export function DashboardEngagement({ surveyId }: DashboardEngagementProps) {
   }, [surveyId, fetchResponses]);
 
   return (
-    <div className="rounded-xl border bg-background p-6 shadow-sm min-h-[560px] max-h-[560px] flex flex-col">
+    <div className="flex max-h-[560px] min-h-[560px] flex-col rounded-xl border bg-background p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground">
-          Tendências de engajamento da equipe
-        </h2>
+        <h2 className="text-xl font-bold text-foreground">Tendências de engajamento da equipe</h2>
       </div>
       {/* Analysis is now automatic, no button needed */}
 
       {loading && (
-        <div className="flex flex-1 flex-col items-center justify-center text-center py-12">
-          <Info className="w-10 h-10 mb-4 animate-spin text-blue-400" />
-          <p className="text-lg font-semibold text-muted-foreground mb-2">Analisando dados com IA...</p>
-          <p className="text-sm text-muted-foreground">Aguarde enquanto processamos as respostas para gerar o resumo de engajamento.</p>
+        <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
+          <Info className="mb-4 h-10 w-10 animate-spin text-blue-400" />
+          <p className="mb-2 text-lg font-semibold text-muted-foreground">
+            Analisando dados com IA...
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Aguarde enquanto processamos as respostas para gerar o resumo de engajamento.
+          </p>
         </div>
       )}
 
@@ -124,18 +125,19 @@ export function DashboardEngagement({ surveyId }: DashboardEngagementProps) {
       )}
 
       {responses.length === 0 && !loading && !error && (
-        <div className="flex flex-1 flex-col items-center justify-center text-center text-muted-foreground py-12">
-          <Info className="w-10 h-10 mb-4 text-blue-400" />
+        <div className="flex flex-1 flex-col items-center justify-center py-12 text-center text-muted-foreground">
+          <Info className="mb-4 h-10 w-10 text-blue-400" />
           <p className="text-lg font-semibold">Nenhuma resposta recebida ainda</p>
-          <p className="text-sm">Assim que as respostas forem recebidas, a análise de engajamento da equipe será exibida aqui.</p>
+          <p className="text-sm">
+            Assim que as respostas forem recebidas, a análise de engajamento da equipe será exibida
+            aqui.
+          </p>
         </div>
       )}
 
       {responses.length > 0 && analysis?.analysis && (
-        <div className='markdown overflow-y-auto flex-1 pr-2'>
-          <ReactMarkdown>
-            {analysis.analysis}
-          </ReactMarkdown>
+        <div className="markdown flex-1 overflow-y-auto pr-2">
+          <ReactMarkdown>{analysis.analysis}</ReactMarkdown>
         </div>
       )}
       {/* Removed invalid useEffect from render */}
