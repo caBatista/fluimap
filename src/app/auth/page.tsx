@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import Image from 'next/image';
 import { useState } from 'react';
 import { SignInCard } from '@/components/sign-in-card';
