@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/ui/icons';
 import { getErrorMessage } from '@/lib/utils';
 
-export function SignInCard() {
+export function SignInCard({ onSwitchToSignUp }: { onSwitchToSignUp?: () => void }) {
   return (
     <SignIn.Root>
       <Clerk.Loading>
@@ -79,8 +79,8 @@ export function SignInCard() {
                 </CardContent>
                 <CardFooter>
                   <div className="grid w-full gap-y-4">
-                    <Button variant="link" size="sm" asChild>
-                      <Clerk.Link navigate="sign-up">Não tem uma conta? Crie uma</Clerk.Link>
+                    <Button variant="link" size="sm" onClick={onSwitchToSignUp}>
+                      Não tem uma conta? Crie uma
                     </Button>
                   </div>
                 </CardFooter>

@@ -1,10 +1,13 @@
+"use client";
 import Image from 'next/image';
+import { useState } from 'react';
 import { SignInCard } from '@/components/sign-in-card';
 import { SignUpCard } from '@/components/sign-up-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartColumn, ClipboardList, Lightbulb } from 'lucide-react';
 
 export default function AuthPage() {
+  const [tab, setTab] = useState('signin');
   return (
     <div className="flex h-screen w-full bg-white transition-colors duration-300 dark:bg-zinc-900">
       <div className="flex w-1/2 flex-col items-center justify-center">
@@ -19,16 +22,16 @@ export default function AuthPage() {
           />
         </div>
 
-        <Tabs defaultValue="signin" className="w-full max-w-md">
+        <Tabs value={tab} onValueChange={setTab} className="w-full max-w-md">
           <TabsList className="grid w-full grid-cols-2 bg-zinc-100 dark:bg-zinc-800">
             <TabsTrigger value="signin">Login</TabsTrigger>
             <TabsTrigger value="signup">Cadastro</TabsTrigger>
           </TabsList>
           <TabsContent value="signin">
-            <SignInCard />
+            <SignInCard onSwitchToSignUp={() => setTab('signup')} />
           </TabsContent>
           <TabsContent value="signup">
-            <SignUpCard />
+            <SignUpCard onSwitchToSignIn={() => setTab('signin')} />
           </TabsContent>
         </Tabs>
       </div>
