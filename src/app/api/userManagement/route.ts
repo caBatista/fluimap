@@ -6,10 +6,15 @@ export async function GET() {
   try {
     await dbConnect();
 
-    const users = await User.find({}, '_id name credits creditsExpirationDate').lean();
+    const users = await User.find(
+      {},
+      '_id clerkId email name credits creditsExpirationDate'
+    ).lean();
 
     const result = users.map((user) => ({
       id: user._id,
+      clerkId: user.clerkId,
+      email: user.email,
       name: user.name,
       credits: user.credits?.toString() ?? '-',
       expirationDate: user.creditsExpirationDate

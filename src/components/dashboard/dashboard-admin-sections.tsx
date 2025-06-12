@@ -73,13 +73,21 @@ export function DashboardAdminSections() {
         <CardContent className="p-4">
           <h2 className="mb-4 text-xl font-semibold">Gestão de Usuários</h2>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-full table-fixed text-left text-sm">
+            <table className="w-full min-w-full table-fixed overflow-hidden rounded-lg border border-gray-200 text-left text-sm">
               <thead>
                 <tr>
-                  <th className="w-[85%] px-4 py-2">Nome</th>
-                  <th className="w-[85%] px-4 py-2">Créditos</th>
-                  <th className="w-[85%] px-4 py-2">Data de Expiração</th>
-                  <th className="w-[15%] px-4 py-2">Ação</th>
+                  <th className="w-[50%] bg-gray-100 px-4 py-2 font-semibold text-gray-700">
+                    Nome
+                  </th>
+                  <th className="w-[50%] bg-gray-100 px-4 py-2 font-semibold text-gray-700">
+                    Créditos
+                  </th>
+                  <th className="w-[50%] bg-gray-100 px-4 py-2 font-semibold text-gray-700">
+                    Data de Expiração
+                  </th>
+                  <th className="w-[15%] bg-gray-100 px-4 py-2 font-semibold text-gray-700">
+                    Ação
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +98,7 @@ export function DashboardAdminSections() {
                     <td className="px-4 py-2">{user.expirationDate}</td>
                     <td className="px-4 py-2">
                       <button
-                        className="text-red-600 hover:underline"
+                        className="rounded-md bg-red-100 px-3 py-1 text-red-700 transition hover:bg-red-200"
                         onClick={() => {
                           setSelectedUserId(user.id);
                           setSelectedUserName(user.name);
@@ -118,7 +126,7 @@ export function DashboardAdminSections() {
             Cancelar
           </button>
           <button
-            className="rounded-md bg-red-600 px-4 py-2 text-white"
+            className="rounded-md bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
             onClick={() => {
               if (selectedUserId) {
                 deleteUserMutation.mutate(selectedUserId);
@@ -133,12 +141,12 @@ export function DashboardAdminSections() {
         <CardContent className="p-4">
           <h2 className="mb-4 text-xl font-semibold">Administração</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="min-w-full overflow-hidden rounded-lg border border-gray-200 text-left text-sm">
               <thead>
                 <tr>
-                  <th className="px-4 py-2">Formulário</th>
-                  <th className="px-4 py-2">Times</th>
-                  <th className="px-4 py-2">Status</th>
+                  <th className="bg-gray-100 px-4 py-2 font-semibold text-gray-700">Formulário</th>
+                  <th className="bg-gray-100 px-4 py-2 font-semibold text-gray-700">Times</th>
+                  <th className="bg-gray-100 px-4 py-2 font-semibold text-gray-700">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -146,7 +154,11 @@ export function DashboardAdminSections() {
                   <tr key={survey.surveyId} className="border-t">
                     <td className="px-4 py-2">{survey.surveyTitle}</td>
                     <td className="px-4 py-2">{survey.teamName}</td>
-                    <td className="px-4 py-2">{survey.status}</td>
+                    <td
+                      className={`px-4 py-2 ${survey.status === 'ativo' ? 'text-green-600' : ''}`}
+                    >
+                      {survey.status}
+                    </td>
                   </tr>
                 ))}
               </tbody>

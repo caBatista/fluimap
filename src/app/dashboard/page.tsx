@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+import { useAuth } from '@clerk/nextjs';
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardCards } from '@/components/dashboard/dashboard-cards';
@@ -36,6 +37,18 @@ const surveysSchema = z.object({
 });
 
 export default function CreateDashboardPage() {
+  const { userId } = useAuth();
+
+  const { data: usersData = [] } = useQuery<{ clerkId: string; email: string }[]>({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/userManagement`);
+      return (await response.json()) as { clerkId: string; email: string }[];
+    },
+  });
+
+  const currentUser = usersData.find((u) => u.clerkId === userId);
+  const isGestor = currentUser?.email === 'fluimap@gmail.com';
   const { data: activeSurveys = [] } = useQuery<Survey[]>({
     queryKey: ['activeSurveys'],
     queryFn: async () => {
@@ -92,10 +105,9 @@ export default function CreateDashboardPage() {
   });
 
   const totalTeams = teams.length;
-  const isGestor = true; //VALIDAR GESTOR, EXIBINDO SOMENTE DASH-ADMIN
 
   return (
-    <div className="flex min-h-screen flex-col px-8 py-4">
+    <div className="mt-8 flex min-h-screen flex-col px-8 py-4">
       {isGestor ? (
         <>
           <DashboardAdminHeader />
