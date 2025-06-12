@@ -1,4 +1,4 @@
-packages <- c("plumber", "dplyr" /*, add other required packages here */)
+packages <- c("plumber", "dplyr")
 install_if_missing <- function(pkg) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, repos = "https://cloud.r-project.org")

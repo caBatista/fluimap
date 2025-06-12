@@ -56,7 +56,7 @@ export function AccountCard({ initialData }: { initialData: AccountData }) {
       <CardHeader>
         <CardTitle className="h-[32px] w-[141px] text-2xl font-bold">Perfil</CardTitle>
         <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          Atualize as informacoes do seu perfil
+          Atualize as informações do seu perfil
         </p>
       </CardHeader>
 
@@ -73,7 +73,7 @@ export function AccountCard({ initialData }: { initialData: AccountData }) {
           </div>
 
           <div className="grid h-[40px] items-center">
-            <Label>Nome do Usuario</Label>
+            <Label>Nome do Usuário</Label>
             <Input
               className="mt-[7px] text-sm text-[hsl(var(--muted-foreground))]"
               {...register('name', { required: true })}

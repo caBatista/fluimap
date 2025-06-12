@@ -42,9 +42,9 @@ export function DeleteAccount() {
     <>
       <Card className="w-full px-4 py-4">
         <CardHeader>
-          <h1 className="text-2xl font-bold">Configuracao da Conta</h1>
+          <h1 className="text-2xl font-bold">Configuração da Conta</h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            Gerencie as preferencias da sua conta
+            Gerencie as preferências da sua conta
           </p>
         </CardHeader>
 
