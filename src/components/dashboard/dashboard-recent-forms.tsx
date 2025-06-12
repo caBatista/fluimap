@@ -99,12 +99,6 @@ export function DashboardRecentForms({ surveys }: SurveyListProps) {
               </div>
 
               <div className="mt-2 flex items-center justify-between">
-                <Link
-                  href={`/surveys/${survey._id}`}
-                  className="text-xs font-medium text-[hsl(var(--primary))] hover:underline"
-                >
-                  Exibir respostas
-                </Link>
                 <span
                   className={cn(
                     'text-xs',

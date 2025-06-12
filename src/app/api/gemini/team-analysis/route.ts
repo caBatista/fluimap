@@ -1,39 +1,40 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
-interface RModelData {
-    nodes: Array<{
-        Pessoa: string;
-        Papel: string;
-        Frequencia: string | number;
-        Direcao?: string;
-        Clareza?: number;
-        Objetividade?: number;
-        Efetividade?: number;
-        Comunicacao?: string;
-    }>;
-    edges: Array<{
-        Pessoa: string;
-        Pessoa2: string;
-        Equipe: string;
-        weight: number;
-    }>;
-}
-
-interface Trend {
-    title: string;
-    description: string;
-    type: 'success' | 'warning' | 'info';
-}
+const ResponseSchemaZod = z.object({
+  surveyId: z.string(),
+  questionnaireId: z.string(),
+  email: z.string().email(),
+  answersByUser: z.array(
+    z.object({
+      name: z.string(),
+      answers: z.record(z.string(), z.string()),
+    })
+  ),
+  createdAt: z.union([z.string(), z.date()]).optional(),
+  updatedAt: z.union([z.string(), z.date()]).optional(),
+});
+type ResponseType = z.infer<typeof ResponseSchemaZod>;
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY ?? '');
 
 export async function POST(request: Request) {
     try {
-        const { rModelData } = (await request.json()) as { rModelData: RModelData };
-
-        if (!rModelData) {
-            return NextResponse.json({ error: 'R model data is required' }, { status: 400 });
+        const bodyRaw: unknown = await request.json();
+        const body = typeof bodyRaw === 'object' && bodyRaw !== null ? bodyRaw as Record<string, unknown> : {};
+        const responsesRaw = Array.isArray(body.responses) ? body.responses : [];
+        if (responsesRaw.length === 0) {
+            return NextResponse.json({ error: 'Responses array is required' }, { status: 400 });
+        }
+        const responses: ResponseType[] = responsesRaw
+          .map((r: unknown) => {
+            const parsed = ResponseSchemaZod.safeParse(r);
+            return parsed.success ? parsed.data : null;
+          })
+          .filter((r): r is ResponseType => r !== null);
+        if (responses.length === 0) {
+            return NextResponse.json({ error: 'No valid responses' }, { status: 400 });
         }
 
         if (!process.env.GOOGLE_API_KEY) {
@@ -43,88 +44,42 @@ export async function POST(request: Request) {
 
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-        const prompt = `
-      Analise os seguintes dados do modelo R sobre o engajamento da equipe e forneça um resumo conciso:
-      
-      Dados dos Nós (Pessoas):
-      ${JSON.stringify(rModelData.nodes, null, 2)}
-      
-      Dados das Conexões:
-      ${JSON.stringify(rModelData.edges, null, 2)}
-      
-      Por favor, forneça:
-      1. Um resumo geral do estado atual da equipe, incluindo:
-         - Níveis de comunicação
-         - Clareza e objetividade nas interações
-         - Efetividade das relações
-      2. Principais pontos de atenção:
-         - Relações que precisam de mais atenção
-         - Padrões de comunicação que podem ser melhorados
-      3. Sugestões de melhorias:
-         - Como melhorar a comunicação
-         - Como fortalecer as relações
-         - Como aumentar a efetividade
-      
-      Mantenha o resumo conciso e direto ao ponto.
-    `;
+        const answersSummary = responses.map((resp, idx) => {
+            return `Resposta #${idx + 1} (email: ${resp.email}):\n` +
+                resp.answersByUser.map(
+                    (a: { name: string; answers: Record<string, string> }) =>
+                        `- ${a.name}: ${Object.entries(a.answers).map(([q, ans]) => `${q}: ${ans}`).join('; ')}`
+                ).join('\n');
+        }).join('\n\n');
 
+        console.log('Generated answers summary:', answersSummary);
+
+        const prompt = `
+        Analise as respostas abaixo de um questionário de equipe.
+        
+        ${answersSummary}
+        
+        Por favor, forneça um resumo exatamente em  formato MD, mantendo uma estrutura clara e concisa, respondendo de forma resumida e destacando os principais pontos de engajamento da equipe. A resposta deve ser exatamente no seguinte formato, usando os simbolos de Markdown para formatação e alguns emojis nos titulos das sessões para destacar os pontos principais:
+        
+        ### um paragrafo resumindo o indice de engajamento da equipe
+        ### um paragrafo resumindo a comunicação da equipe
+        ### um paragrafo resumindo os pontos fortes da equipe 
+        ### um paragrafo resumindo os pontos fracos da equipe
+        
+        Uma lista de pontos que precisam de atenção imediata, com base nas respostas.
+
+
+        ### Um paragrafo contendo sugestões de melhorias que podem ser implementadas para aumentar o engajamento e a eficácia da equipe.
+        `;
         const result = await model.generateContent(prompt);
         const response = result.response;
         const text = response.text();
 
-        // Transform the data into trends format
-        const trends: Trend[] = [
-            {
-                title: 'Comunicação',
-                description: `Nível de comunicação: ${calculateCommunicationScore(rModelData.nodes)}%`,
-                type: 'info',
-            },
-            {
-                title: 'Atenção Necessária',
-                description: `${countLowScores(rModelData.nodes)} relações precisam de atenção`,
-                type: 'warning',
-            },
-            {
-                title: 'Efetividade',
-                description: `Efetividade média: ${calculateEffectivenessScore(rModelData.nodes)}%`,
-                type: 'success',
-            },
-        ];
-
         return NextResponse.json({
             analysis: text,
-            trends,
         });
     } catch (error) {
         console.error('Error in Team Analysis API:', error);
         return NextResponse.json({ error: 'Failed to process team analysis' }, { status: 500 });
     }
-}
-
-function calculateCommunicationScore(nodes: RModelData['nodes']): number {
-    const scores = nodes
-        .filter((node) => node.Comunicacao !== undefined)
-        .map((node) => {
-            const score = Number(node.Comunicacao);
-            return isNaN(score) ? 0 : score;
-        });
-
-    if (scores.length === 0) return 0;
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-}
-
-function countLowScores(nodes: RModelData['nodes']): number {
-    return nodes.filter((node) => {
-        const scores = [node.Clareza ?? 0, node.Objetividade ?? 0, node.Efetividade ?? 0];
-        return scores.some((score) => score < 6);
-    }).length;
-}
-
-function calculateEffectivenessScore(nodes: RModelData['nodes']): number {
-    const scores = nodes
-        .filter((node) => node.Efetividade !== undefined)
-        .map((node) => node.Efetividade ?? 0);
-
-    if (scores.length === 0) return 0;
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
 }

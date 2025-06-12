@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Info, Loader2 } from 'lucide-react';
 import { Network } from 'vis-network/standalone/esm/vis-network';
 
 type DashboardNetworkGraphProps = {
@@ -210,14 +211,18 @@ export function DashboardNetworkGraph({ surveyId }: DashboardNetworkGraphProps) 
           <div ref={containerRef} className="absolute inset-0" />
 
           {loading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center text-gray-500">
-              Carregando gráfico...
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center py-12 bg-background/80">
+              <Loader2 className="w-10 h-10 mb-4 animate-spin text-blue-400" />
+              <p className="text-lg font-semibold text-muted-foreground mb-2">Carregando gráfico...</p>
+              <p className="text-sm text-muted-foreground">Aguarde enquanto processamos as respostas para gerar o gráfico de conexões da equipe.</p>
             </div>
           )}
 
           {hasError && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center text-gray-500">
-              Sem respostas da pesquisa até o momento.
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-muted-foreground py-12 bg-background/80">
+              <Info className="w-10 h-10 mb-4 text-blue-400" />
+              <p className="text-lg font-semibold">Nenhuma resposta recebida ainda</p>
+              <p className="text-sm">Assim que as respostas forem recebidas, o gráfico de conexões da equipe será exibido aqui.</p>
             </div>
           )}
         </div>

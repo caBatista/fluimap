@@ -75,9 +75,6 @@ export default function CreateDashboardPage() {
             respondents = 0;
           }
 
-          console.log('respondents count:', respondents);
-          console.log('responsesCount:', survey.responsesCount);
-
           const responsesCount = survey.responsesCount ?? 0;
           const progress = respondents > 0 ? Math.round((responsesCount / respondents) * 100) : 0;
 
@@ -161,13 +158,13 @@ export default function CreateDashboardPage() {
 
       <DashboardNetworkGraph surveyId={selectedSurveyId} />
 
-      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <DashboardRecentForms surveys={recentSurveys} />
-
-        <DashboardEngagement
-          activeSurveys={totalActiveSurveys}
-          closedSurveys={totalClosedSurveys}
-        />
+      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2 ">
+        <div className="flex flex-col h-full">
+          <DashboardRecentForms surveys={recentSurveys} />
+        </div>
+        <div className="flex flex-col h-full">
+          <DashboardEngagement surveyId={selectedSurveyId} />
+        </div>
       </div>
     </div>
   );
