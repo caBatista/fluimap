@@ -19,13 +19,6 @@ type WelcomeEmailProps = {
   link?: string;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL
-  ? `https://${process.env.NEXT_PUBLIC_API_URL}`
-  : 'localhost:3000';
-
-const fallbackImageUrl =
-  'https://raw.githubusercontent.com/caBatista/fluimap/main/public/LogoFluiMap.png';
-
 const SurveyEmail = ({ username = 'Steve', link }: WelcomeEmailProps) => {
   const previewText = `Anwser you survey, ${username}!`;
 
@@ -38,7 +31,7 @@ const SurveyEmail = ({ username = 'Steve', link }: WelcomeEmailProps) => {
           <Container className="mx-auto my-10 w-[465px] p-5">
             <Section className="mt-8">
               <Img
-                src={baseUrl ? `${baseUrl}/LogoFluiMap.png` : fallbackImageUrl}
+                src="https://raw.githubusercontent.com/caBatista/fluimap/main/public/LogoFluiMap.png"
                 width="250"
                 height="250"
                 alt="Logo FluiMap"
