@@ -1,19 +1,21 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList, Users, BarChart2 } from 'lucide-react';
+import { ClipboardList, Users, BarChart2, Layers } from 'lucide-react';
 
 interface DashboardCardsProps {
   activeSurveys: number;
   closedSurveys: number;
   responsesCount: number;
   surveyId?: string;
+  totalTeams: number;
 }
 
 export function DashboardCards({
   activeSurveys,
   closedSurveys,
   responsesCount,
+  totalTeams,
 }: DashboardCardsProps) {
   const cards = [
     {
@@ -31,10 +33,15 @@ export function DashboardCards({
       value: responsesCount,
       icon: <BarChart2 className="text-indigo-400" />,
     },
+    {
+      title: 'Times',
+      value: totalTeams,
+      icon: <Layers className="text-orange-500" />,
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, index) => (
         <Card key={index} className="rounded-2xl shadow-md">
           <CardContent className="p-4">
