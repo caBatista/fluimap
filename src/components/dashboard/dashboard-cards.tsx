@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList, Users, BarChart2, Star } from 'lucide-react';
+import { ClipboardList, Users, BarChart2, Star, Clock, Activity } from 'lucide-react';
 
 interface DashboardCardsProps {
   activeTab: number;
@@ -43,10 +43,26 @@ export function DashboardCards({ activeTab, totalTeams, recentSurvey }: Dashboar
       trendDescription: 'do último trimestre',
       trendColor: 'text-red-500',
     },
+    {
+      title: 'Tempo médio de resposta',
+      value: '4h 32m',
+      icon: <Clock className="text-orange-400" />,
+      trend: '-8%',
+      trendDescription: 'em relação à semana passada',
+      trendColor: 'text-green-500',
+    },
+    {
+      title: 'Atividade recente',
+      value: '26 ações',
+      icon: <Activity className="text-purple-500" />,
+      trend: '+15%',
+      trendDescription: 'nas últimas 24h',
+      trendColor: 'text-green-500',
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {cards.map((card, index) => (
         <Card key={index} className="rounded-2xl shadow-md">
           <CardContent className="p-4">
@@ -60,7 +76,8 @@ export function DashboardCards({ activeTab, totalTeams, recentSurvey }: Dashboar
               </div>
             </div>
             <p className={`mt-2 text-sm ${card.trendColor}`}>
-              {card.trend} <span className="text-muted-foreground">{card.trendDescription}</span>
+              {card.trend}{' '}
+              <span className="text-muted-foreground">{card.trendDescription}</span>
             </p>
           </CardContent>
         </Card>
